@@ -17,6 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { siteConfig } from "@/config/site";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import SidebarHistory from "./sidebar-history";
@@ -31,19 +32,19 @@ export function AppSidebar({ user }: AppSidebarProps) {
   const { setOpenMobile } = useSidebar();
 
   return (
-    <Sidebar className="group-data-[side=left]:border-r-0">
+    <Sidebar>
       <SidebarHeader>
         <SidebarMenu>
           <div className="flex flex-row justify-between items-center">
             <Link
-              href="/"
+              href="/chat"
               onClick={() => {
                 setOpenMobile(false);
               }}
               className="flex flex-row gap-3 items-center"
             >
-              <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
-                Chatbot
+              <span className="text-lg font-medium px-2  cursor-pointer">
+                {siteConfig.name}
               </span>
             </Link>
             <Tooltip>
@@ -54,8 +55,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                   className="p-2 h-fit"
                   onClick={() => {
                     setOpenMobile(false);
-                    router.push("/");
-                    router.refresh();
+                    router.push("/chat");
                   }}
                 >
                   <PlusIcon />

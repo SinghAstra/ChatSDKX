@@ -1,4 +1,4 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
@@ -29,10 +29,7 @@ const ChatLayout = async ({ children }: ChatLayoutProps) => {
   return (
     <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar user={session.user} />
-      <main>
-        <SidebarTrigger />
-        {children}
-      </main>
+      <main>{children}</main>
     </SidebarProvider>
   );
 };
