@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,12 +7,22 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "./ui/sidebar";
+} from "@/components/ui/sidebar";
+import { Chat } from "@prisma/client";
+import {
+  CheckCircleIcon,
+  GlobeIcon,
+  LockIcon,
+  MoreHorizontalIcon,
+  ShareIcon,
+  TrashIcon,
+} from "lucide-react";
+import Link from "next/link";
 
 export const ChatItem = ({
   chat,
@@ -26,11 +35,9 @@ export const ChatItem = ({
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
 }) => {
-  const { visibilityType, setVisibilityType } = useChatVisibility({
-    chatId: chat.id,
-    initialVisibility: chat.visibility,
-  });
-
+  const handleVisibility = () => {
+    console.log("handleVisibility is called");
+  };
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild isActive={isActive}>
@@ -60,29 +67,23 @@ export const ChatItem = ({
               <DropdownMenuSubContent>
                 <DropdownMenuItem
                   className="cursor-pointer flex-row justify-between"
-                  onClick={() => {
-                    setVisibilityType("private");
-                  }}
+                  onClick={() => handleVisibility}
                 >
                   <div className="flex flex-row gap-2 items-center">
                     <LockIcon size={12} />
                     <span>Private</span>
                   </div>
-                  {visibilityType === "private" ? (
-                    <CheckCircleFillIcon />
-                  ) : null}
+                  {chat.visibility === "private" ? <CheckCircleIcon /> : null}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer flex-row justify-between"
-                  onClick={() => {
-                    setVisibilityType("public");
-                  }}
+                  onClick={handleVisibility}
                 >
                   <div className="flex flex-row gap-2 items-center">
                     <GlobeIcon />
                     <span>Public</span>
                   </div>
-                  {visibilityType === "public" ? <CheckCircleFillIcon /> : null}
+                  {chat.visibility === "public" ? <CheckCircleIcon /> : null}
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>

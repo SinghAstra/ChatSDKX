@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/sidebar";
 import { Chat } from "@prisma/client";
 import { isToday, isYesterday, subMonths, subWeeks } from "date-fns";
-import { User } from "next-auth";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -63,7 +62,7 @@ const groupChatsByDate = (chats: Chat[]): GroupedChats => {
   }, initialGroups);
 };
 
-export function SidebarHistory({ user }: { user: User }) {
+export function SidebarHistory() {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
 

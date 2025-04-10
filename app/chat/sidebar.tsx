@@ -21,7 +21,7 @@ import { siteConfig } from "@/config/site";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { SidebarHistory } from "./sidebar-history";
-import SidebarUserNav from "./sidebar-user-nav";
+import { SidebarUserNav } from "./sidebar-user-nav";
 
 interface AppSidebarProps {
   user: User;
@@ -67,9 +67,11 @@ export function AppSidebar({ user }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarHistory user={user} />
+        <SidebarHistory />
       </SidebarContent>
-      <SidebarFooter>{user && <SidebarUserNav user={user} />}</SidebarFooter>
+      <SidebarFooter>
+        <SidebarUserNav user={user} />
+      </SidebarFooter>
     </Sidebar>
   );
 }
