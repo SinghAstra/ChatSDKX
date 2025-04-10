@@ -38,19 +38,20 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
             delay={0.2}
           >
             <GradientButton onClick={handleGetStarted}>
-              ✨ Start Learning DSA
+              ✨ Start Building with AI
             </GradientButton>
 
             <h1 className="text-foreground text-center py-6 text-5xl font-medium text-balance sm:text-6xl md:text-7xl lg:text-8xl  w-full">
-              Master <br />
+              Build{" "}
               <span className="text-transparent bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text inline-bloc">
-                DSA
+                AI Apps
               </span>
             </h1>
 
             <p className="mb-4 text-lg tracking-tight text-muted-foreground md:text-xl text-balance">
-              Your personal AI tutor for learning DSA &
-              <br />I will guide you every step of the way.
+              Kickstart your project with a full-stack template powered by
+              <br />
+              Vercel AI SDK, App Router, shadcn/ui, and more.
             </p>
             <div className="flex items-center justify-center gap-4 z-50">
               <BackgroundShine className="rounded-md">
@@ -109,10 +110,9 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
             className="flex flex-col items-center justify-center gap-8  "
           >
             <h1 className="mt-8 text-foreground py-4  text-center text-4xl font-medium tracking-tight md:text-7xl">
-              Master <br />
-              Data Structures
-              <br /> & <br />
-              Algorithms
+              Build <br />
+              Full-Stack AI Apps <br />
+              with Ease
             </h1>
             <BackgroundShine>
               <Link
