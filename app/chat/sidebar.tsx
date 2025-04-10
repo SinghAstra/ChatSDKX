@@ -20,7 +20,7 @@ import {
 import { siteConfig } from "@/config/site";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import SidebarHistory from "./sidebar-history";
+import { SidebarHistory } from "./sidebar-history";
 import SidebarUserNav from "./sidebar-user-nav";
 
 interface AppSidebarProps {
