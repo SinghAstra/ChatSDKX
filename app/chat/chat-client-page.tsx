@@ -2,16 +2,29 @@
 
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
+import { Visibility } from "@prisma/client";
+import { UIMessage } from "ai";
 import React from "react";
 import { ModelSelector } from "./model-selector";
 import { SidebarToggle } from "./sidebar-toggle";
 import { VisibilitySelector } from "./visibility-selector";
 
 interface ChatClientPageProps {
-  initialChatModelId: string;
+  id: string;
+  initialMessages: UIMessage[];
+  isReadOnly: boolean;
+
+  chatModel: string;
+  chatVisibility: Visibility;
 }
 
-const ChatClientPage = ({ initialChatModelId }: ChatClientPageProps) => {
+const ChatClientPage = ({
+  chatModel,
+  chatVisibility,
+  id,
+  initialMessages,
+  isReadOnly,
+}: ChatClientPageProps) => {
   const { open, setOpen } = useSidebar();
   return (
     <div className="h-screen flex flex-col">
@@ -27,8 +40,8 @@ const ChatClientPage = ({ initialChatModelId }: ChatClientPageProps) => {
             </span>
           )}
         </div>
-        <ModelSelector initialChatModelId={initialChatModelId} />
-        <VisibilitySelector />
+        {!isReadOnly && <ModelSelector chatModel={chatModel} />}
+        {!isReadOnly && <VisibilitySelector chatVisibility={chatVisibility} />}
       </div>
       <div className="flex-1 flex items-center justify-center"></div>
     </div>

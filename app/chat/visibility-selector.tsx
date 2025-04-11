@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { Visibility } from "@prisma/client";
 import {
   ChevronDownIcon,
   CircleCheck,
@@ -15,17 +16,16 @@ import {
   LockIcon,
 } from "lucide-react";
 import { ReactNode, useState } from "react";
+import { saveChatVisibilityAsCookie } from "./action";
 
-export type VisibilityType = "private" | "public";
-
-interface Visibility {
-  id: VisibilityType;
+interface VisibilityObject {
+  id: Visibility;
   label: string;
   description: string;
   icon: ReactNode;
 }
 
-const visibilities: Visibility[] = [
+const visibilities: VisibilityObject[] = [
   {
     id: "private",
     label: "Private",
@@ -40,10 +40,16 @@ const visibilities: Visibility[] = [
   },
 ];
 
-export function VisibilitySelector() {
+interface VisibilitySelectorProps {
+  chatVisibility: Visibility;
+}
+
+export function VisibilitySelector({
+  chatVisibility,
+}: VisibilitySelectorProps) {
   const [open, setOpen] = useState(false);
   const [visibilityType, setVisibilityType] =
-    useState<VisibilityType>("public");
+    useState<Visibility>(chatVisibility);
   const selectedVisibility = visibilities.find(
     (visibility) => visibility.id === visibilityType
   );
@@ -71,8 +77,9 @@ export function VisibilitySelector() {
           <DropdownMenuItem
             key={visibility.id}
             onSelect={() => {
-              setVisibilityType(visibility.id);
               setOpen(false);
+              setVisibilityType(visibility.id);
+              saveChatVisibilityAsCookie(visibility.id);
             }}
             className="gap-4 group/item flex flex-row justify-between items-center"
             data-active={visibility.id === visibilityType}

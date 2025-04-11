@@ -2,6 +2,7 @@
 
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
+import { Visibility } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 
@@ -33,4 +34,9 @@ export async function fetchChats() {
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
   cookieStore.set("chat-model", model);
+}
+
+export async function saveChatVisibilityAsCookie(visibility: Visibility) {
+  const cookieStore = await cookies();
+  cookieStore.set("chat-visibility", visibility);
 }

@@ -15,15 +15,15 @@ import { ChevronDownIcon, CircleCheck } from "lucide-react";
 import { saveChatModelAsCookie } from "./action";
 
 interface ModelSelectorProps {
-  initialChatModelId: string;
+  chatModel: string;
 }
 
-export function ModelSelector({ initialChatModelId }: ModelSelectorProps) {
+export function ModelSelector({ chatModel }: ModelSelectorProps) {
   const [open, setOpen] = useState(false);
-  const [selectedModelId, setSelectedModelId] = useState(initialChatModelId);
+  const [selectedModel, setSelectedModel] = useState(chatModel);
 
   const selectedChatModel = chatModels.find(
-    (chatModel) => chatModel.id === selectedModelId
+    (chatModel) => chatModel.id === selectedModel
   );
 
   return (
@@ -49,10 +49,10 @@ export function ModelSelector({ initialChatModelId }: ModelSelectorProps) {
               key={id}
               onSelect={() => {
                 setOpen(false);
-                setSelectedModelId(id);
+                setSelectedModel(id);
                 saveChatModelAsCookie(id);
               }}
-              data-active={id === selectedModelId}
+              data-active={id === selectedModel}
               asChild
             >
               <button
