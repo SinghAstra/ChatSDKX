@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
+import { fetchChats } from "./action";
 import { AppSidebar } from "./sidebar";
 
 interface ChatLayoutProps {
@@ -22,14 +23,15 @@ const ChatLayout = async ({ children }: ChatLayoutProps) => {
   const cookieStore = await cookies();
   const initialSidebarState =
     cookieStore.get("sidebar-state")?.value === "true";
-  const initialChatModelId = cookieStore.get("chat-model")?.value;
   if (!session) {
     redirect("/auth/sign-in");
   }
 
+  const response = await fetchChats();
+
   return (
     <SidebarProvider defaultOpen={initialSidebarState}>
-      <AppSidebar user={session.user} />
+      <AppSidebar user={session.user} chats={response.chats} />
       <main>{children}</main>
     </SidebarProvider>
   );

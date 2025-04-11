@@ -18,16 +18,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { siteConfig } from "@/config/site";
+import { Chat } from "@prisma/client";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
-import { SidebarHistory } from "./sidebar-history";
+import { ChatHistory } from "./chat-history";
 import { SidebarUserNav } from "./sidebar-user-nav";
 
 interface AppSidebarProps {
   user: User;
+  chats: Chat[];
 }
 
-export function AppSidebar({ user }: AppSidebarProps) {
+export function AppSidebar({ user, chats }: AppSidebarProps) {
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
 
@@ -67,7 +69,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarHistory />
+        <ChatHistory chats={chats} />
       </SidebarContent>
       <SidebarFooter>
         <SidebarUserNav user={user} />

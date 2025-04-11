@@ -1,32 +1,13 @@
-"use client";
-
-import { useSidebar } from "@/components/ui/sidebar";
-import { siteConfig } from "@/config/site";
+import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { cookies } from "next/headers";
 import React from "react";
-import { ModelSelector } from "./model-selector";
-import { SidebarToggle } from "./sidebar-toggle";
+import ChatClientPage from "./chat-client-page";
 
-const ChatPage = () => {
-  const { open, setOpen } = useSidebar();
-  return (
-    <div className="h-screen flex flex-col">
-      <div className="flex items-center gap-2 p-2">
-        <div className="flex items-center gap-2">
-          <SidebarToggle />{" "}
-          {!open && (
-            <span
-              className="text-lg font-medium cursor-pointer"
-              onClick={() => setOpen(true)}
-            >
-              {siteConfig.name}
-            </span>
-          )}
-        </div>
-        <ModelSelector />
-      </div>
-      <div className="flex-1 flex items-center justify-center"></div>
-    </div>
-  );
+const ChatPage = async () => {
+  const cookieStore = await cookies();
+  const initialChatModelId =
+    cookieStore.get("chat-model")?.value || DEFAULT_CHAT_MODEL;
+  return <ChatClientPage initialChatModelId={initialChatModelId} />;
 };
 
 export default ChatPage;

@@ -19,7 +19,6 @@ import { isToday, isYesterday, subMonths, subWeeks } from "date-fns";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { fetchChats } from "./action";
 import { ChatItem } from "./sidebar-history-item";
 
 type GroupedChats = {
@@ -62,7 +61,11 @@ const groupChatsByDate = (chats: Chat[]): GroupedChats => {
   }, initialGroups);
 };
 
-export function SidebarHistory() {
+interface ChatHistoryProps {
+  chats: Chat[];
+}
+
+export function ChatHistory({ chats }: ChatHistoryProps) {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
 
@@ -70,27 +73,6 @@ export function SidebarHistory() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [chats, setChats] = useState<Chat[]>([]);
-  const [isFetchingChats, setIsFetchingChats] = useState(true);
-
-  useEffect(() => {
-    const fetchChat = async () => {
-      try {
-        setIsFetchingChats(true);
-        const response = await fetchChats();
-        setChats(response.chats);
-      } catch (error) {
-        if (error instanceof Error) {
-          console.log("error.stack is ", error.stack);
-          console.log("error.message is ", error.message);
-          setMessage(error.message);
-        }
-      } finally {
-        setIsFetchingChats(false);
-      }
-    };
-    fetchChat();
-  }, []);
 
   useEffect(() => {
     if (!message) return;
@@ -111,18 +93,6 @@ export function SidebarHistory() {
       router.push("/");
     }
   };
-
-  if (isFetchingChats) {
-    return (
-      <SidebarGroup>
-        <SidebarGroupContent>
-          <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
-            Wait Fetching Chats
-          </div>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    );
-  }
 
   if (chats.length === 0) {
     return (

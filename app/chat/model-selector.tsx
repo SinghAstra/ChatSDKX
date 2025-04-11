@@ -9,14 +9,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { chatModels, DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { chatModels } from "@/lib/ai/models";
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon, CircleCheck } from "lucide-react";
 import { saveChatModelAsCookie } from "./action";
 
-export function ModelSelector() {
+interface ModelSelectorProps {
+  initialChatModelId: string;
+}
+
+export function ModelSelector({ initialChatModelId }: ModelSelectorProps) {
   const [open, setOpen] = useState(false);
-  const [selectedModelId, setSelectedModelId] = useState(DEFAULT_CHAT_MODEL);
+  const [selectedModelId, setSelectedModelId] = useState(initialChatModelId);
 
   const selectedChatModel = chatModels.find(
     (chatModel) => chatModel.id === selectedModelId
