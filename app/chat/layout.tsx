@@ -20,14 +20,15 @@ export async function generateMetadata() {
 const ChatLayout = async ({ children }: ChatLayoutProps) => {
   const session = await getServerSession(authOptions);
   const cookieStore = await cookies();
-  const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
-  //   console.log("cookieStore.getAll() is ", cookieStore.getAll());
+  const initialSidebarState =
+    cookieStore.get("sidebar-state")?.value === "true";
+  const initialChatModelId = cookieStore.get("chat-model")?.value;
   if (!session) {
     redirect("/auth/sign-in");
   }
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider defaultOpen={initialSidebarState}>
       <AppSidebar user={session.user} />
       <main>{children}</main>
     </SidebarProvider>

@@ -3,6 +3,7 @@
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 
 export async function fetchChats() {
   try {
@@ -27,4 +28,9 @@ export async function fetchChats() {
     }
     return { message: "Failed to Fetch Chats", chats: [] };
   }
+}
+
+export async function saveChatModelAsCookie(model: string) {
+  const cookieStore = await cookies();
+  cookieStore.set("chat-model", model);
 }
