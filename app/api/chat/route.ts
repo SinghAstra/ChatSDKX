@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth-options";
-import { anthropic } from "@ai-sdk/anthropic";
-import { Message, streamText } from "ai";
+import { google } from "@ai-sdk/google";
+import { Message, streamText, StreamTextResult, ToolSet } from "ai";
 import { getServerSession } from "next-auth";
 
 export async function POST(req: Request) {
@@ -15,9 +15,20 @@ export async function POST(req: Request) {
   if (!session) {
     return new Response("Unauthorized", { status: 401 });
   }
-
-  const result = await streamText({
-    model: openai(""),
+  let result: StreamTextResult<ToolSet, never>;
+  try {
+    result = await streamText({
+      model: google("gemini-1.5-pro-latest"),
+      messages: messages as Message[],
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
+  }
+  result = await streamText({
+    model: google("gemini-1.5-pro-latest"),
     messages: messages as Message[],
   });
 
