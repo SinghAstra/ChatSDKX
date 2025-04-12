@@ -1,4 +1,5 @@
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { generateID } from "@/lib/utils";
 import { Visibility } from "@prisma/client";
 import { cookies } from "next/headers";
 import React from "react";
@@ -10,8 +11,19 @@ const ChatPage = async () => {
   const chatVisibility =
     (cookieStore.get("chat-visibility")?.value as Visibility) ||
     ("private" as Visibility);
+
+  const id = generateID();
+
+  console.log("In chat/page.tsx id is ", id);
+
   return (
-    <ChatClientPage chatModel={chatModel} chatVisibility={chatVisibility} />
+    <ChatClientPage
+      id={id}
+      initialMessages={[]}
+      chatModel={chatModel}
+      chatVisibility={chatVisibility}
+      isReadOnly={false}
+    />
   );
 };
 
