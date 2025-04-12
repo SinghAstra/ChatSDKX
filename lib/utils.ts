@@ -1,5 +1,5 @@
 import { google } from "@ai-sdk/google";
-import { generateText, Message } from "ai";
+import { generateText, Message, UIMessage } from "ai";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -68,4 +68,9 @@ export async function generateTitleFromUserMessage({
   });
 
   return title;
+}
+
+export function getMostRecentUserMessage(messages: UIMessage[]) {
+  const userMessages = messages.filter((message) => message.role === "user");
+  return userMessages.at(-1);
 }
