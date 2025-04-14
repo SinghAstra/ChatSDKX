@@ -9,21 +9,22 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { chatModels } from "@/lib/ai/models";
+import { ChatReasoningId } from "@/interfaces/ai";
+import { chatReasoning } from "@/lib/ai/models";
 import { cn } from "@/lib/utils";
 import { ChevronDownIcon, CircleCheck } from "lucide-react";
 import { saveChatModelAsCookie } from "./action";
 
-interface ModelSelectorProps {
-  chatModel: string;
+interface ReasoningSelectorProps {
+  chatReasoningId: ChatReasoningId;
 }
 
-export function ModelSelector({ chatModel }: ModelSelectorProps) {
+export function ReasoningSelector({ chatReasoningId }: ReasoningSelectorProps) {
   const [open, setOpen] = useState(false);
-  const [selectedModel, setSelectedModel] = useState(chatModel);
+  const [selectedReasoning, setSelectedReasoning] = useState(chatReasoningId);
 
-  const selectedChatModel = chatModels.find(
-    (chatModel) => chatModel.id === selectedModel
+  const selectedChatModel = chatReasoning.find(
+    (chatReasoning) => chatReasoning.id === selectedReasoning
   );
 
   return (
@@ -40,8 +41,8 @@ export function ModelSelector({ chatModel }: ModelSelectorProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="min-w-[300px]">
-        {chatModels.map((chatModel) => {
-          const { id } = chatModel;
+        {chatReasoning.map((reasoning) => {
+          const { id } = reasoning;
 
           return (
             <DropdownMenuItem
@@ -49,10 +50,10 @@ export function ModelSelector({ chatModel }: ModelSelectorProps) {
               key={id}
               onSelect={() => {
                 setOpen(false);
-                setSelectedModel(id);
+                setSelectedReasoning(id);
                 saveChatModelAsCookie(id);
               }}
-              data-active={id === selectedModel}
+              data-active={id === selectedReasoning}
               asChild
             >
               <button
@@ -60,9 +61,9 @@ export function ModelSelector({ chatModel }: ModelSelectorProps) {
                 className="gap-4 group/item flex flex-row justify-between items-center w-full"
               >
                 <div className="flex flex-col gap-1 items-start">
-                  <div>{chatModel.name}</div>
+                  <div>{reasoning.name}</div>
                   <div className="text-xs text-muted-foreground">
-                    {chatModel.description}
+                    {reasoning.description}
                   </div>
                 </div>
 

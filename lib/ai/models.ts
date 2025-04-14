@@ -1,20 +1,16 @@
-interface ChatModel {
-  id: string;
-  name: string;
-  description: string;
-}
+import { ChatReasoning } from "@/interfaces/ai";
 
-export const chatModels: ChatModel[] = [
+export const chatReasoning: ChatReasoning[] = [
   {
-    id: "chat-model",
-    name: "Chat model",
+    id: "regular-model",
+    name: "Regular model",
     description: "Primary model for all-purpose chat",
   },
   {
-    id: "chat-model-reasoning",
+    id: "reasoning-model",
     name: "Reasoning model",
     description: "Uses advanced reasoning",
   },
 ];
 
-export const DEFAULT_CHAT_MODEL: string = chatModels[0].id;
+export const DEFAULT_CHAT_REASONING: string = chatReasoning[0].id;

@@ -33,7 +33,7 @@ export async function fetchChats() {
 
 export async function saveChatModelAsCookie(model: string) {
   const cookieStore = await cookies();
-  cookieStore.set("chat-model", model);
+  cookieStore.set("chat-reasoning", model);
 }
 
 export async function saveChatVisibilityAsCookie(visibility: Visibility) {

@@ -1,4 +1,5 @@
-import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { ChatReasoningId } from "@/interfaces/ai";
+import { DEFAULT_CHAT_REASONING } from "@/lib/ai/models";
 import { generateID } from "@/lib/utils";
 import { Visibility } from "@prisma/client";
 import { cookies } from "next/headers";
@@ -7,7 +8,9 @@ import ChatClientPage from "./chat-client-page";
 
 const ChatPage = async () => {
   const cookieStore = await cookies();
-  const chatModel = cookieStore.get("chat-model")?.value || DEFAULT_CHAT_MODEL;
+  const chatReasoningId =
+    (cookieStore.get("chat-reasoning")?.value as ChatReasoningId) ||
+    (DEFAULT_CHAT_REASONING as ChatReasoningId);
   const chatVisibility =
     (cookieStore.get("chat-visibility")?.value as Visibility) ||
     ("private" as Visibility);
@@ -20,7 +23,7 @@ const ChatPage = async () => {
     <ChatClientPage
       id={id}
       initialMessages={[]}
-      chatModel={chatModel}
+      chatReasoningId={chatReasoningId}
       chatVisibility={chatVisibility}
       isReadOnly={false}
     />

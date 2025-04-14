@@ -10,3 +10,11 @@ export const chatModelNames = [
 ] as const;
 
 export type ChatModel = (typeof chatModelNames)[number];
+
+export type ChatReasoningId = "regular-model" | "reasoning-model";
+
+export interface ChatReasoning {
+  id: ChatReasoningId;
+  name: string;
+  description: string;
+}
