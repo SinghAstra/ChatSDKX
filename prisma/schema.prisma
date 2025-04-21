@@ -110,7 +110,7 @@ model Document {
   user       User        @relation(fields: [userId], references: [id])
   suggestions Suggestion[]
 
-  @@id([id, createdAt])
+  @@id([id])
 }
 
 // Suggestion
@@ -126,7 +126,7 @@ model Suggestion {
   createdAt           DateTime
 
   user                User     @relation(fields: [userId], references: [id])
-  document            Document @relation(fields: [documentId, documentCreatedAt], references: [id, createdAt])
+  document            Document @relation(fields: [documentId], references: [id])
 }
 
 

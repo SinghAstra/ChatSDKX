@@ -14,7 +14,7 @@ const AuthLayout = async ({ children }: AuthLayoutProps) => {
   if (isLoggedIn) {
     redirect("/chat");
   }
-  return { children };
+  return children;
 };
 
 export default AuthLayout;
