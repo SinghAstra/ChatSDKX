@@ -75,15 +75,21 @@ export async function POST(request: Request) {
       }
     }
 
+    let parsedUserExperimentalAttachments = [];
+
+    if (userMessage.experimental_attachments) {
+      parsedUserExperimentalAttachments = JSON.parse(
+        JSON.stringify(userMessage.experimental_attachments)
+      );
+    }
+
     await prisma.message.create({
       data: {
         chatId: id,
         id: userMessage.id,
         role: "user",
         parts: JSON.parse(JSON.stringify(userMessage.parts)),
-        attachments:
-          JSON.parse(JSON.stringify(userMessage.experimental_attachments)) ??
-          [],
+        attachments: parsedUserExperimentalAttachments,
         createdAt: new Date(),
       },
     });
@@ -135,16 +141,21 @@ export async function POST(request: Request) {
                   responseMessages: response.messages,
                 });
 
+                let parsedAssistantExperimentalAttachments = [];
+
+                if (assistantMessage.experimental_attachments) {
+                  parsedAssistantExperimentalAttachments = JSON.parse(
+                    JSON.stringify(assistantMessage.experimental_attachments)
+                  );
+                }
+
                 await prisma.message.create({
                   data: {
                     id: assistantId,
                     chatId: id,
                     role: assistantMessage.role,
                     parts: JSON.parse(JSON.stringify(userMessage.parts)),
-                    attachments:
-                      JSON.parse(
-                        JSON.stringify(userMessage.experimental_attachments)
-                      ) ?? [],
+                    attachments: parsedAssistantExperimentalAttachments,
                     createdAt: new Date(),
                   },
                 });

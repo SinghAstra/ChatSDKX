@@ -3,10 +3,10 @@ import { imageDocumentHandler } from "@/artifacts/image/server";
 import { sheetDocumentHandler } from "@/artifacts/sheet/server";
 import { textDocumentHandler } from "@/artifacts/text/server";
 import { ArtifactKind } from "@/components/artifact";
+import { Document } from "@prisma/client";
 import { DataStreamWriter } from "ai";
 import { Session } from "next-auth";
-import { saveDocument } from "../db/queries";
-import { Document } from "../db/schema";
+import { prisma } from "../prisma";
 
 export interface SaveDocumentProps {
   id: string;
@@ -52,12 +52,15 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
       });
 
       if (args.session?.user?.id) {
-        await saveDocument({
-          id: args.id,
-          title: args.title,
-          content: draftContent,
-          kind: config.kind,
-          userId: args.session.user.id,
+        await prisma.document.create({
+          data: {
+            id: args.id,
+            title: args.title,
+            content: draftContent,
+            kind: config.kind,
+            userId: args.session.user.id,
+            createdAt: new Date(),
+          },
         });
       }
 
@@ -72,12 +75,15 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
       });
 
       if (args.session?.user?.id) {
-        await saveDocument({
-          id: args.document.id,
-          title: args.document.title,
-          content: draftContent,
-          kind: config.kind,
-          userId: args.session.user.id,
+        await prisma.document.create({
+          data: {
+            id: args.document.id,
+            title: args.document.title,
+            content: draftContent,
+            kind: config.kind,
+            userId: args.session.user.id,
+            createdAt: new Date(),
+          },
         });
       }
 
@@ -86,7 +92,10 @@ export function createDocumentHandler<T extends ArtifactKind>(config: {
   };
 }
 
-export const documentHandlersByArtifactKind: DocumentHandler[] = [
+/*
+ * Use this array to define the document handlers for each artifact kind.
+ */
+export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
   textDocumentHandler,
   codeDocumentHandler,
   imageDocumentHandler,
