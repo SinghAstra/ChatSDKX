@@ -10,6 +10,7 @@ import {
   generateID,
   generateTitleFromUserMessage,
   getMostRecentUserMessage,
+  getTrailingMessageId,
 } from "@/lib/utils";
 import {
   UIMessage,
@@ -134,26 +135,30 @@ export async function POST(request: Request) {
                   responseMessages: response.messages,
                 });
 
-                await saveMessages({
-                  messages: [
-                    {
-                      id: assistantId,
-                      chatId: id,
-                      role: assistantMessage.role,
-                      parts: assistantMessage.parts,
-                      attachments:
-                        assistantMessage.experimental_attachments ?? [],
-                      createdAt: new Date(),
-                    },
-                  ],
+                await prisma.message.create({
+                  data: {
+                    id: assistantId,
+                    chatId: id,
+                    role: assistantMessage.role,
+                    parts: JSON.parse(JSON.stringify(userMessage.parts)),
+                    attachments:
+                      JSON.parse(
+                        JSON.stringify(userMessage.experimental_attachments)
+                      ) ?? [],
+                    createdAt: new Date(),
+                  },
                 });
-              } catch (_) {
+              } catch (error) {
+                if (error instanceof Error) {
+                  console.log("error.stack is ", error.stack);
+                  console.log("error.message is ", error.message);
+                }
                 console.error("Failed to save chat");
               }
             }
           },
           experimental_telemetry: {
-            isEnabled: isProductionEnvironment,
+            isEnabled: true,
             functionId: "stream-text",
           },
         });
@@ -169,39 +174,12 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
+    if (error instanceof Error) {
+      console.log("error.stack is ", error.stack);
+      console.log("error.message is ", error.message);
+    }
     return new Response("An error occurred while processing your request!", {
       status: 404,
-    });
-  }
-}
-
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
-
-  if (!id) {
-    return new Response("Not Found", { status: 404 });
-  }
-
-  const session = await auth();
-
-  if (!session || !session.user) {
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  try {
-    const chat = await getChatById({ id });
-
-    if (chat.userId !== session.user.id) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-
-    await deleteChatById({ id });
-
-    return new Response("Chat deleted", { status: 200 });
-  } catch (error) {
-    return new Response("An error occurred while processing your request!", {
-      status: 500,
     });
   }
 }

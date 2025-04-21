@@ -1,7 +1,16 @@
-import { generateText, Message, UIMessage } from "ai";
+import {
+  CoreAssistantMessage,
+  CoreToolMessage,
+  generateText,
+  Message,
+  UIMessage,
+} from "ai";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { myProvider } from "./ai/providers";
+
+type ResponseMessageWithoutId = CoreToolMessage | CoreAssistantMessage;
+type ResponseMessage = ResponseMessageWithoutId & { id: string };
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -73,4 +82,16 @@ export async function generateTitleFromUserMessage({
 export function getMostRecentUserMessage(messages: UIMessage[]) {
   const userMessages = messages.filter((message) => message.role === "user");
   return userMessages.at(-1);
+}
+
+export function getTrailingMessageId({
+  messages,
+}: {
+  messages: ResponseMessage[];
+}): string | null {
+  const trailingMessage = messages.at(-1);
+
+  if (!trailingMessage) return null;
+
+  return trailingMessage.id;
 }
