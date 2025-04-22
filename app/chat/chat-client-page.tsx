@@ -56,7 +56,7 @@ const ChatClientPage = ({
   }, [message]);
 
   return (
-    <div className="h-screen flex flex-col w-full relative border border-yellow-400">
+    <div className="h-screen flex flex-col w-full relative">
       <div className="flex items-center gap-2 p-2">
         <div className="flex items-center gap-2">
           <SidebarToggle />{" "}

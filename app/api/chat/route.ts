@@ -1,9 +1,5 @@
 import { systemPrompt } from "@/lib/ai/prompt";
 import { myProvider } from "@/lib/ai/providers";
-import { createDocument } from "@/lib/ai/tools/create-document";
-import { getWeather } from "@/lib/ai/tools/get-weather";
-import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
-import { updateDocument } from "@/lib/ai/tools/update-document";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import {
@@ -75,21 +71,13 @@ export async function POST(request: Request) {
       }
     }
 
-    let parsedUserExperimentalAttachments = [];
-
-    if (userMessage.experimental_attachments) {
-      parsedUserExperimentalAttachments = JSON.parse(
-        JSON.stringify(userMessage.experimental_attachments)
-      );
-    }
-
     await prisma.message.create({
       data: {
         chatId: id,
         id: userMessage.id,
         role: "user",
         parts: JSON.parse(JSON.stringify(userMessage.parts)),
-        attachments: parsedUserExperimentalAttachments,
+        attachments: [],
         createdAt: new Date(),
       },
     });
@@ -103,26 +91,8 @@ export async function POST(request: Request) {
           system: prompt,
           messages,
           maxSteps: 5,
-          experimental_activeTools:
-            chatReasoningId === "reasoning-model"
-              ? []
-              : [
-                  "getWeather",
-                  "createDocument",
-                  "updateDocument",
-                  "requestSuggestions",
-                ],
           experimental_transform: smoothStream({ chunking: "word" }),
           experimental_generateMessageId: generateID,
-          tools: {
-            getWeather,
-            createDocument: createDocument({ session, dataStream }),
-            updateDocument: updateDocument({ session, dataStream }),
-            requestSuggestions: requestSuggestions({
-              session,
-              dataStream,
-            }),
-          },
           onFinish: async ({ response }) => {
             if (session.user?.id) {
               try {
@@ -141,21 +111,13 @@ export async function POST(request: Request) {
                   responseMessages: response.messages,
                 });
 
-                let parsedAssistantExperimentalAttachments = [];
-
-                if (assistantMessage.experimental_attachments) {
-                  parsedAssistantExperimentalAttachments = JSON.parse(
-                    JSON.stringify(assistantMessage.experimental_attachments)
-                  );
-                }
-
                 await prisma.message.create({
                   data: {
                     id: assistantId,
                     chatId: id,
                     role: assistantMessage.role,
                     parts: JSON.parse(JSON.stringify(userMessage.parts)),
-                    attachments: parsedAssistantExperimentalAttachments,
+                    attachments: [],
                     createdAt: new Date(),
                   },
                 });
