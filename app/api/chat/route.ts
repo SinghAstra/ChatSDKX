@@ -1,4 +1,4 @@
-import { systemPrompt } from "@/lib/ai/prompt";
+import { regularPrompt } from "@/lib/ai/prompt";
 import { myProvider } from "@/lib/ai/providers";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
@@ -24,11 +24,9 @@ export async function POST(request: Request) {
     const {
       id,
       messages,
-      chatReasoningId,
     }: {
       id: string;
       messages: Array<UIMessage>;
-      chatReasoningId: string;
     } = await request.json();
 
     const session = await getServerSession(authOptions);
@@ -40,7 +38,6 @@ export async function POST(request: Request) {
     console.log("Destructured req.json() is ", {
       id,
       messages,
-      chatReasoningId,
     });
 
     const userMessage = getMostRecentUserMessage(messages);
@@ -84,11 +81,9 @@ export async function POST(request: Request) {
 
     return createDataStreamResponse({
       execute: (dataStream) => {
-        const prompt = systemPrompt({ selectedChatModel: chatReasoningId });
-        console.log("prompt is ", prompt);
         const result = streamText({
-          model: myProvider.languageModel(chatReasoningId),
-          system: prompt,
+          model: myProvider.languageModel("regular-model"),
+          system: regularPrompt,
           messages,
           maxSteps: 5,
           experimental_transform: smoothStream({ chunking: "word" }),

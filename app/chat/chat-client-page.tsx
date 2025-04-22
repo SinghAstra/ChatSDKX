@@ -3,14 +3,12 @@
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
-import { ChatReasoningId } from "@/interfaces/ai";
 import { generateID } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { Visibility } from "@prisma/client";
 import { UIMessage } from "ai";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { ReasoningSelector } from "./reasoning-selector";
 import { SidebarToggle } from "./sidebar-toggle";
 import { VisibilitySelector } from "./visibility-selector";
 
@@ -19,12 +17,10 @@ interface ChatClientPageProps {
   initialMessages: UIMessage[];
   isReadOnly: boolean;
 
-  chatReasoningId: ChatReasoningId;
   chatVisibility: Visibility;
 }
 
 const ChatClientPage = ({
-  chatReasoningId,
   chatVisibility,
   id,
   initialMessages,
@@ -35,7 +31,7 @@ const ChatClientPage = ({
 
   const { messages, handleSubmit, input, setInput, status } = useChat({
     id,
-    body: { id, chatReasoningId },
+    body: { id },
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,
@@ -69,7 +65,6 @@ const ChatClientPage = ({
             </span>
           )}
         </div>
-        {!isReadOnly && <ReasoningSelector chatReasoningId={chatReasoningId} />}
         {!isReadOnly && <VisibilitySelector chatVisibility={chatVisibility} />}
       </div>
       <div className="flex-1 flex flex-col p-4 overflow-y-auto pb-12">
