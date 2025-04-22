@@ -73,7 +73,6 @@ model Message {
   chatId     String
   role       String
   parts      Json
-  attachments Json
   createdAt  DateTime
 
   chat       Chat     @relation(fields: [chatId], references: [id])

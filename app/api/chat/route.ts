@@ -74,7 +74,6 @@ export async function POST(request: Request) {
         id: userMessage.id,
         role: "user",
         parts: JSON.parse(JSON.stringify(userMessage.parts)),
-        attachments: [],
         createdAt: new Date(),
       },
     });
@@ -112,7 +111,6 @@ export async function POST(request: Request) {
                     chatId: id,
                     role: assistantMessage.role,
                     parts: JSON.parse(JSON.stringify(userMessage.parts)),
-                    attachments: [],
                     createdAt: new Date(),
                   },
                 });
