@@ -4,7 +4,6 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { generateTitleFromUserMessage } from "@/lib/utils";
 import { Visibility } from "@prisma/client";
-import { Message } from "ai";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 

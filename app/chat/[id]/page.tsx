@@ -5,8 +5,8 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import React from "react";
-import ChatClientPage from "../chat-client-page";
 import { fetchChat } from "./action";
+import ChatClientPage from "./chat-client-page";
 
 const ChatPage = async ({ params }: { params: { id: string } }) => {
   const cookieStore = await cookies();

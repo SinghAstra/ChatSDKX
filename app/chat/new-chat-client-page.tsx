@@ -3,7 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
-import { generateID, getMostRecentUserMessage } from "@/lib/utils";
+import { generateID } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { Visibility } from "@prisma/client";
 import { UIMessage } from "ai";
@@ -14,7 +14,7 @@ import { createChat } from "./action";
 import { SidebarToggle } from "./sidebar-toggle";
 import { VisibilitySelector } from "./visibility-selector";
 
-interface ChatClientPageProps {
+interface NewChatClientPageProps {
   id: string;
   initialMessages: UIMessage[];
   isReadOnly: boolean;
@@ -22,12 +22,12 @@ interface ChatClientPageProps {
   chatVisibility: Visibility;
 }
 
-const ChatClientPage = ({
+const NewChatClientPage = ({
   chatVisibility,
   id,
   initialMessages,
   isReadOnly,
-}: ChatClientPageProps) => {
+}: NewChatClientPageProps) => {
   const { open, setOpen } = useSidebar();
   const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
@@ -121,4 +121,4 @@ const ChatClientPage = ({
   );
 };
 
-export default ChatClientPage;
+export default NewChatClientPage;

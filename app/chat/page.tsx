@@ -2,7 +2,7 @@ import { generateID } from "@/lib/utils";
 import { Visibility } from "@prisma/client";
 import { cookies } from "next/headers";
 import React from "react";
-import ChatClientPage from "./chat-client-page";
+import NewChatClientPage from "./new-chat-client-page";
 
 const ChatPage = async () => {
   const cookieStore = await cookies();
@@ -13,7 +13,7 @@ const ChatPage = async () => {
   const id = generateID();
 
   return (
-    <ChatClientPage
+    <NewChatClientPage
       id={id}
       initialMessages={[]}
       chatVisibility={chatVisibility}

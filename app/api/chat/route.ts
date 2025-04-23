@@ -53,9 +53,7 @@ export async function POST(request: Request) {
     console.log("chat is ", chat);
 
     if (!chat) {
-      const title = await generateTitleFromUserMessage({
-        message: userMessage,
-      });
+      const title = await generateTitleFromUserMessage(userMessage.content);
 
       const newChat = await prisma.chat.create({
         data: { id, userId: session.user.id, title, createdAt: new Date() },
