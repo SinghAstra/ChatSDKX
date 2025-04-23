@@ -163,3 +163,60 @@ pre > code {
   border-radius: 4px;
   background-color: hsl(var(--muted) / 0.2);
 }
+
+/* Custom animations for loading state */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-in-out;
+  }
+
+  .animate-width-grow {
+    animation: widthGrow 1.5s ease-in-out infinite;
+  }
+
+  .animate-loading-dot {
+    animation: loadingDot 1.4s infinite;
+  }
+
+  .animation-delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .animation-delay-400 {
+    animation-delay: 0.4s;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes widthGrow {
+  0% {
+    width: 0;
+    opacity: 0.7;
+  }
+  50% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    opacity: 0.7;
+  }
+}
+
+@keyframes loadingDot {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 1;
+  }
+}
