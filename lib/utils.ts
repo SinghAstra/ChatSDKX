@@ -2,7 +2,6 @@ import {
   CoreAssistantMessage,
   CoreToolMessage,
   generateText,
-  Message,
   UIMessage,
 } from "ai";
 import { clsx, type ClassValue } from "clsx";
@@ -61,11 +60,7 @@ export function getIconName(name: string) {
   return fileExtensionIconMap[ext as keyof typeof fileExtensionIconMap];
 }
 
-export async function generateTitleFromUserMessage({
-  message,
-}: {
-  message: Message;
-}) {
+export async function generateTitleFromUserMessage(message: string) {
   const { text: title } = await generateText({
     model: myProvider.languageModel("title-model"),
     system: `\n

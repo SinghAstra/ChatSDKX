@@ -12,8 +12,6 @@ const ChatPage = async () => {
 
   const id = generateID();
 
-  console.log("In chat/page.tsx id is ", id);
-
   return (
     <ChatClientPage
       id={id}

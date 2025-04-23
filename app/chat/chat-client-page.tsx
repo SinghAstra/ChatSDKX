@@ -3,13 +3,14 @@
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
-import { generateID } from "@/lib/utils";
+import { generateID, getMostRecentUserMessage } from "@/lib/utils";
 import { useChat } from "@ai-sdk/react";
 import { Visibility } from "@prisma/client";
 import { UIMessage } from "ai";
 import { useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
+import { createChat } from "./action";
 import { SidebarToggle } from "./sidebar-toggle";
 import { VisibilitySelector } from "./visibility-selector";
 
@@ -29,9 +30,6 @@ const ChatClientPage = ({
 }: ChatClientPageProps) => {
   const { open, setOpen } = useSidebar();
   const [message, setMessage] = useState<string | null>(null);
-  const [isFirstSubmit, setIsFirstSubmit] = useState(
-    initialMessages.length === 0
-  );
   const router = useRouter();
 
   const { messages, handleSubmit, input, setInput, status } = useChat({
@@ -58,13 +56,9 @@ const ChatClientPage = ({
 
   const handleCustomSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
-    if (isFirstSubmit) {
-      router.push(`/chat/${id}`); // ✅ Redirect immediately
-      setIsFirstSubmit(false);
-    }
-
-    handleSubmit(e); // send the message
+    await createChat(id, input);
+    router.push(`/chat/${id}`);
+    handleSubmit(e);
   };
 
   return (
