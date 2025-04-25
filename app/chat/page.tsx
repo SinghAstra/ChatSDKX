@@ -17,6 +17,8 @@ const ChatPage = async () => {
     (cookieStore.get("chat-visibility")?.value as Visibility) ||
     ("private" as Visibility);
 
+  console.log("chatVisibility", chatVisibility);
+
   const id = generateID();
 
   return (

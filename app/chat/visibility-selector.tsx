@@ -41,17 +41,17 @@ const visibilities: VisibilityObject[] = [
 ];
 
 interface VisibilitySelectorProps {
-  chatVisibility: Visibility;
+  visibility: Visibility;
+  setVisibility: (visibility: Visibility) => void;
 }
 
 export function VisibilitySelector({
-  chatVisibility,
+  visibility,
+  setVisibility,
 }: VisibilitySelectorProps) {
   const [open, setOpen] = useState(false);
-  const [visibilityType, setVisibilityType] =
-    useState<Visibility>(chatVisibility);
   const selectedVisibility = visibilities.find(
-    (visibility) => visibility.id === visibilityType
+    (elem) => elem.id === visibility
   );
 
   return (
@@ -73,22 +73,22 @@ export function VisibilitySelector({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="start" className="min-w-[300px]">
-        {visibilities.map((visibility) => (
+        {visibilities.map((elem) => (
           <DropdownMenuItem
-            key={visibility.id}
+            key={elem.id}
             onSelect={() => {
               setOpen(false);
-              setVisibilityType(visibility.id);
-              saveChatVisibilityAsCookie(visibility.id);
+              setVisibility(elem.id);
+              saveChatVisibilityAsCookie(elem.id);
             }}
             className="gap-4 group/item flex flex-row justify-between items-center cursor-pointer"
-            data-active={visibility.id === visibilityType}
+            data-active={elem.id === visibility}
           >
             <div className="flex flex-col gap-1 items-start">
-              {visibility.label}
-              {visibility.description && (
+              {elem.label}
+              {elem.description && (
                 <div className="text-xs text-muted-foreground">
-                  {visibility.description}
+                  {elem.description}
                 </div>
               )}
             </div>

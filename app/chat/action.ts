@@ -32,7 +32,11 @@ export async function fetchChats() {
   }
 }
 
-export async function createChat(id: string, message: string) {
+export async function createChat(
+  id: string,
+  message: string,
+  visibility: Visibility
+) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
@@ -46,6 +50,7 @@ export async function createChat(id: string, message: string) {
         id,
         userId: session.user.id,
         title,
+        visibility,
         createdAt: new Date(),
       },
     });

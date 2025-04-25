@@ -36,7 +36,10 @@ const NewChatClientPage = ({
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   // const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [visibility, setVisibility] = useState<Visibility>(chatVisibility);
   const [visibilityChanged, setVisibilityChanged] = useState(false);
+  const [startingConversation, setStartingConversation] =
+    useState<boolean>(false);
 
   const { handleSubmit, input, setInput, status } = useChat({
     id,
@@ -83,8 +86,8 @@ const NewChatClientPage = ({
   const handleCustomSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-
-    await createChat(id, input);
+    setStartingConversation(true);
+    await createChat(id, input, chatVisibility);
     router.push(`/chat/${id}`);
     handleSubmit(e);
   };
@@ -117,7 +120,10 @@ const NewChatClientPage = ({
               onClick={handleVisibilityChange}
               className="cursor-pointer"
             >
-              <VisibilitySelector chatVisibility={chatVisibility} />
+              <VisibilitySelector
+                visibility={visibility}
+                setVisibility={setVisibility}
+              />
             </motion.div>
 
             <AvatarMenu user={user} />
@@ -135,10 +141,20 @@ const NewChatClientPage = ({
           <div className="bg-primary/10 p-6 rounded-full mb-4">
             <Bot className="h-12 w-12 text-primary" />
           </div>
-          <h2 className="text-2xl font-bold mb-2">Start a new conversation</h2>
-          <p className="text-muted-foreground max-w-md">
-            Type a message below to begin chatting with the AI assistant.
-          </p>
+          {startingConversation ? (
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Starting conversation</h2>
+            </div>
+          ) : (
+            <div>
+              <h2 className="text-2xl font-bold mb-2">
+                Start a new conversation
+              </h2>
+              <p className="text-muted-foreground max-w-md">
+                Type a message below to begin chatting with the AI assistant.
+              </p>
+            </div>
+          )}
         </FadeSlideIn>
         {/* ) : (
         <div className="flex flex-col gap-6 mb-4">
@@ -252,40 +268,42 @@ const NewChatClientPage = ({
       </div>
 
       {/* Input Area */}
-      <div className="sticky bottom-0 inset-x-0 bg-background/80 backdrop-blur-md p-4 md:p-6">
-        <div className="max-w-5xl mx-auto">
-          <Card className="shadow-lg border overflow-hidden">
-            <form onSubmit={handleCustomSubmit} className="flex items-center">
-              <Input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-6 px-4"
-              />
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="p-2 mr-2"
-              >
-                <Button
-                  type="submit"
-                  size="icon"
-                  disabled={status === "streaming" || !input.trim()}
-                  className={`rounded-full ${
-                    !input.trim() ? "opacity-50" : "opacity-100"
-                  }`}
+      {!startingConversation && (
+        <div className="sticky bottom-0 inset-x-0 bg-background/80 backdrop-blur-md p-4 md:p-6">
+          <div className="max-w-5xl mx-auto">
+            <Card className="shadow-lg border overflow-hidden">
+              <form onSubmit={handleCustomSubmit} className="flex items-center">
+                <Input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Type your message..."
+                  className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-6 px-4"
+                />
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="p-2 mr-2"
                 >
-                  <Send className="h-5 w-5" />
-                </Button>
-              </motion.div>
-            </form>
-          </Card>
-          <p className="text-xs text-center text-muted-foreground mt-2">
-            AI responses are generated and may not always be accurate.
-          </p>
+                  <Button
+                    type="submit"
+                    size="icon"
+                    disabled={status === "streaming" || !input.trim()}
+                    className={`rounded-full ${
+                      !input.trim() ? "opacity-50" : "opacity-100"
+                    }`}
+                  >
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+              </form>
+            </Card>
+            <p className="text-xs text-center text-muted-foreground mt-2">
+              AI responses are generated and may not always be accurate.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Visibility change animation */}
       <AnimatePresence>
@@ -294,22 +312,26 @@ const NewChatClientPage = ({
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
-            className="fixed inset-0 pointer-events-none flex items-center justify-center z-50"
+            className={`fixed inset-0 pointer-events-none flex items-center justify-center z-50 ${
+              open ? "pl-[--sidebar-width]" : "pl-0"
+            } `}
           >
-            <div className="bg-primary/20 rounded-full p-8">
-              <motion.div
-                animate={{
-                  scale: [1, 1.2, 1],
-                  rotate: [0, 10, -10, 0],
-                }}
-                transition={{ duration: 0.6 }}
-              >
-                {chatVisibility === "public" ? (
-                  <span className="text-4xl">🌎</span>
-                ) : (
-                  <span className="text-4xl">🔒</span>
-                )}
-              </motion.div>
+            <div className="bg-muted/40 backdrop-blur-sm rounded-md p-16">
+              <div className="bg-muted/20 backdrop-blur-lg rounded-full p-6">
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    rotate: [0, 10, -10, 0],
+                  }}
+                  transition={{ duration: 0.6 }}
+                >
+                  {visibility === "public" ? (
+                    <span className="text-4xl">🌎</span>
+                  ) : (
+                    <span className="text-4xl">🔒</span>
+                  )}
+                </motion.div>
+              </div>
             </div>
           </motion.div>
         )}
