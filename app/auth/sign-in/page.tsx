@@ -1,6 +1,7 @@
 "use client";
 
-import AnimationContainer from "@/components/global/animation-container";
+import FadeIn from "@/components/global/fade-in";
+import FadeSlideIn from "@/components/global/fade-slide-in";
 import { Button } from "@/components/ui/button";
 import RotatingBorderBadge from "@/components/ui/rotating-border-badge";
 import { Separator } from "@/components/ui/separator";
@@ -92,7 +93,7 @@ export default function SignIn() {
 
           <div className="space-y-4 max-w-2xl p-6">
             {features.map((feature, i) => (
-              <AnimationContainer key={i} delay={i * 0.2}>
+              <FadeSlideIn key={i} delay={i * 0.2}>
                 <div className="flex items-start gap-4 p-4 rounded-lg border backdrop-blur-md">
                   <div className="p-2 rounded-md border">
                     <feature.icon />
@@ -106,7 +107,7 @@ export default function SignIn() {
                     </p>
                   </div>
                 </div>
-              </AnimationContainer>
+              </FadeSlideIn>
             ))}
           </div>
 
@@ -121,71 +122,74 @@ export default function SignIn() {
           {/* Decorative elements */}
           <div className="absolute -top-16 -right-16 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
           <div className="absolute -bottom-16 -left-16 h-64 w-64 rounded-full bg-purple-500/20 blur-3xl" />
-
-          <div className="w-[400px] p-8 bg-card/40 backdrop-blur-sm rounded-md border space-y-6">
-            <div className="space-y-2 text-center">
-              <RotatingBorderBadge title={`Welcome to ${siteConfig.name}`} />
-            </div>
-
-            <div className="space-y-4">
-              <Button
-                onClick={handleGitHubSignIn}
-                disabled={isGithubLoading}
-                variant="outline"
-                className="w-full text-foreground"
-              >
-                {isGithubLoading ? (
-                  <>
-                    <Loader className="w-5 h-5 animate-spin" />
-                    Wait ...
-                  </>
-                ) : (
-                  <>
-                    <FaGithub className="mr-2 h-5 w-5" />
-                    <span className="text-center tracking-wide">
-                      Continue with GitHub
-                    </span>
-                  </>
-                )}
-              </Button>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <Separator />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase ">
-                  <span className="bg-background px-2 text-foreground">Or</span>
-                </div>
+          <FadeIn delay={0.1}>
+            <div className="w-[400px] p-8 bg-card/40 backdrop-blur-sm rounded-md border space-y-6">
+              <div className="space-y-2 text-center">
+                <RotatingBorderBadge title={`Welcome to ${siteConfig.name}`} />
               </div>
 
-              <Button
-                variant="outline"
-                className="w-full text-foreground"
-                onClick={handleGoogleSignIn}
-                disabled={isGoogleLoading}
-              >
-                {isGoogleLoading ? (
-                  <>
-                    <Loader className="w-5 h-5 animate-spin" />
-                    Wait ...
-                  </>
-                ) : (
-                  <>
-                    <Image
-                      src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-                      alt="Google"
-                      width={18}
-                      height={18}
-                      className="mr-2"
-                    />
-                    <span className="text-center tracking-wide">
-                      Continue with Google
+              <div className="space-y-4">
+                <Button
+                  onClick={handleGitHubSignIn}
+                  disabled={isGithubLoading}
+                  variant="outline"
+                  className="w-full text-foreground"
+                >
+                  {isGithubLoading ? (
+                    <>
+                      <Loader className="w-5 h-5 animate-spin" />
+                      Wait ...
+                    </>
+                  ) : (
+                    <>
+                      <FaGithub className="mr-2 h-5 w-5" />
+                      <span className="text-center tracking-wide">
+                        Continue with GitHub
+                      </span>
+                    </>
+                  )}
+                </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <Separator />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase ">
+                    <span className="bg-background px-2 text-foreground">
+                      Or
                     </span>
-                  </>
-                )}
-              </Button>
+                  </div>
+                </div>
+
+                <Button
+                  variant="outline"
+                  className="w-full text-foreground"
+                  onClick={handleGoogleSignIn}
+                  disabled={isGoogleLoading}
+                >
+                  {isGoogleLoading ? (
+                    <>
+                      <Loader className="w-5 h-5 animate-spin" />
+                      Wait ...
+                    </>
+                  ) : (
+                    <>
+                      <Image
+                        src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                        alt="Google"
+                        width={18}
+                        height={18}
+                        className="mr-2"
+                      />
+                      <span className="text-center tracking-wide">
+                        Continue with Google
+                      </span>
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </div>
