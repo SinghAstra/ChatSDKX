@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
@@ -9,7 +8,7 @@ import { Message, Role } from "@prisma/client";
 import { motion } from "framer-motion";
 import { Send } from "lucide-react";
 import { useParams } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { SidebarToggle } from "../sidebar-toggle";
 
@@ -31,12 +30,18 @@ const ChatClientPage = ({ messages }: ChatClientPageProps) => {
     setMessage(null);
   }, [message]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    // When a new Input Comes we should save the message in db ,
+    // reflect the changes in frontend & then stream the response
+    // Should a new user message be created in /ask or new api route or server action ?
+    // Where and why ?
+    // How to save model response in db ?
     setResponse("");
 
     const res = await fetch(`/api/chat/${params.id}/ask`, {
       method: "POST",
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message: input }),
     });
 
     const reader = res.body?.getReader();
@@ -56,7 +61,7 @@ const ChatClientPage = ({ messages }: ChatClientPageProps) => {
 
   return (
     <div className="h-screen flex flex-col w-full relative">
-      <div className="flex items-center gap-2 p-2">
+      <div className="flex items-center gap-2 p-2 sticky top-0 inset-x-0">
         <div className="flex items-center gap-2">
           <SidebarToggle />{" "}
           {!open && (
@@ -83,18 +88,20 @@ const ChatClientPage = ({ messages }: ChatClientPageProps) => {
               {message.content}
             </div>
           ))}
-          <div
-            className={`whitespace-pre-wrap border rounded-md p-2 max-w-[60%] 
+          {response && (
+            <div
+              className={`whitespace-pre-wrap border rounded-md p-2 max-w-[60%] 
                   "self-start bg-muted/40 text-foreground"
               }`}
-          >
-            {response}
-          </div>
+            >
+              {response}
+            </div>
+          )}
         </div>
       </div>
-      <div className="sticky bottom-0 inset-x-0 bg-background/80 backdrop-blur-md p-4 md:p-6">
+      <div className="sticky bottom-0 inset-x-0  backdrop-blur-md p-2">
         <div className="max-w-5xl mx-auto">
-          <Card className="shadow-lg border overflow-hidden">
+          <div className="shadow-lg border overflow-hidden rounded-md">
             <form onSubmit={handleSubmit} className="flex items-center">
               <Input
                 ref={inputRef}
@@ -120,10 +127,7 @@ const ChatClientPage = ({ messages }: ChatClientPageProps) => {
                 </Button>
               </motion.div>
             </form>
-          </Card>
-          <p className="text-xs text-center text-muted-foreground mt-2">
-            AI responses are generated and may not always be accurate.
-          </p>
+          </div>
         </div>
       </div>
     </div>
