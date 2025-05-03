@@ -52,7 +52,7 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
             <p className="mb-4 text-lg tracking-tight text-muted-foreground md:text-xl text-balance">
               Kickstart your project with a full-stack template powered by
               <br />
-              Vercel AI SDK, App Router, shadcn/ui, and more.
+              Gemini API
             </p>
             <div className="flex items-center justify-center gap-4 z-50">
               <BackgroundShine className="rounded-md">
@@ -112,7 +112,10 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
           >
             <h1 className="mt-8 text-foreground py-4  text-center text-4xl font-medium tracking-tight md:text-7xl">
               Build <br />
-              Full-Stack AI Apps <br />
+              <span className="text-transparent bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text inline-bloc">
+                Full Stack AI Apps{" "}
+              </span>
+              <br />
               with Ease
             </h1>
             <BackgroundShine>

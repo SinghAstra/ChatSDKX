@@ -45,7 +45,7 @@ export function AppSidebar({ user, chats }: AppSidebarProps) {
               }}
               className="flex flex-row gap-3 items-center"
             >
-              <span className="text-lg font-medium px-2  cursor-pointer">
+              <span className="text-lg font-medium px-2 cursor-pointer">
                 {siteConfig.name}
               </span>
             </Link>

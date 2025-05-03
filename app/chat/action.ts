@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { generateTitleFromUserMessage } from "@/lib/utils";
 import { Visibility } from "@prisma/client";
 import { getServerSession } from "next-auth";
-import { cookies } from "next/headers";
 
 export async function fetchChats() {
   try {
@@ -62,9 +61,4 @@ export async function createChat(
     }
     return { message: "Failed to Create Chat" };
   }
-}
-
-export async function saveChatVisibilityAsCookie(visibility: Visibility) {
-  const cookieStore = await cookies();
-  cookieStore.set("chat-visibility", visibility);
 }
