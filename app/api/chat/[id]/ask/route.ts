@@ -24,22 +24,6 @@ export async function POST(
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-    const chat = ai.chats.create({
-      model: "gemini-2.0-flash",
-      history: [
-        {
-          role: "user",
-          parts: [{ text: "Hello" }],
-        },
-        {
-          role: "model",
-          parts: [{ text: "Great to meet you. What would you like to know?" }],
-        },
-      ],
-    });
-
-    console.log("After Chat.");
-
     const newUserMessage = await prisma.message.create({
       data: {
         chatId: id,
@@ -49,6 +33,26 @@ export async function POST(
     });
 
     console.log("newUserMessage is ", newUserMessage);
+
+    const lastMessages = await prisma.message.findMany({
+      where: { chatId: id },
+      orderBy: { createdAt: "asc" },
+      take: 10,
+    });
+
+    const history = lastMessages.map((msg) => ({
+      role: msg.role === Role.user ? "user" : "model",
+      parts: [{ text: msg.content }],
+    }));
+
+    console.log("history is ", history);
+
+    const chat = ai.chats.create({
+      model: "gemini-2.0-flash",
+      history,
+    });
+
+    console.log("After Chat.");
 
     const stream = await chat.sendMessageStream({
       message,
