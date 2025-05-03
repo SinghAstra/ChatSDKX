@@ -10,6 +10,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Send } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { SidebarToggle } from "../sidebar-toggle";
 
@@ -86,7 +87,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
   }, [messages, autoScroll]);
 
   return (
-    <div className="h-screen flex flex-col w-full relative">
+    <div className="ṃin-h-screen flex flex-col w-full relative border border-cyan-400 overflow-x-hidden">
       <div className="flex items-center gap-2 p-2 sticky top-0 inset-x-0 backdrop-blur-sm bg-transparent z-[99]">
         <div className="flex items-center gap-2 ">
           <SidebarToggle />{" "}
@@ -100,22 +101,23 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
           )}
         </div>
       </div>
-      <div className="flex-1 flex flex-col p-4 overflow-y-auto pb-12 -mt-14 pt-16 relative">
-        <div className="flex flex-col gap-2 mb-4" ref={messagesRef}>
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`whitespace-pre-wrap border rounded-md p-2 max-w-[60%] ${
-                message.role === Role.user
-                  ? "self-end bg-muted text-muted-foreground"
-                  : "self-start bg-muted/40 text-foreground"
-              }`}
-            >
-              {message.content}
-            </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+      <div
+        className="flex-1 flex gap-2 flex-col p-4 overflow-y-auto pb-12 pt-16 relative overflow-x-hidden"
+        ref={messagesRef}
+      >
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`whitespace-pre-wrap border rounded-md p-2 max-w-[60%] ${
+              message.role === Role.user
+                ? "self-end bg-muted text-muted-foreground"
+                : "self-start bg-muted/40 text-foreground"
+            }`}
+          >
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
         <AnimatePresence>
           {showScrollButton && (
             <motion.button
