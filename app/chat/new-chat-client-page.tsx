@@ -10,7 +10,10 @@ import { siteConfig } from "@/config/site";
 import { motion } from "framer-motion";
 import { Bot, Send } from "lucide-react";
 import { User } from "next-auth";
+import { useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { createChat } from "./action";
 import { SidebarToggle } from "./sidebar-toggle";
 
 interface NewChatClientPageProps {
@@ -21,10 +24,20 @@ const NewChatClientPage = ({ user }: NewChatClientPageProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { open, setOpen } = useSidebar();
   const [input, setInput] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const router = useRouter();
 
-  const handleFormSubmit = (e: FormEvent) => {
+  const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log("In handleFormSubmit");
+    const { chat } = await createChat(input);
+
+    if (!chat) {
+      setMessage("Could Not Create Chat.");
+      return;
+    }
+
+    // Navigate to /chat/:id
+    router.push(`/chat/${chat.id}`);
   };
 
   useEffect(() => {
@@ -32,6 +45,12 @@ const NewChatClientPage = ({ user }: NewChatClientPageProps) => {
       inputRef.current.focus();
     }
   }, []);
+
+  useEffect(() => {
+    if (!message) return;
+    toast(message);
+    setMessage(null);
+  }, [message]);
 
   return (
     <div className="h-screen flex flex-col w-full ">

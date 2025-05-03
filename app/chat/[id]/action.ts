@@ -18,7 +18,7 @@ export async function fetchChat(id: string) {
     return null;
   }
 
-  if (chat.userId === session.user.id || chat.visibility === "public") {
+  if (chat.userId === session.user.id) {
     return chat;
   }
 }

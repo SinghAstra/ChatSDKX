@@ -1,55 +1,58 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
-import { generateID } from "@/lib/utils";
-import { useChat } from "@ai-sdk/react";
-import { Visibility } from "@prisma/client";
-import { UIMessage } from "ai";
-import React, { useEffect, useState } from "react";
+import { Message, Role } from "@prisma/client";
+import { motion } from "framer-motion";
+import { Send } from "lucide-react";
+import { useParams } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { SidebarToggle } from "../sidebar-toggle";
-import { VisibilitySelector } from "../visibility-selector";
 
 interface ChatClientPageProps {
-  id: string;
-  initialMessages: UIMessage[];
-  isReadOnly: boolean;
-
-  chatVisibility: Visibility;
+  messages: Message[];
 }
 
-const ChatClientPage = ({
-  chatVisibility,
-  id,
-  initialMessages,
-  isReadOnly,
-}: ChatClientPageProps) => {
+const ChatClientPage = ({ messages }: ChatClientPageProps) => {
   const { open, setOpen } = useSidebar();
   const [message, setMessage] = useState<string | null>(null);
-
-  const { messages, handleSubmit, input, setInput, status } = useChat({
-    id,
-    body: { id },
-    initialMessages,
-    experimental_throttle: 100,
-    sendExtraMessageFields: true,
-    generateId: generateID,
-    onError: (error) => {
-      if (error instanceof Error) {
-        console.log("error.stack is ", error.stack);
-        console.log("error.message is ", error.message);
-      }
-      setMessage(error.message || "An error occurred, please try again!");
-    },
-  });
+  const [input, setInput] = useState("");
+  const [response, setResponse] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+  const params = useParams();
 
   useEffect(() => {
     if (!message) return;
     toast(message);
     setMessage(null);
   }, [message]);
+
+  const handleSubmit = async () => {
+    setResponse("");
+
+    const res = await fetch(`/api/chat/${params.id}/ask`, {
+      method: "POST",
+      body: JSON.stringify({ message }),
+    });
+
+    const reader = res.body?.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      if (!reader) {
+        setMessage("Reader is undefined");
+        return;
+      }
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      setResponse((prev) => prev + chunk);
+    }
+  };
 
   return (
     <div className="h-screen flex flex-col w-full relative">
@@ -65,7 +68,6 @@ const ChatClientPage = ({
             </span>
           )}
         </div>
-        {!isReadOnly && <VisibilitySelector chatVisibility={chatVisibility} />}
       </div>
       <div className="flex-1 flex flex-col p-4 overflow-y-auto pb-12">
         <div className="flex flex-col gap-2 mb-4">
@@ -73,39 +75,56 @@ const ChatClientPage = ({
             <div
               key={message.id}
               className={`whitespace-pre-wrap border rounded-md p-2 max-w-[60%] ${
-                message.role === "user"
+                message.role === Role.user
                   ? "self-end bg-muted text-muted-foreground"
                   : "self-start bg-muted/40 text-foreground"
               }`}
             >
-              {message.parts.map((part, i) => {
-                switch (part.type) {
-                  case "text":
-                    return <div key={`${message.id}-${i}`}>{part.text}</div>;
-                }
-              })}
+              {message.content}
             </div>
           ))}
+          <div
+            className={`whitespace-pre-wrap border rounded-md p-2 max-w-[60%] 
+                  "self-start bg-muted/40 text-foreground"
+              }`}
+          >
+            {response}
+          </div>
         </div>
       </div>
-      <div className="p-2 sticky bottom-0 inset-x-0 bg-background backdrop-blur-sm ">
-        {!isReadOnly && (
-          <form onSubmit={handleSubmit} className="flex gap-2 mt-auto">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              className="flex-1 border rounded-md px-3 py-2 text-sm"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white rounded-md px-4 py-2 text-sm"
-              disabled={status === "streaming" || !input.trim()}
-            >
-              Send
-            </button>
-          </form>
-        )}
+      <div className="sticky bottom-0 inset-x-0 bg-background/80 backdrop-blur-md p-4 md:p-6">
+        <div className="max-w-5xl mx-auto">
+          <Card className="shadow-lg border overflow-hidden">
+            <form onSubmit={handleSubmit} className="flex items-center">
+              <Input
+                ref={inputRef}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type your message..."
+                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-6 px-4"
+              />
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="p-2 mr-2"
+              >
+                <Button
+                  type="submit"
+                  size="icon"
+                  disabled={!input.trim()}
+                  className={`rounded-full ${
+                    !input.trim() ? "opacity-50" : "opacity-100"
+                  }`}
+                >
+                  <Send className="h-5 w-5" />
+                </Button>
+              </motion.div>
+            </form>
+          </Card>
+          <p className="text-xs text-center text-muted-foreground mt-2">
+            AI responses are generated and may not always be accurate.
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -1,15 +1,6 @@
-import {
-  CoreAssistantMessage,
-  CoreToolMessage,
-  generateText,
-  UIMessage,
-} from "ai";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { myProvider } from "./ai/providers";
-
-type ResponseMessageWithoutId = CoreToolMessage | CoreAssistantMessage;
-type ResponseMessage = ResponseMessageWithoutId & { id: string };
+import { generateText } from "./ai";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -61,32 +52,14 @@ export function getIconName(name: string) {
 }
 
 export async function generateTitleFromUserMessage(message: string) {
-  const { text: title } = await generateText({
-    model: myProvider.languageModel("title-model"),
-    system: `\n
+  const title = await generateText(
+    `\n
     - you will generate a short title based on the first message a user begins a conversation with
     - ensure it is not more than 80 characters long
     - the title should be a summary of the user's message
-    - do not use quotes or colons`,
-    prompt: JSON.stringify(message),
-  });
+    - do not use quotes or colons
+    - This is the First Message Send by User : ${message}`
+  );
 
   return title;
-}
-
-export function getMostRecentUserMessage(messages: UIMessage[]) {
-  const userMessages = messages.filter((message) => message.role === "user");
-  return userMessages.at(-1);
-}
-
-export function getTrailingMessageId({
-  messages,
-}: {
-  messages: ResponseMessage[];
-}): string | null {
-  const trailingMessage = messages.at(-1);
-
-  if (!trailingMessage) return null;
-
-  return trailingMessage.id;
 }
