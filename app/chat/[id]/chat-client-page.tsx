@@ -10,9 +10,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Send } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { SidebarToggle } from "../sidebar-toggle";
+import { Markdown } from "./markdown";
 
 interface ChatClientPageProps {
   initialMessages: Message[];
@@ -87,8 +87,12 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
   }, [messages, autoScroll]);
 
   return (
-    <div className="ṃin-h-screen flex flex-col w-full relative border border-cyan-400 overflow-x-hidden">
-      <div className="flex items-center gap-2 p-2 sticky top-0 inset-x-0 backdrop-blur-sm bg-transparent z-[99]">
+    <div className="ṃin-h-screen flex flex-col w-full relative overflow-x-hidden">
+      <div
+        className={`flex items-center gap-2 p-2 fixed ${
+          open ? "left-[16rem]" : "left-0"
+        } top-0 right-0 bg-muted/40 z-[99]`}
+      >
         <div className="flex items-center gap-2 ">
           <SidebarToggle />{" "}
           {!open && (
@@ -114,7 +118,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
                 : "self-start bg-muted/40 text-foreground"
             }`}
           >
-            <ReactMarkdown>{message.content}</ReactMarkdown>
+            <Markdown>{message.content}</Markdown>
           </div>
         ))}
         <div ref={messagesEndRef} />
@@ -139,8 +143,12 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
           )}
         </AnimatePresence>
       </div>
-      <div className="sticky bottom-0 inset-x-0  backdrop-blur-md p-2">
-        <div className="max-w-5xl mx-auto">
+      <div
+        className={`fixed bottom-0 right-0 ${
+          open ? "left-[16rem]" : "left-0"
+        }  bg-muted/40 p-2`}
+      >
+        <div className="max-w-5xl mx-auto bg-background rounded-md">
           <div className="shadow-lg border overflow-hidden rounded-md">
             <form onSubmit={handleFormSubmit} className="flex items-center">
               <Input
