@@ -18,9 +18,7 @@ const ChatPage = async ({ params }: { params: { id: string } }) => {
     notFound();
   }
 
-  console.log("chat.messages is ", chat.messages);
-
-  return <ChatClientPage messages={chat.messages} />;
+  return <ChatClientPage initialMessages={chat.messages} />;
 };
 
 export default ChatPage;

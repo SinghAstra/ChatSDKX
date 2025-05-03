@@ -4,25 +4,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
+import useMessages from "@/hooks/use-message";
 import { Message, Role } from "@prisma/client";
-import { motion } from "framer-motion";
-import { Send } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronDown, Send } from "lucide-react";
 import { useParams } from "next/navigation";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { SidebarToggle } from "../sidebar-toggle";
 
 interface ChatClientPageProps {
-  messages: Message[];
+  initialMessages: Message[];
 }
 
-const ChatClientPage = ({ messages }: ChatClientPageProps) => {
+const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
   const { open, setOpen } = useSidebar();
   const [message, setMessage] = useState<string | null>(null);
-  const [input, setInput] = useState("");
-  const [response, setResponse] = useState("");
+  const [input, setInput] = useState(
+    "I am newbie so i want to take my time while building mvp of linux give me topic that i should and code to write for building mvp of linux"
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const params = useParams();
+  const { messages, sendMessage } = useMessages(
+    initialMessages,
+    params.id as string
+  );
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesRef = useRef<HTMLDivElement>(null);
+  const [autoScroll, setAutoScroll] = useState(true);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+
+  console.log("messages.length is ", messages.length);
 
   useEffect(() => {
     if (!message) return;
@@ -30,39 +42,52 @@ const ChatClientPage = ({ messages }: ChatClientPageProps) => {
     setMessage(null);
   }, [message]);
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleFormSubmit = (e: FormEvent) => {
+    console.log("in handleFormSubmit");
     e.preventDefault();
-    // When a new Input Comes we should save the message in db ,
-    // reflect the changes in frontend & then stream the response
-    // Should a new user message be created in /ask or new api route or server action ?
-    // Where and why ?
-    // How to save model response in db ?
-    setResponse("");
-
-    const res = await fetch(`/api/chat/${params.id}/ask`, {
-      method: "POST",
-      body: JSON.stringify({ message: input }),
-    });
-
-    const reader = res.body?.getReader();
-    const decoder = new TextDecoder();
-
-    while (true) {
-      if (!reader) {
-        setMessage("Reader is undefined");
-        return;
-      }
-      const { done, value } = await reader.read();
-      if (done) break;
-      const chunk = decoder.decode(value);
-      setResponse((prev) => prev + chunk);
+    console.log("input is ", input);
+    console.log("!input || !input.trim() is ", !input || !input.trim());
+    if (input.trim()) {
+      sendMessage(input);
     }
   };
 
+  const scrollToBottom = () => {
+    setAutoScroll(true);
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setAutoScroll(entry.isIntersecting);
+        setShowScrollButton(!entry.isIntersecting);
+      },
+      { threshold: 0.8 }
+    );
+
+    const val = messagesEndRef.current;
+
+    if (val) {
+      observer.observe(val);
+    }
+
+    return () => {
+      if (val) {
+        observer.unobserve(val);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (autoScroll) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, autoScroll]);
+
   return (
     <div className="h-screen flex flex-col w-full relative">
-      <div className="flex items-center gap-2 p-2 sticky top-0 inset-x-0">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 p-2 sticky top-0 inset-x-0 backdrop-blur-sm bg-transparent z-[99]">
+        <div className="flex items-center gap-2 ">
           <SidebarToggle />{" "}
           {!open && (
             <span
@@ -74,8 +99,8 @@ const ChatClientPage = ({ messages }: ChatClientPageProps) => {
           )}
         </div>
       </div>
-      <div className="flex-1 flex flex-col p-4 overflow-y-auto pb-12">
-        <div className="flex flex-col gap-2 mb-4">
+      <div className="flex-1 flex flex-col p-4 overflow-y-auto pb-12 -mt-14 pt-16 relative">
+        <div className="flex flex-col gap-2 mb-4" ref={messagesRef}>
           {messages.map((message) => (
             <div
               key={message.id}
@@ -88,21 +113,33 @@ const ChatClientPage = ({ messages }: ChatClientPageProps) => {
               {message.content}
             </div>
           ))}
-          {response && (
-            <div
-              className={`whitespace-pre-wrap border rounded-md p-2 max-w-[60%] 
-                  "self-start bg-muted/40 text-foreground"
-              }`}
-            >
-              {response}
-            </div>
-          )}
+          <div ref={messagesEndRef} />
         </div>
+        <AnimatePresence>
+          {showScrollButton && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.3 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.3 }}
+              transition={{ duration: 0.3 }}
+              onClick={scrollToBottom}
+              className="absolute bottom-4 right-4 bg-muted text-muted-foreground rounded-full p-2 shadow-lg z-50"
+              aria-label="Scroll to bottom"
+            >
+              <motion.div
+                animate={{ y: [0, 3, 0] }}
+                transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1.5 }}
+              >
+                <ChevronDown size={20} />
+              </motion.div>
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
       <div className="sticky bottom-0 inset-x-0  backdrop-blur-md p-2">
         <div className="max-w-5xl mx-auto">
           <div className="shadow-lg border overflow-hidden rounded-md">
-            <form onSubmit={handleSubmit} className="flex items-center">
+            <form onSubmit={handleFormSubmit} className="flex items-center">
               <Input
                 ref={inputRef}
                 value={input}

@@ -57,10 +57,8 @@ export async function POST(
     console.log("After stream.");
     let fullResponse = "";
 
-    // 1. What is encoder ?
     const encoder = new TextEncoder();
 
-    // 2. What is Readable Stream ?
     const readable = new ReadableStream({
       async start(controller) {
         for await (const chunk of stream) {
@@ -81,7 +79,6 @@ export async function POST(
       },
     });
 
-    // 3. Why are we setting those headers ?
     return new Response(readable, {
       headers: {
         "Content-Type": "text/plain",
