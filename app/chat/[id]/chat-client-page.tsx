@@ -48,6 +48,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
     console.log("input is ", input);
     console.log("!input || !input.trim() is ", !input || !input.trim());
     if (input.trim()) {
+      setAutoScroll(true);
       sendMessage(input);
     }
   };
@@ -123,7 +124,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
               exit={{ opacity: 0, scale: 0.3 }}
               transition={{ duration: 0.3 }}
               onClick={scrollToBottom}
-              className="absolute bottom-4 right-4 bg-muted text-muted-foreground rounded-full p-2 shadow-lg z-50"
+              className="fixed bottom-20 right-12 bg-muted text-muted-foreground rounded-full p-2 shadow-lg z-50"
               aria-label="Scroll to bottom"
             >
               <motion.div
