@@ -1,6 +1,6 @@
 import Pre from "@/components/markdown/pre";
 import { cn, getIconName, hasSupportedExtension } from "@/lib/utils";
-import React, { ComponentProps, memo } from "react";
+import React, { ComponentProps, memo, ReactElement } from "react";
 import ReactMarkdown from "react-markdown";
 // import rehypeCodeTitles from "rehype-code-titles";
 import rehypePrism from "rehype-prism-plus";
@@ -134,50 +134,29 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       <em className={cn("not-italic", className)} {...props} />
     ),
     ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
-      <ul
-        className={cn("ml-3 py-0  my-0 border-green-400 border", className)}
-        {...props}
-      />
+      <ul className={cn("ml-3 py-0  my-0", className)} {...props} />
     ),
     ol: ({ className, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
-      <ol
-        className={cn(
-          "   list-decimal ml-6 border-yellow-400 border",
-          className
-        )}
-        {...props}
-      />
+      <ol className={cn("   list-decimal ml-6", className)} {...props} />
     ),
     li: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
-      const first = React.Children.toArray(props.children)[0];
-      console.log("first is ", first);
-      console.log("!first is ", !first);
-      if (!first) {
-        const second = React.Children.toArray(props.children)[1];
-        console.log("second is ", second);
-      }
-      if (React.isValidElement(first) && first.type === "p") {
-        console.log("Inside the if of li");
+      const children = React.Children.toArray(props.children);
+
+      const pChild = children.find(
+        (child) => React.isValidElement(child) && child.type === components.p
+      ) as React.ReactElement | undefined;
+
+      if (pChild) {
+        console.log("pChild is ", pChild);
         return (
-          <li
-            className={cn(
-              "py-0 my-0 list-disc ml-6 border-red-400 border",
-              className
-            )}
-            {...props}
-          >
-            {first.props.children}
+          <li className={cn("py-0 my-0 list-disc ml-6 ", className)}>
+            {pChild.props.children}
           </li>
         );
       }
+
       return (
-        <li
-          className={cn(
-            "py-0 my-0 list-disc ml-6 border-red-400 border",
-            className
-          )}
-          {...props}
-        />
+        <li className={cn("py-0 my-0 list-disc ml-6 ", className)} {...props} />
       );
     },
     a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
