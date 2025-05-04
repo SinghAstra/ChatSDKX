@@ -1,8 +1,105 @@
 import Pre from "@/components/markdown/pre";
-import { cn } from "@/lib/utils";
-import React, { memo } from "react";
+import { cn, getIconName, hasSupportedExtension } from "@/lib/utils";
+import React, { ComponentProps, memo } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeCodeTitles from "rehype-code-titles";
+import rehypePrism from "rehype-prism-plus";
 import remarkGfm from "remark-gfm";
+import { visit } from "unist-util-visit";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const preProcess = () => (tree: any) => {
+  visit(tree, (node) => {
+    if (node?.type === "element" && node?.tagName === "pre") {
+      const [codeEl] = node.children;
+      if (codeEl.tagName !== "code") return;
+      node.raw = codeEl.children?.[0].value;
+    }
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const postProcess = () => (tree: any) => {
+  visit(tree, "element", (node) => {
+    if (node?.type === "element" && node?.tagName === "pre") {
+      node.properties["raw"] = node.raw;
+    }
+  });
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const normalizeLanguage = () => (tree: any) => {
+  const supported = new Set([
+    "js",
+    "ts",
+    "tsx",
+    "jsx",
+    "html",
+    "css",
+    "json",
+    "bash",
+    "python",
+    "c",
+    "cpp",
+    "java",
+  ]);
+
+  visit(tree, "element", (node) => {
+    if (node.tagName === "code" && node.properties?.className) {
+      const classNames = node.properties.className;
+      const langClass = classNames.find((c: string) =>
+        c.startsWith("language-")
+      );
+
+      if (langClass) {
+        const lang = langClass.replace("language-", "");
+        if (!supported.has(lang)) {
+          // fallback to plain text if unsupported
+          node.properties.className = ["language-text"];
+        }
+      }
+    }
+  });
+};
+
+// function rehypeCodeTitlesWithLogo() {
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   return (tree: any) => {
+//     visit(tree, "element", (node) => {
+//       if (
+//         node?.tagName === "div" &&
+//         node?.properties?.className?.includes("rehype-code-title")
+//       ) {
+//         const titleTextNode = node.children.find(
+//           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//           (child: any) => child.type === "text"
+//         );
+//         if (!titleTextNode) return;
+
+//         // Extract filename and language
+//         const titleText = titleTextNode.value;
+//         const match = hasSupportedExtension(titleText);
+//         if (!match) return;
+
+//         const splittedNames = titleText.split(".");
+//         const ext = splittedNames[splittedNames.length - 1];
+//         const iconClass = `devicon-${getIconName(
+//           ext
+//         )}-plain text-[17px] colored`;
+
+//         // Insert icon before title text
+//         if (iconClass) {
+//           node.children.unshift({
+//             type: "element",
+//             tagName: "i",
+//             properties: { className: [iconClass, "code-icon"] },
+//             children: [],
+//           });
+//         }
+//       }
+//     });
+//   };
+// }
 
 const NonMemoizedMarkdown = ({ children }: { children: string }) => {
   const components = {
@@ -30,6 +127,9 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
     strong: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
       <strong className={cn("font-normal inline", className)} {...props} />
     ),
+    em: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+      <em className={cn("not-italic", className)} {...props} />
+    ),
     ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
       <ul className={cn("ml-2py-0  my-0", className)} {...props} />
     ),
@@ -53,10 +153,10 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       <p className={cn(" py-0 m-0 font-thin ", className)} {...props} />
     ),
     pre: Pre,
-    code: ({ node, inline, className, children, ...props }: any) => {
+    code: ({ className, children, ...props }: ComponentProps<"code">) => {
       return (
         <code
-          className={`${className} text-sm bg-zinc-800 py-0.5 px-1 rounded-md w-full overflow-x-auto `}
+          className={`${className} text-sm  py-0.5 px-1 rounded w-[200px] border`}
           {...props}
         >
           {children}
@@ -66,7 +166,18 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
   };
 
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[
+        preProcess,
+        // rehypeCodeTitles,
+        // rehypeCodeTitlesWithLogo,
+        normalizeLanguage,
+        rehypePrism,
+        postProcess,
+      ]}
+      components={components}
+    >
       {children}
     </ReactMarkdown>
   );
