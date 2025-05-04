@@ -106,7 +106,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
         </div>
       </div>
       <div
-        className="flex-1 flex gap-2 flex-col p-4 overflow-y-auto pb-24 pt-16 relative overflow-x-hidden"
+        className="flex-1 flex gap-2 flex-col p-4 overflow-y-auto pb-32 pt-16 relative overflow-x-hidden"
         ref={messagesRef}
       >
         {messages.map((message) => (

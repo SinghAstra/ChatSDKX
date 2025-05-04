@@ -53,9 +53,8 @@ export async function POST(
     });
 
     console.log("After Chat.");
-
     const stream = await chat.sendMessageStream({
-      message,
+      message: `Respond using proper Markdown. Use \\n  to change line at end of paragraphs. Do not use \n at end of headings. Do not have an \n empty line at end of headings l.\n\n${message}`,
     });
 
     console.log("After stream.");
