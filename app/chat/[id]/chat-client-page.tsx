@@ -144,7 +144,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
         </AnimatePresence>
       </div>
       <div
-        className={`fixed bottom-0 right-0 ${
+        className={`fixed z-[20] bottom-0 right-0 ${
           open ? "left-[16rem]" : "left-0"
         }  bg-muted/40 p-2`}
       >

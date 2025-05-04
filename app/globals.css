@@ -145,10 +145,12 @@ input:-webkit-autofill:not(:focus) {
   color: #ffa657; /* GitHub Light Orange */
 }
 
+li > p {
+  color: #d2a8ff;
+  display: inline;
+}
+
 pre > code {
-  width: 100%;
-  padding: 10px 14px !important;
-  overflow-x: auto;
   border: 0;
 }
 

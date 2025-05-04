@@ -54,22 +54,40 @@ export async function POST(
 
     console.log("After Chat.");
     const stream = await chat.sendMessageStream({
-      message: `Respond using proper Markdown. 
-    Use \\n to break paragraphs. Do not use \\n after headings or include extra blank lines after headings.
+      message: `Respond using **valid Markdown** with proper formatting.
     
-    For multi-line code, wrap it in triple backticks with the appropriate file extension. For example:
+    - Use **\\n** only to separate regular paragraphs.
+    - **Do not** use \\n after headings (e.g., ## Title) or add extra blank lines after headings.
+      
+    **Code Formatting Rules (important for syntax highlighting with Rehype Prism+):**
+    
+    - For multi-line code, always wrap in triple backticks with the correct language tag.
+    - **Use only these specific tags:**
+      - \`\`\`js — for JavaScript
+      - \`\`\`ts — for TypeScript
+      - \`\`\`bash — for terminal commands
+    - **Do not use** \`\`\`javascript or \`\`\`typescript — they will break syntax highlighting.
+      
+    **Examples:**
     
     JavaScript:
     \`\`\`js
-    // your code here
+    // your JS code here
     \`\`\`
     
-    Terminal commands:
+    TypeScript:
+    \`\`\`ts
+    // your TS code here
+    \`\`\`
+    
+    Terminal:
     \`\`\`bash
     npm install some-package
     \`\`\`
     
-    Only use one code block per language. Keep code properly indented and clean.\n\n${message}`,
+    Write clean, properly indented code with no surrounding text inside code blocks. Only include one code block per language per response if possible.
+    
+    Now respond to the following:\n\n${message}`,
     });
 
     console.log("After stream.");

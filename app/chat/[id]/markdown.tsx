@@ -2,7 +2,7 @@ import Pre from "@/components/markdown/pre";
 import { cn, getIconName, hasSupportedExtension } from "@/lib/utils";
 import React, { ComponentProps, memo } from "react";
 import ReactMarkdown from "react-markdown";
-import rehypeCodeTitles from "rehype-code-titles";
+// import rehypeCodeTitles from "rehype-code-titles";
 import rehypePrism from "rehype-prism-plus";
 import remarkGfm from "remark-gfm";
 import { visit } from "unist-util-visit";
@@ -125,20 +125,61 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       <h6 className={cn(" text-base", className)} {...props} />
     ),
     strong: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-      <strong className={cn("font-normal inline", className)} {...props} />
+      <strong
+        className={cn("font-normal inline text-cyan-400", className)}
+        {...props}
+      />
     ),
     em: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
       <em className={cn("not-italic", className)} {...props} />
     ),
     ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
-      <ul className={cn("ml-2py-0  my-0", className)} {...props} />
+      <ul
+        className={cn("ml-3 py-0  my-0 border-green-400 border", className)}
+        {...props}
+      />
     ),
     ol: ({ className, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
-      <ol className={cn("  ml-2", className)} {...props} />
+      <ol
+        className={cn(
+          "   list-decimal ml-6 border-yellow-400 border",
+          className
+        )}
+        {...props}
+      />
     ),
-    li: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-      <li className={cn("py-0 my-0", className)} {...props} />
-    ),
+    li: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
+      const first = React.Children.toArray(props.children)[0];
+      console.log("first is ", first);
+      console.log("!first is ", !first);
+      if (!first) {
+        const second = React.Children.toArray(props.children)[1];
+        console.log("second is ", second);
+      }
+      if (React.isValidElement(first) && first.type === "p") {
+        console.log("Inside the if of li");
+        return (
+          <li
+            className={cn(
+              "py-0 my-0 list-disc ml-6 border-red-400 border",
+              className
+            )}
+            {...props}
+          >
+            {first.props.children}
+          </li>
+        );
+      }
+      return (
+        <li
+          className={cn(
+            "py-0 my-0 list-disc ml-6 border-red-400 border",
+            className
+          )}
+          {...props}
+        />
+      );
+    },
     a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
       <a
         className={cn("font-medium underline underline-offset-4", className)}
@@ -150,13 +191,13 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       className,
       ...props
     }: React.HTMLAttributes<HTMLParagraphElement>) => (
-      <p className={cn(" py-0 m-0 font-thin ", className)} {...props} />
+      <p className={cn(" py-0 m-0 font-thin", className)} {...props} />
     ),
     pre: Pre,
     code: ({ className, children, ...props }: ComponentProps<"code">) => {
       return (
         <code
-          className={`${className} text-sm  py-0.5 px-1 rounded w-[200px] border`}
+          className={`${className} text-sm  py-0.5 px-1 rounded  border`}
           {...props}
         >
           {children}
