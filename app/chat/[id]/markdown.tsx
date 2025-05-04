@@ -53,12 +53,16 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       <p className={cn(" py-0 m-0 font-thin ", className)} {...props} />
     ),
     pre: Pre,
-    code: ({ className, ...props }: React.ComponentProps<"code">) => (
-      <code
-        className={`${className} text-sm bg-zinc-800 py-0.5 px-1 rounded-md overflow-x-auto`}
-        {...props}
-      />
-    ),
+    code: ({ node, inline, className, children, ...props }: any) => {
+      return (
+        <code
+          className={`${className} text-sm bg-zinc-800 py-0.5 px-1 rounded-md w-full overflow-x-auto `}
+          {...props}
+        >
+          {children}
+        </code>
+      );
+    },
   };
 
   return (

@@ -112,10 +112,10 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`whitespace-pre-wrap border rounded-md p-2 max-w-[60%] ${
+            className={`whitespace-pre-line overflow-hidden  border rounded-md p-2 max-w-[60%] ${
               message.role === Role.user
-                ? "self-end bg-muted text-muted-foreground"
-                : "self-start bg-muted/40 text-foreground"
+                ? "self-end bg-muted/40 text-foreground/70"
+                : "self-start bg-muted/20 text-foreground"
             }`}
           >
             <Markdown>{message.content}</Markdown>

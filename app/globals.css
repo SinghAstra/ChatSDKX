@@ -145,11 +145,12 @@ input:-webkit-autofill:not(:focus) {
   color: #ffa657; /* GitHub Light Orange */
 }
 
-pre > code {
-  display: grid;
-  max-width: inherit !important;
+/* pre > code {
+  width: 100%;
   padding: 10px 14px !important;
-}
+  overflow-x: auto;
+  color: #f97583; */
+/* } */
 
 .rehype-code-title {
   margin-top: 1rem;

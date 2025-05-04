@@ -54,7 +54,22 @@ export async function POST(
 
     console.log("After Chat.");
     const stream = await chat.sendMessageStream({
-      message: `Respond using proper Markdown. Use \\n  to change line at end of paragraphs. Do not use \n at end of headings. Do not have an \n empty line at end of headings l.\n\n${message}`,
+      message: `Respond using proper Markdown. 
+    Use \\n to break paragraphs. Do not use \\n after headings or include extra blank lines after headings.
+    
+    For multi-line code, wrap it in triple backticks with the appropriate file extension. For example:
+    
+    JavaScript:
+    \`\`\`js
+    // your code here
+    \`\`\`
+    
+    Terminal commands:
+    \`\`\`bash
+    npm install some-package
+    \`\`\`
+    
+    Only use one code block per language. Keep code properly indented and clean.\n\n${message}`,
     });
 
     console.log("After stream.");
