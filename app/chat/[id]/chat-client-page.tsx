@@ -106,7 +106,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
         </div>
       </div>
       <div
-        className="flex-1 flex gap-2 flex-col p-4 overflow-y-auto pb-12 pt-16 relative overflow-x-hidden"
+        className="flex-1 flex gap-2 flex-col p-4 overflow-y-auto pb-24 pt-16 relative overflow-x-hidden"
         ref={messagesRef}
       >
         {messages.map((message) => (
@@ -130,7 +130,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
               exit={{ opacity: 0, scale: 0.3 }}
               transition={{ duration: 0.3 }}
               onClick={scrollToBottom}
-              className="fixed bottom-20 right-12 bg-muted text-muted-foreground rounded-full p-2 shadow-lg z-50"
+              className="fixed bottom-20 right-4 bg-muted text-muted-foreground rounded-full p-2 shadow-lg z-50"
               aria-label="Scroll to bottom"
             >
               <motion.div
