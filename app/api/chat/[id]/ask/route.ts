@@ -1,6 +1,8 @@
+import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { GoogleGenAI } from "@google/genai";
 import { Role } from "@prisma/client";
+import { getServerSession } from "next-auth";
 
 export async function POST(
   req: Request,
@@ -13,6 +15,10 @@ export async function POST(
   const id = params.id;
   console.log("id is ", id);
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return new Response("Unauthorized", { status: 401 });
+    }
     const { message } = await req.json();
 
     console.log("message is ", message);
@@ -20,6 +26,21 @@ export async function POST(
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     if (!GEMINI_API_KEY) {
       throw new Error("GEMINI_API_KEY is required.");
+    }
+
+    let chat = await prisma.chat.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!chat) {
+      chat = await prisma.chat.create({
+        data: {
+          id,
+          userId: session.user.id,
+        },
+      });
     }
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
@@ -47,13 +68,13 @@ export async function POST(
 
     console.log("history is ", history);
 
-    const chat = ai.chats.create({
+    const aiChat = ai.chats.create({
       model: "gemini-2.0-flash",
       history,
     });
 
     console.log("After Chat.");
-    const stream = await chat.sendMessageStream({
+    const stream = await aiChat.sendMessageStream({
       config: {
         systemInstruction: `Respond using valid Markdown with proper formatting.
     

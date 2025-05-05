@@ -11,7 +11,11 @@ export async function fetchChat(id: string) {
 
   const chat = await prisma.chat.findUnique({
     where: { id },
-    include: { messages: true },
+    include: {
+      messages: {
+        orderBy: { createdAt: "asc" },
+      },
+    },
   });
 
   if (!chat) {
