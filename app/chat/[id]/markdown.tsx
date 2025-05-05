@@ -14,13 +14,10 @@ const preProcess = () => (tree: any) => {
       if (codeEl.tagName !== "code") return;
       node.raw = codeEl.children?.[0].value;
       const meta = codeEl.data?.meta;
-      console.log("meta is ", meta);
-      console.log("typeof meta is ", typeof meta);
       if (meta && typeof meta === "string") {
         const fileMatch = meta.match(/title=([\w./-]+)/);
         if (fileMatch) {
           node.filename = fileMatch[1];
-          console.log("fileName is ", fileMatch[1]);
         }
       }
     }

@@ -2,8 +2,8 @@ import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import React from "react";
+import Chat from "../chat";
 import { fetchChat } from "./action";
-import ChatClientPage from "./chat-client-page";
 
 const ChatPage = async ({ params }: { params: { id: string } }) => {
   const session = await getServerSession(authOptions);
@@ -23,7 +23,14 @@ const ChatPage = async ({ params }: { params: { id: string } }) => {
     chat.messages.length
   );
 
-  return <ChatClientPage initialMessages={chat.messages} />;
+  return (
+    <Chat
+      initialMessages={chat.messages}
+      user={session.user}
+      chatId={params.id}
+      newChat={false}
+    />
+  );
 };
 
 export default ChatPage;

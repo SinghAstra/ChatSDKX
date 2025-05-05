@@ -7,7 +7,6 @@ export default function Pre({
   filename,
   ...rest
 }: ComponentProps<"pre"> & { raw?: string; filename?: string }) {
-  console.log("fileName in pre is ", filename);
   return (
     <div className=" relative bg-muted/20 rounded w-[550px]  border  ">
       <div className="text-sm px-3 py-1 border-b bg-muted/20 rounded-t flex items-center justify-between">
