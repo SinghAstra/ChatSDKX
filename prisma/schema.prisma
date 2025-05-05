@@ -59,7 +59,7 @@ model VerificationToken {
 
 model Chat {
   id         String    @id @default(uuid())
-  title      String
+  title      String    @default("New Chat")
   userId     String
   createdAt  DateTime   @default(now())
 

@@ -3,7 +3,6 @@
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { generateTitleFromUserMessage } from "@/lib/utils";
-import { Role } from "@prisma/client";
 import { getServerSession } from "next-auth";
 
 export async function fetchChats() {
@@ -31,33 +30,24 @@ export async function fetchChats() {
   }
 }
 
-export async function createChat(message: string) {
+export async function createChat(message: string, id: string) {
   try {
     const session = await getServerSession(authOptions);
     if (!session) {
       return { message: "Authentication required" };
     }
 
-    const title = (await generateTitleFromUserMessage(message)) || "No Title";
-
     const chat = await prisma.chat.create({
       data: {
+        id,
         userId: session.user.id,
-        title,
         createdAt: new Date(),
       },
     });
 
-    const newMessage = await prisma.message.create({
-      data: {
-        chatId: chat.id,
-        role: Role.user,
-        content: message,
-      },
-    });
+    generateTitleFromUserMessage(message, chat.id);
 
     console.log("chat is ", chat);
-    console.log("newMessage is ", newMessage);
     return { chat };
   } catch (error) {
     if (error instanceof Error) {

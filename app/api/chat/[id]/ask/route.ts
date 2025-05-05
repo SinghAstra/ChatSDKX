@@ -54,7 +54,8 @@ export async function POST(
 
     console.log("After Chat.");
     const stream = await chat.sendMessageStream({
-      message: `Respond using **valid Markdown** with proper formatting.
+      config: {
+        systemInstruction: `Respond using valid Markdown with proper formatting.
     
     - Use **\\n** only to separate regular paragraphs.
     - **Do not** use \\n after headings (e.g., ## Title) or add extra blank lines after headings.
@@ -92,7 +93,9 @@ export async function POST(
     
     Write clean, properly indented code with no surrounding text inside code blocks. Only include one code block per language per response if possible.
     
-    Now respond to the following:\n\n${message}`,
+    \n\n`,
+      },
+      message: message,
     });
 
     console.log("After stream.");

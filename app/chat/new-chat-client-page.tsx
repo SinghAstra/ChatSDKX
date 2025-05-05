@@ -1,5 +1,6 @@
 "use client";
 
+import { useChat } from "@/components/context/chat";
 import FadeSlideIn from "@/components/global/fade-slide-in";
 import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
+import { generateID } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Bot, Send } from "lucide-react";
 import { User } from "next-auth";
@@ -26,16 +28,18 @@ const NewChatClientPage = ({ user }: NewChatClientPageProps) => {
   const [input, setInput] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const router = useRouter();
+  const id = generateID();
+  const { sendMessage } = useChat();
 
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const { chat } = await createChat(input);
+    const { chat } = await createChat(input, id);
 
     if (!chat) {
       setMessage("Could Not Create Chat.");
       return;
     }
-
+    sendMessage(input, id);
     // Navigate to /chat/:id
     router.push(`/chat/${chat.id}`);
   };

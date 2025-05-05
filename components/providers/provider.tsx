@@ -4,6 +4,7 @@ import { siteConfig } from "@/config/site";
 import { SessionProvider } from "next-auth/react";
 import Image from "next/image";
 import React, { ReactNode, Suspense } from "react";
+import { ChatProvider } from "../context/chat";
 
 interface ProviderProps {
   children: ReactNode;
@@ -29,7 +30,9 @@ const LoadingFallback = () => {
 const Providers = ({ children }: ProviderProps) => {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <SessionProvider>{children}</SessionProvider>
+      <SessionProvider>
+        <ChatProvider>{children}</ChatProvider>
+      </SessionProvider>
     </Suspense>
   );
 };

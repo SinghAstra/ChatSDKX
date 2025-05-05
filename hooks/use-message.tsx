@@ -1,7 +1,7 @@
 import { Role } from "@prisma/client";
 import { useState } from "react";
 
-type ClientMessage = {
+export type ClientMessage = {
   id: string;
   role: Role;
   content: string;
