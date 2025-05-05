@@ -3,12 +3,11 @@ import { Button } from "@/components/ui/button";
 import { compileMDX } from "next-mdx-remote/rsc";
 import Link from "next/link";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeCodeTitles from "rehype-code-titles";
 import rehypePrism from "rehype-prism-plus";
 import rehypeSlug from "rehype-slug";
 import remarkGfm from "remark-gfm";
 import { visit } from "unist-util-visit";
-import { cn, getIconName, hasSupportedExtension } from "./utils";
+import { cn } from "./utils";
 
 const components = {
   Button,
@@ -157,8 +156,6 @@ export async function parseMdx(rawMdx: string) {
       mdxOptions: {
         rehypePlugins: [
           preProcess,
-          rehypeCodeTitles,
-          rehypeCodeTitlesWithLogo,
           rehypePrism,
           rehypeSlug,
           rehypeAutolinkHeadings,
@@ -217,42 +214,3 @@ const postProcess = () => (tree: any) => {
     }
   });
 };
-
-function rehypeCodeTitlesWithLogo() {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (tree: any) => {
-    visit(tree, "element", (node) => {
-      if (
-        node?.tagName === "div" &&
-        node?.properties?.className?.includes("rehype-code-title")
-      ) {
-        const titleTextNode = node.children.find(
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (child: any) => child.type === "text"
-        );
-        if (!titleTextNode) return;
-
-        // Extract filename and language
-        const titleText = titleTextNode.value;
-        const match = hasSupportedExtension(titleText);
-        if (!match) return;
-
-        const splittedNames = titleText.split(".");
-        const ext = splittedNames[splittedNames.length - 1];
-        const iconClass = `devicon-${getIconName(
-          ext
-        )}-plain text-[17px] colored`;
-
-        // Insert icon before title text
-        if (iconClass) {
-          node.children.unshift({
-            type: "element",
-            tagName: "i",
-            properties: { className: [iconClass, "code-icon"] },
-            children: [],
-          });
-        }
-      }
-    });
-  };
-}

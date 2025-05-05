@@ -59,31 +59,36 @@ export async function POST(
     - Use **\\n** only to separate regular paragraphs.
     - **Do not** use \\n after headings (e.g., ## Title) or add extra blank lines after headings.
       
-    **Code Formatting Rules (important for syntax highlighting with Rehype Prism+):**
-    
+    **Code Formatting Rules (important for syntax highlighting with Rehype Prism+ and Code Titles):**
+
     - For multi-line code, always wrap in triple backticks with the correct language tag.
     - **Use only these specific tags:**
       - \`\`\`js — for JavaScript
       - \`\`\`ts — for TypeScript
       - \`\`\`bash — for terminal commands
     - **Do not use** \`\`\`javascript or \`\`\`typescript — they will break syntax highlighting.
-      
+
+    **Code Titles (for rehype-code-titles):**
+    - When showing a file name, add it as a title in the code block info string.
+    - Syntax: \`\`\`js title=app.js
+
     **Examples:**
-    
+
     JavaScript:
-    \`\`\`js
+    \`\`\`js title=app.js
     // your JS code here
     \`\`\`
-    
+
     TypeScript:
-    \`\`\`ts
+    \`\`\`ts title=main.ts
     // your TS code here
     \`\`\`
-    
+
     Terminal:
-    \`\`\`bash
+    \`\`\`bash title=install.sh
     npm install some-package
     \`\`\`
+
     
     Write clean, properly indented code with no surrounding text inside code blocks. Only include one code block per language per response if possible.
     

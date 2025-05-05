@@ -1,19 +1,36 @@
 "use client";
 
 import { CheckIcon, CopyIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
-export default function Copy({ content }: { content: string }) {
+interface CopyProps {
+  content: string;
+  fileName?: string;
+}
+
+export default function Copy({ content, fileName }: CopyProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   async function handleCopy() {
     await navigator.clipboard.writeText(content);
     setIsCopied(true);
 
+    if (fileName) {
+      setMessage(`Copied ${fileName}`);
+    }
+
     setTimeout(() => {
       setIsCopied(false);
     }, 2000);
   }
+
+  useEffect(() => {
+    if (!message) return;
+    toast(message);
+    setMessage(null);
+  }, [message]);
 
   return (
     <div

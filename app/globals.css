@@ -107,8 +107,6 @@ input:-webkit-autofill:not(:focus) {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64' width='64' height='64' fill='none' stroke='rgb(255 255 255 / 0.02)'%3e%3cpath d='M0 .5H63.5V64'/%3e%3c/svg%3e");
 }
 
-/* Prism Syntax Highlight */
-
 .keyword {
   color: #f97583; /* GitHub Light Red */
 }
@@ -152,19 +150,6 @@ li > p {
 
 pre > code {
   border: 0;
-}
-
-.rehype-code-title {
-  margin-top: 1rem;
-  margin-bottom: -1rem;
-  border: 1px solid hsl(var(--border));
-  letter-spacing: 0.05em;
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  padding: 7px 14px;
-  border-radius: 4px;
-  background-color: hsl(var(--muted) / 0.2);
 }
 
 /* Custom animations for loading state */

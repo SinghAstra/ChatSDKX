@@ -21,9 +21,7 @@ interface ChatClientPageProps {
 const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
   const { open, setOpen } = useSidebar();
   const [message, setMessage] = useState<string | null>(null);
-  const [input, setInput] = useState(
-    "I am newbie so i want to take my time while building mvp of linux give me topic that i should and code to write for building mvp of linux"
-  );
+  const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const params = useParams();
   const { messages, sendMessage } = useMessages(

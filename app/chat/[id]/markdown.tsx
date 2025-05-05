@@ -1,8 +1,7 @@
 import Pre from "@/components/markdown/pre";
-import { cn, getIconName, hasSupportedExtension } from "@/lib/utils";
-import React, { ComponentProps, memo, ReactElement } from "react";
+import { cn } from "@/lib/utils";
+import React, { ComponentProps, memo } from "react";
 import ReactMarkdown from "react-markdown";
-// import rehypeCodeTitles from "rehype-code-titles";
 import rehypePrism from "rehype-prism-plus";
 import remarkGfm from "remark-gfm";
 import { visit } from "unist-util-visit";
@@ -14,6 +13,16 @@ const preProcess = () => (tree: any) => {
       const [codeEl] = node.children;
       if (codeEl.tagName !== "code") return;
       node.raw = codeEl.children?.[0].value;
+      const meta = codeEl.data?.meta;
+      console.log("meta is ", meta);
+      console.log("typeof meta is ", typeof meta);
+      if (meta && typeof meta === "string") {
+        const fileMatch = meta.match(/title=([\w./-]+)/);
+        if (fileMatch) {
+          node.filename = fileMatch[1];
+          console.log("fileName is ", fileMatch[1]);
+        }
+      }
     }
   });
 };
@@ -23,6 +32,7 @@ const postProcess = () => (tree: any) => {
   visit(tree, "element", (node) => {
     if (node?.type === "element" && node?.tagName === "pre") {
       node.properties["raw"] = node.raw;
+      node.properties["filename"] = node.filename;
     }
   });
 };
@@ -62,45 +72,6 @@ const normalizeLanguage = () => (tree: any) => {
   });
 };
 
-// function rehypeCodeTitlesWithLogo() {
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   return (tree: any) => {
-//     visit(tree, "element", (node) => {
-//       if (
-//         node?.tagName === "div" &&
-//         node?.properties?.className?.includes("rehype-code-title")
-//       ) {
-//         const titleTextNode = node.children.find(
-//           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-//           (child: any) => child.type === "text"
-//         );
-//         if (!titleTextNode) return;
-
-//         // Extract filename and language
-//         const titleText = titleTextNode.value;
-//         const match = hasSupportedExtension(titleText);
-//         if (!match) return;
-
-//         const splittedNames = titleText.split(".");
-//         const ext = splittedNames[splittedNames.length - 1];
-//         const iconClass = `devicon-${getIconName(
-//           ext
-//         )}-plain text-[17px] colored`;
-
-//         // Insert icon before title text
-//         if (iconClass) {
-//           node.children.unshift({
-//             type: "element",
-//             tagName: "i",
-//             properties: { className: [iconClass, "code-icon"] },
-//             children: [],
-//           });
-//         }
-//       }
-//     });
-//   };
-// }
-
 const NonMemoizedMarkdown = ({ children }: { children: string }) => {
   const components = {
     h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
@@ -137,28 +108,11 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       <ul className={cn("ml-3 py-0  my-0", className)} {...props} />
     ),
     ol: ({ className, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
-      <ol className={cn("   list-decimal ml-6", className)} {...props} />
+      <ol className={cn("list-decimal ml-6", className)} {...props} />
     ),
-    li: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
-      const children = React.Children.toArray(props.children);
-
-      const pChild = children.find(
-        (child) => React.isValidElement(child) && child.type === components.p
-      ) as React.ReactElement | undefined;
-
-      if (pChild) {
-        console.log("pChild is ", pChild);
-        return (
-          <li className={cn("py-0 my-0 list-disc ml-6 ", className)}>
-            {pChild.props.children}
-          </li>
-        );
-      }
-
-      return (
-        <li className={cn("py-0 my-0 list-disc ml-6 ", className)} {...props} />
-      );
-    },
+    li: ({ className, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
+      <li className={cn("list-disc ml-6", className)} {...props} />
+    ),
     a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
       <a
         className={cn("font-medium underline underline-offset-4", className)}
@@ -188,14 +142,7 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
-      rehypePlugins={[
-        preProcess,
-        // rehypeCodeTitles,
-        // rehypeCodeTitlesWithLogo,
-        normalizeLanguage,
-        rehypePrism,
-        postProcess,
-      ]}
+      rehypePlugins={[preProcess, normalizeLanguage, rehypePrism, postProcess]}
       components={components}
     >
       {children}
