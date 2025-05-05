@@ -130,9 +130,6 @@ const NewChatClientPage = ({ user }: NewChatClientPageProps) => {
               </motion.div>
             </form>
           </Card>
-          <p className="text-xs text-center text-muted-foreground mt-2">
-            AI responses are generated and may not always be accurate.
-          </p>
         </div>
       </div>
     </div>

@@ -1,10 +1,10 @@
 "use client";
 
+import { setChatMessages, useChat } from "@/components/context/chat";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
 import { siteConfig } from "@/config/site";
-import useMessages from "@/hooks/use-message";
 import { Message, Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Send } from "lucide-react";
@@ -24,16 +24,21 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
   const [input, setInput] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const params = useParams();
-  const { messages, sendMessage } = useMessages(
-    initialMessages,
-    params.id as string
-  );
+  const id = params.id as string;
+  const { state, dispatch, sendMessage } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const messages = state.chatMessages[id];
 
-  console.log("messages.length is ", messages.length);
+  useEffect(() => {
+    if (!(initialMessages.length > 1)) {
+      console.log("initialMessages.length is not greater than one");
+      return;
+    }
+    dispatch(setChatMessages(initialMessages, id));
+  }, [dispatch, id, initialMessages]);
 
   useEffect(() => {
     if (!message) return;
@@ -48,7 +53,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
     console.log("!input || !input.trim() is ", !input || !input.trim());
     if (input.trim()) {
       setAutoScroll(true);
-      sendMessage(input);
+      sendMessage(input, id);
     }
   };
 
@@ -107,7 +112,7 @@ const ChatClientPage = ({ initialMessages }: ChatClientPageProps) => {
         className="flex-1 flex gap-2 flex-col p-4 overflow-y-auto pb-32 pt-16 relative overflow-x-hidden"
         ref={messagesRef}
       >
-        {messages.map((message) => (
+        {state.chatMessages[id]?.messages.map((message) => (
           <div
             key={message.id}
             className={`whitespace-pre-line overflow-hidden  border rounded-md p-2 max-w-[60%] ${
