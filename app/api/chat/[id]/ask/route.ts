@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
+import { generateTitleFromUserMessage } from "@/lib/utils";
 import { GoogleGenAI } from "@google/genai";
 import { Role } from "@prisma/client";
 import { getServerSession } from "next-auth";
@@ -35,12 +36,18 @@ export async function POST(
     });
 
     if (!chat) {
+      const title = await generateTitleFromUserMessage(message);
+
       chat = await prisma.chat.create({
         data: {
           id,
+          title,
           userId: session.user.id,
+          createdAt: new Date(),
         },
       });
+
+      console.log("new Chat is ", chat);
     }
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
@@ -66,7 +73,7 @@ export async function POST(
       parts: [{ text: msg.content }],
     }));
 
-    console.log("history is ", history);
+    console.log("history.length is ", history.length);
 
     const aiChat = ai.chats.create({
       model: "gemini-2.0-flash",
