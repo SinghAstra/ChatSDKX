@@ -1,7 +1,7 @@
 "use client";
 
 import type { User } from "next-auth";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,20 +18,35 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { siteConfig } from "@/config/site";
+import { fetcher } from "@/lib/utils";
 import { Chat } from "@prisma/client";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
+import useSWR from "swr";
 import { ChatHistory } from "./chat-history";
 import { SidebarUserNav } from "./sidebar-user-nav";
 
 interface AppSidebarProps {
   user: User;
-  chats: Chat[];
 }
 
-export function AppSidebar({ user, chats }: AppSidebarProps) {
+export function AppSidebar({ user }: AppSidebarProps) {
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
+  const pathname = usePathname();
+  const {
+    data: chats,
+    isLoading,
+    mutate,
+  } = useSWR<Chat[]>(user ? "/api/chat" : null, fetcher, {
+    fallbackData: [],
+  });
+
+  useEffect(() => {
+    console.log("pathname is ", pathname);
+    mutate();
+  }, [pathname, mutate]);
 
   return (
     <Sidebar>
@@ -69,7 +84,12 @@ export function AppSidebar({ user, chats }: AppSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <ChatHistory chats={chats} />
+        {isLoading && (
+          <div className="w-full h-full flex items-center justify-center">
+            Loading....
+          </div>
+        )}
+        {!isLoading && chats && <ChatHistory chats={chats} />}
       </SidebarContent>
       <SidebarFooter>
         <SidebarUserNav user={user} />

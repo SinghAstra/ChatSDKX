@@ -33,9 +33,19 @@ export async function generateTitleFromUserMessage(
       id: chatId,
     },
     data: {
-      title: message,
+      title,
     },
   });
 
   return title;
 }
+
+export const fetcher = async (url: string) => {
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error("Failed to Fetch Data Using Fetcher");
+  }
+
+  return res.json();
+};
