@@ -2,13 +2,13 @@
 
 import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
+import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/config/site";
 import useMessages, { ClientMessage } from "@/hooks/use-message";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bot, ChevronDown, Send } from "lucide-react";
+import { ChevronDown, Send } from "lucide-react";
 import { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
@@ -23,7 +23,7 @@ interface ChatProps {
 }
 
 const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const { open, setOpen } = useSidebar();
   const [input, setInput] = useState("");
   const { messages, sendMessage } = useMessages(initialMessages, chatId);
@@ -95,7 +95,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       <div
         className={`flex items-center justify-between  p-2 fixed ${
           open ? "left-[16rem]" : "left-0"
-        } top-0 right-0 bg-muted/40 z-[99]`}
+        } top-0 right-0 backdrop-blur-sm z-[99]`}
       >
         <div className="flex items-center gap-2 ">
           <SidebarToggle />{" "}
@@ -115,31 +115,19 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
       {/* Chat Area */}
       {messages.length === 0 ? (
-        <div
-          // delay={0.2}
-          className="flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full min-h-screen"
-        >
-          <div className="bg-primary/10 p-6 rounded-full">
-            <Bot className="h-12 w-12 text-primary" />
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-bold mb-2">
-              Start a new conversation
-            </h2>
-            <p className="text-muted-foreground max-w-md">
-              Type a message below to begin chatting with the AI assistant.
-            </p>
-          </div>
+        <div className="flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full min-h-screen">
+          <h2 className="text-5xl font-bold mb-8">
+            What can I help you with ?
+          </h2>
           {/* Input Area */}
-          <div className=" w-full mx-auto shadow-lg rounded-md  border border-purple-400">
+          <div className=" w-full mx-auto shadow-lg rounded-md  border ">
             <form onSubmit={handleFormSubmit} className="flex items-center">
-              <Input
+              <Textarea
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-6 px-4"
+                className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[60px] max-h-[200px]"
               />
               <motion.div
                 whileHover={{ scale: 1.05 }}
@@ -168,7 +156,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`whitespace-pre-line overflow-hidden  border rounded-md p-2 max-w-[60%] ${
+              className={`whitespace-pre-line overflow-hidden  border rounded p-2 max-w-[60%] ${
                 message.role === Role.user
                   ? "self-end bg-muted/40 text-foreground/70"
                   : "self-start bg-muted/20 text-foreground"
@@ -204,17 +192,17 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           <div
             className={`fixed z-[20] bottom-0 right-0 ${
               open ? "left-[16rem]" : "left-0"
-            }  bg-muted/40 p-2`}
+            }  backdrop-blur-sm p-2`}
           >
             <div className="max-w-5xl mx-auto bg-background rounded-md">
               <div className="shadow-lg border overflow-hidden rounded-md">
                 <form onSubmit={handleFormSubmit} className="flex items-center">
-                  <Input
+                  <Textarea
                     ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type your message..."
-                    className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-6 px-4"
+                    className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-6 px-4 resize-none"
                   />
                   <motion.div
                     whileHover={{ scale: 1.05 }}

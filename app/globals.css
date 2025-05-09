@@ -35,13 +35,16 @@ body {
     --chart-5: 340 75% 55%;
     /* Radius */
     --radius: 0.875rem;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-background: 240 5% 4%; /* Almost black */
+    --sidebar-foreground: 0 0% 95%; /* Light text for contrast */
+
+    --sidebar-primary: 224.3 76.3% 48%; /* Keep as-is if you want a vibrant accent color */
+    --sidebar-primary-foreground: 0 0% 100%; /* White for primary content */
+
+    --sidebar-accent: 240 3% 8%; /* Darker accent */
+    --sidebar-accent-foreground: 0 0% 95%; /* Slightly off-white for readability */
+
+    --sidebar-border: 240 2% 10%; /* Very dark border */
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
