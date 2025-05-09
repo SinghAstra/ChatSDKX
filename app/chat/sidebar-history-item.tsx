@@ -25,7 +25,7 @@ export const ChatItem = ({
   setOpenMobile: (open: boolean) => void;
 }) => {
   return (
-    <SidebarMenuItem>
+    <SidebarMenuItem className="rounded-sm">
       <SidebarMenuButton asChild isActive={isActive}>
         <Link href={`/chat/${chat.id}`} onClick={() => setOpenMobile(false)}>
           <span>{chat.title}</span>

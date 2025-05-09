@@ -120,19 +120,22 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             What can I help you with ?
           </h2>
           {/* Input Area */}
-          <div className=" w-full mx-auto shadow-lg rounded-md  border ">
-            <form onSubmit={handleFormSubmit} className="flex items-center">
-              <Textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message..."
-                className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[60px] max-h-[200px]"
-              />
+          <form
+            onSubmit={handleFormSubmit}
+            className="flex flex-col w-full mx-auto shadow-lg rounded-md  border  relative "
+          >
+            <Textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] pb-[20px]"
+            />
+            <div className="flex justify-end gap-2">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-2 mr-2"
+                className="p-2 mr-2  "
               >
                 <Button
                   type="submit"
@@ -145,8 +148,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                   <Send className="h-5 w-5" />
                 </Button>
               </motion.div>
-            </form>
-          </div>
+            </div>
+          </form>
         </div>
       ) : (
         <div
@@ -196,7 +199,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           >
             <div className="max-w-5xl mx-auto bg-background rounded-md">
               <div className="shadow-lg border overflow-hidden rounded-md">
-                <form onSubmit={handleFormSubmit} className="flex items-center">
+                <form onSubmit={handleFormSubmit} className="flex flex-col ">
                   <Textarea
                     ref={inputRef}
                     value={input}
@@ -204,22 +207,24 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                     placeholder="Type your message..."
                     className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-6 px-4 resize-none"
                   />
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="p-2 mr-2"
-                  >
-                    <Button
-                      type="submit"
-                      size="icon"
-                      disabled={!input.trim()}
-                      className={`rounded-full ${
-                        !input.trim() ? "opacity-50" : "opacity-100"
-                      }`}
+                  <div className="border flex">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="p-2 mr-2 ml-auto"
                     >
-                      <Send className="h-5 w-5" />
-                    </Button>
-                  </motion.div>
+                      <Button
+                        type="submit"
+                        size="icon"
+                        disabled={!input.trim()}
+                        className={`rounded-full ${
+                          !input.trim() ? "opacity-50" : "opacity-100"
+                        }`}
+                      >
+                        <Send className="h-5 w-5" />
+                      </Button>
+                    </motion.div>
+                  </div>
                 </form>
               </div>
             </div>
