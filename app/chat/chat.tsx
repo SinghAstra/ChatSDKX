@@ -1,13 +1,9 @@
 "use client";
 
+import { useToastContext } from "@/components/providers/toast";
 import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/config/site";
@@ -44,16 +40,23 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [filePreview, setFilePreview] = useState("");
+  const [filePreviews, setFilePreviews] = useState<string[]>([]);
+  const [filePreviewForModal, setFilePreviewForModal] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
+  const { setToastMessage } = useToastContext();
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     console.log("event.target.value.length is ", event.target.value.length);
-    if (event.target.value.length > 500 && !filePreview) {
-      setFilePreview(event.target.value);
+    const { value } = event.target;
+    if (value.length > 500) {
+      if (filePreviews.includes(value)) {
+        setToastMessage("File Already Copied.");
+        return;
+      }
+      setFilePreviews((prev) => [...prev, value]);
       return;
     }
-    setInput(event.target.value);
+    setInput(value);
   };
 
   const handleFormSubmit = async (e: FormEvent) => {
@@ -116,9 +119,9 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   return (
     <div className="min-h-screen flex flex-col w-full relative overflow-x-hidden ">
       <div
-        className={`flex items-center justify-between  p-2 fixed ${
+        className={`flex items-center justify-between  p-2 fixed  ${
           open ? "left-[16rem]" : "left-0"
-        } top-0 right-0 backdrop-blur-sm z-[99]`}
+        } top-0 right-0 backdrop-blur-sm `}
       >
         <div className="flex items-center gap-2 ">
           <SidebarToggle />{" "}
@@ -147,26 +150,34 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             onSubmit={handleFormSubmit}
             className="flex flex-col w-full mx-auto shadow-lg rounded-md  border  relative "
           >
-            <div className="overflow-x-auto bg-muted/10 p-2">
-              {filePreview && (
-                <div className="flex items-center justify-between bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px]">
-                  <span
-                    className=" text-xs whitespace-pre-wrap"
-                    onClick={() => setShowModal(true)}
-                  >
-                    {filePreview.slice(0, 80)}...
-                  </span>
-                  <Button
-                    variant={"outline"}
-                    size={"icon"}
-                    className="text-sm absolute top-1 right-2 rounded-full  h-6 w-6 "
-                    onClick={() => setFilePreview("")}
-                  >
-                    ×
-                  </Button>
-                </div>
-              )}
-            </div>
+            {filePreviews.map((preview, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] overflow-hidden"
+              >
+                <span
+                  className="text-xs"
+                  onClick={() => {
+                    setShowModal(true);
+                    setFilePreviewForModal(preview);
+                  }}
+                >
+                  {preview.split("\n").slice(0, 3).join("\n")}...
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
+                  onClick={() =>
+                    setFilePreviews((prev) =>
+                      prev.filter((_, i) => i !== index)
+                    )
+                  }
+                >
+                  ×
+                </Button>
+              </div>
+            ))}
 
             <Textarea
               ref={inputRef}
@@ -278,7 +289,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <DialogContent className="max-w-3xl border p-0">
           <div className="max-h-[80vh] overflow-auto text-sm whitespace-pre-wrap px-3 py-2">
-            {filePreview}
+            {filePreviewForModal}
           </div>
         </DialogContent>
       </Dialog>
