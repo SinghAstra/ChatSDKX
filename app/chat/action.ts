@@ -28,3 +28,8 @@ export async function fetchChats() {
     return { message: "Failed to Fetch chats", chats: [] };
   }
 }
+
+export async function improvePrompt(prompt: string) {
+  // return await improvePromptWithGemini(prompt);
+  return prompt + "New one";
+}

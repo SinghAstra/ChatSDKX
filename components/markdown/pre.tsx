@@ -20,7 +20,7 @@ export default function Pre({
             className="border w-6 h-6 flex items-center justify-center rounded cursor-pointer hover:bg-muted transition-all duration-200"
             onClick={() => setShowMaximize(true)}
           >
-            <Maximize2 className="w-3 h-3" />
+            <Maximize2 className="w-3 h-3 text-muted-foreground" />
           </div>
           <Copy content={raw!} fileName={filename} />
         </div>

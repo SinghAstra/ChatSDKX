@@ -10,7 +10,7 @@ import { siteConfig } from "@/config/site";
 import useMessages, { ClientMessage } from "@/hooks/use-message";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Send } from "lucide-react";
+import { ChevronDown, Send, Sparkle, Undo2 } from "lucide-react";
 import { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, {
@@ -21,6 +21,7 @@ import React, {
   useState,
 } from "react";
 import { Markdown } from "./[id]/markdown";
+import { improvePrompt } from "./action";
 import { SidebarToggle } from "./sidebar-toggle";
 
 interface ChatProps {
@@ -43,7 +44,21 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
   const [filePreviewForModal, setFilePreviewForModal] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
+  const [originalPrompt, setOriginalPrompt] = useState<string | null>(null);
   const { setToastMessage } = useToastContext();
+
+  const handleImprovePrompt = async () => {
+    setOriginalPrompt(input); // Save original
+    const improved = await improvePrompt(input);
+    setInput(improved);
+  };
+
+  const handleUndoImprove = () => {
+    if (originalPrompt !== null) {
+      setInput(originalPrompt);
+      setOriginalPrompt(null);
+    }
+  };
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = event.target;
@@ -54,6 +69,9 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       }
       setFilePreviews((prev) => [...prev, value]);
       return;
+    }
+    if (originalPrompt !== null && value !== input) {
+      setOriginalPrompt(null);
     }
     setInput(value);
   };
@@ -215,7 +233,33 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               placeholder="Type your message..."
               className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] pb-[20px]"
             />
-            <div className="flex justify-end gap-2">
+            <div className="flex justify-end items-center gap-2 ">
+              {originalPrompt ? (
+                <Button
+                  variant={"outline"}
+                  onClick={handleUndoImprove}
+                  className=" flex gap-2"
+                >
+                  <Undo2 className="w-3 h-3" /> Undo
+                </Button>
+              ) : (
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button
+                    variant={"outline"}
+                    disabled={!input.trim()}
+                    onClick={handleImprovePrompt}
+                    className={` ${
+                      !input.trim() ? "opacity-50" : "opacity-100"
+                    } flex gap-2`}
+                  >
+                    <Sparkle className="w-3 h-3" /> Improve Prompt
+                  </Button>
+                </motion.div>
+              )}
+
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -237,7 +281,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         </div>
       ) : (
         <div
-          className="flex-1 flex gap-2 flex-col px-2 overflow-y-auto pb-40 pt-16 relative overflow-x-hidden"
+          className="flex-1 flex gap-2 flex-col px-2 overflow-y-auto pb-64 pt-16 relative overflow-x-hidden"
           ref={messagesRef}
         >
           {messages.map((message) => (
