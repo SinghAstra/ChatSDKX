@@ -2,6 +2,12 @@
 
 import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/config/site";
@@ -11,7 +17,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Send } from "lucide-react";
 import { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { FormEvent, useEffect, useRef, useState } from "react";
+import React, {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Markdown } from "./[id]/markdown";
 import { SidebarToggle } from "./sidebar-toggle";
 
@@ -32,6 +44,17 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [filePreview, setFilePreview] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    console.log("event.target.value.length is ", event.target.value.length);
+    if (event.target.value.length > 500 && !filePreview) {
+      setFilePreview(event.target.value);
+      return;
+    }
+    setInput(event.target.value);
+  };
 
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -124,10 +147,31 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             onSubmit={handleFormSubmit}
             className="flex flex-col w-full mx-auto shadow-lg rounded-md  border  relative "
           >
+            <div className="overflow-x-auto bg-muted/10 p-2">
+              {filePreview && (
+                <div className="flex items-center justify-between bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px]">
+                  <span
+                    className=" text-xs whitespace-pre-wrap"
+                    onClick={() => setShowModal(true)}
+                  >
+                    {filePreview.slice(0, 80)}...
+                  </span>
+                  <Button
+                    variant={"outline"}
+                    size={"icon"}
+                    className="text-sm absolute top-1 right-2 rounded-full  h-6 w-6 "
+                    onClick={() => setFilePreview("")}
+                  >
+                    ×
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <Textarea
               ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               placeholder="Type your message..."
               className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] pb-[20px]"
             />
@@ -231,6 +275,13 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           </div>
         </div>
       )}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-3xl border p-0">
+          <div className="max-h-[80vh] overflow-auto text-sm whitespace-pre-wrap px-3 py-2">
+            {filePreview}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,13 +1,11 @@
-
-import { Button } from '@/components/ui/button';
-import { useSidebar } from '@/components/ui/sidebar';
+import { Button } from "@/components/ui/button";
+import { useSidebar } from "@/components/ui/sidebar";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
-import { SidebarIcon } from 'lucide-react';
-
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { SidebarIcon } from "lucide-react";
 
 export function SidebarToggle() {
   const { toggleSidebar } = useSidebar();
