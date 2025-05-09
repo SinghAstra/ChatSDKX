@@ -150,34 +150,47 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             onSubmit={handleFormSubmit}
             className="flex flex-col w-full mx-auto shadow-lg rounded-md  border  relative "
           >
-            {filePreviews.map((preview, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] overflow-hidden"
-              >
-                <span
-                  className="text-xs"
-                  onClick={() => {
-                    setShowModal(true);
-                    setFilePreviewForModal(preview);
-                  }}
-                >
-                  {preview.split("\n").slice(0, 3).join("\n")}...
-                </span>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
-                  onClick={() =>
-                    setFilePreviews((prev) =>
-                      prev.filter((_, i) => i !== index)
-                    )
-                  }
-                >
-                  ×
-                </Button>
+            {filePreviews.length > 0 && (
+              <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
+                {filePreviews.map((preview, index) => (
+                  <div
+                    key={index}
+                    className="bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] "
+                  >
+                    <div
+                      className="text-left"
+                      onClick={() => {
+                        setFilePreviewForModal(preview);
+                        setShowModal(true);
+                      }}
+                    >
+                      {preview
+                        .split("\n")
+                        .filter((line) => line.trim() !== "")
+                        .slice(0, 5)
+                        .map((line, index) => (
+                          <p key={index} className="text-xs truncate">
+                            {line}
+                          </p>
+                        ))}
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
+                      onClick={() =>
+                        setFilePreviews((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        )
+                      }
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
 
             <Textarea
               ref={inputRef}
