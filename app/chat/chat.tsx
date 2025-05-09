@@ -46,7 +46,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const { setToastMessage } = useToastContext();
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    console.log("event.target.value.length is ", event.target.value.length);
     const { value } = event.target;
     if (value.length > 500) {
       if (filePreviews.includes(value)) {
@@ -57,6 +56,22 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       return;
     }
     setInput(value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (input.trim()) {
+        setInput("");
+        scrollToBottom();
+        sendMessage(input);
+        if (newChat) {
+          console.log("Navigated to /chat/:id");
+          window.history.replaceState({}, "", `/chat/${chatId}`);
+        }
+      }
+    }
+    // if Shift+Enter, do nothing (allow newline)
   };
 
   const handleFormSubmit = async (e: FormEvent) => {
@@ -195,6 +210,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             <Textarea
               ref={inputRef}
               value={input}
+              onKeyDown={handleKeyDown}
               onChange={handleInputChange}
               placeholder="Type your message..."
               className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] pb-[20px]"
@@ -221,7 +237,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         </div>
       ) : (
         <div
-          className="flex-1 flex gap-2 flex-col px-2 overflow-y-auto pb-32 pt-16 relative overflow-x-hidden"
+          className="flex-1 flex gap-2 flex-col px-2 overflow-y-auto pb-40 pt-16 relative overflow-x-hidden"
           ref={messagesRef}
         >
           {messages.map((message) => (
@@ -268,18 +284,61 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             <div className="max-w-5xl mx-auto bg-background rounded-md">
               <div className="shadow-lg border overflow-hidden rounded-md">
                 <form onSubmit={handleFormSubmit} className="flex flex-col ">
+                  {filePreviews.length > 0 && (
+                    <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
+                      {filePreviews.map((preview, index) => (
+                        <div
+                          key={index}
+                          className="bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] "
+                        >
+                          <div
+                            className="text-left"
+                            onClick={() => {
+                              setFilePreviewForModal(preview);
+                              setShowModal(true);
+                            }}
+                          >
+                            {preview
+                              .split("\n")
+                              .filter((line) => line.trim() !== "")
+                              .slice(0, 5)
+                              .map((line, index) => (
+                                <p key={index} className="text-xs truncate">
+                                  {line}
+                                </p>
+                              ))}
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
+                            onClick={() =>
+                              setFilePreviews((prev) =>
+                                prev.filter((_, i) => i !== index)
+                              )
+                            }
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <Textarea
                     ref={inputRef}
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
                     placeholder="Type your message..."
-                    className="flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 py-6 px-4 resize-none"
+                    className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[40px] pb-[20px]"
                   />
-                  <div className="border flex">
+                  <div className="flex justify-end gap-2">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      className="p-2 mr-2 ml-auto"
+                      className="p-2 mr-2  "
                     >
                       <Button
                         type="submit"
