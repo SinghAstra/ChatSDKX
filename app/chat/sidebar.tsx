@@ -29,22 +29,22 @@ import { SidebarUserNav } from "./sidebar-user-nav";
 
 interface AppSidebarProps {
   user: User;
+  initialChats: Chat[];
 }
 
-export function AppSidebar({ user }: AppSidebarProps) {
+export function AppSidebar({ user, initialChats }: AppSidebarProps) {
   const router = useRouter();
   const { setOpenMobile } = useSidebar();
   const pathname = usePathname();
-  const {
-    data: chats,
-    isLoading,
-    mutate,
-  } = useSWR<Chat[]>(user ? "/api/chat" : null, fetcher, {
-    fallbackData: [],
-  });
+  const { data: chats, mutate } = useSWR<Chat[]>(
+    user ? "/api/chat" : null,
+    fetcher,
+    {
+      fallbackData: initialChats,
+    }
+  );
 
   useEffect(() => {
-    console.log("pathname is ", pathname);
     mutate();
   }, [pathname, mutate]);
 
@@ -72,7 +72,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
                   className="p-2 h-fit"
                   onClick={() => {
                     setOpenMobile(false);
-                    router.push("/chat");
+                    router.push("/chat?new=true");
                   }}
                 >
                   <PlusIcon />
@@ -83,14 +83,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
           </div>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
-        {isLoading && (
-          <div className="w-full h-full flex items-center justify-center">
-            Loading....
-          </div>
-        )}
-        {!isLoading && chats && <ChatHistory chats={chats} />}
-      </SidebarContent>
+      <SidebarContent>{chats && <ChatHistory chats={chats} />}</SidebarContent>
       <SidebarFooter>
         <SidebarUserNav user={user} />
       </SidebarFooter>

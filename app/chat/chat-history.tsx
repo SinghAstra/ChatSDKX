@@ -98,7 +98,7 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
     return (
       <SidebarGroup>
         <SidebarGroupContent>
-          <div className="px-2 text-zinc-500 w-full flex flex-row justify-center items-center text-sm gap-2">
+          <div className="px-2 text-zinc-500 w-full h-full flex flex-row justify-center items-center text-sm gap-2">
             Your conversations will appear here once you start chatting!
           </div>
         </SidebarGroupContent>
@@ -115,7 +115,7 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
           <SidebarMenu>
             <div className="flex flex-col gap-6">
               {groupedChats.today.length > 0 && (
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                     Today
                   </div>
@@ -135,7 +135,7 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
               )}
 
               {groupedChats.yesterday.length > 0 && (
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                     Yesterday
                   </div>
@@ -155,7 +155,7 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
               )}
 
               {groupedChats.lastWeek.length > 0 && (
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                     Last 7 days
                   </div>
@@ -175,7 +175,7 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
               )}
 
               {groupedChats.lastMonth.length > 0 && (
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                     Last 30 days
                   </div>
@@ -195,7 +195,7 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
               )}
 
               {groupedChats.older.length > 0 && (
-                <div>
+                <div className="flex flex-col gap-2">
                   <div className="px-2 py-1 text-xs text-sidebar-foreground/50">
                     Older than last month
                   </div>

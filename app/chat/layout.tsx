@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
+import { fetchChats } from "./action";
 import { AppSidebar } from "./sidebar";
 
 interface ChatLayoutProps {
@@ -19,9 +20,11 @@ const ChatLayout = async ({ children }: ChatLayoutProps) => {
     redirect("/auth/sign-in");
   }
 
+  const { chats } = await fetchChats();
+
   return (
     <SidebarProvider defaultOpen={initialSidebarState}>
-      <AppSidebar user={session.user} />
+      <AppSidebar user={session.user} initialChats={chats} />
       <main className="w-full">{children}</main>
     </SidebarProvider>
   );

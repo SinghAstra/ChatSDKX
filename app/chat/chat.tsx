@@ -10,6 +10,7 @@ import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bot, ChevronDown, Send } from "lucide-react";
 import { User } from "next-auth";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { Markdown } from "./[id]/markdown";
 import { SidebarToggle } from "./sidebar-toggle";
@@ -28,14 +29,15 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const { messages, sendMessage } = useMessages(initialMessages, chatId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
-  const [autoScroll, setAutoScroll] = useState(true);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
     setInput("");
-    setAutoScroll(true);
+    scrollToBottom();
     sendMessage(input);
     // Navigate to /chat/:id
     if (newChat) {
@@ -45,7 +47,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   };
 
   const scrollToBottom = () => {
-    setAutoScroll(true);
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -57,7 +59,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setAutoScroll(entry.isIntersecting);
         setShowScrollButton(!entry.isIntersecting);
       },
       { threshold: 0.8 }
@@ -77,10 +78,17 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   }, []);
 
   useEffect(() => {
-    if (autoScroll) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const newVal = searchParams.get("new");
+    if (newVal) {
+      const params = new URLSearchParams(searchParams.toString());
+
+      // Remove the "deleteKey" param
+      params.delete("new");
+
+      // Update the URL without reloading
+      router.replace(`?${params.toString()}`, { scroll: false });
     }
-  }, [messages, autoScroll]);
+  }, [searchParams, router]);
 
   return (
     <div className="min-h-screen flex flex-col w-full relative overflow-x-hidden ">
