@@ -28,13 +28,3 @@ export async function fetchChats() {
     return { message: "Failed to Fetch chats", chats: [] };
   }
 }
-export async function improvePrompt(prompt: string) {
-  return {
-    improved: prompt + " (Improved)", // Replace with Gemini logic later
-    reasoning: "Made it more specific and added context.", // Explain improvement
-    suggestions: [
-      "What is your target audience?",
-      "Do you have an expected tone?",
-    ], // Suggest more details
-  };
-}

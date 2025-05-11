@@ -9,6 +9,7 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/config/site";
 import useMessages, { ClientMessage } from "@/hooks/use-message";
+import { improvePrompt } from "@/lib/gemini";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Send, Sparkle, Undo2 } from "lucide-react";
@@ -22,7 +23,6 @@ import React, {
   useState,
 } from "react";
 import { Markdown } from "./[id]/markdown";
-import { improvePrompt } from "./action";
 import { SidebarToggle } from "./sidebar-toggle";
 
 interface ChatProps {
@@ -72,28 +72,39 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = event.target;
-    if (value.length > 500) {
-      if (filePreviews.includes(value)) {
-        setToastMessage("File Already Copied.");
-        return;
-      }
-      setFilePreviews((prev) => [...prev, value]);
-      return;
-    }
     if (originalPrompt !== null && value !== input) {
       setOriginalPrompt(null);
     }
     setInput(value);
   };
 
+  const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
+    const pasteData = event.clipboardData.getData("text");
+
+    if (pasteData.length > 1000) {
+      event.preventDefault(); // prevent it from inserting into input
+
+      if (filePreviews.includes(pasteData)) {
+        setToastMessage("File Already Copied.");
+        return;
+      }
+
+      setFilePreviews((prev) => [...prev, pasteData]);
+    } else {
+      // If it's not too long, allow paste to input
+      setInput((prev) => prev + pasteData);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (input.trim()) {
-        setInput("");
-        scrollToBottom();
         const fullMessage = [...filePreviews, input].join("\n\n");
         sendMessage(fullMessage);
+        setInput("");
+        setFilePreviews([]);
+        scrollToBottom();
         if (newChat) {
           console.log("Navigated to /chat/:id");
           window.history.replaceState({}, "", `/chat/${chatId}`);
@@ -106,10 +117,11 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-    setInput("");
-    scrollToBottom();
     const fullMessage = [...filePreviews, input].join("\n\n");
     sendMessage(fullMessage);
+    setInput("");
+    setFilePreviews([]);
+    scrollToBottom();
     // Navigate to /chat/:id
     if (newChat) {
       console.log("Navigated to /chat/:id");
@@ -186,8 +198,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
       {/* Chat Area */}
       {messages.length === 0 ? (
-        <div className="flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full min-h-screen">
-          {improvementReason && (
+        <div className="flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full min-h-screen my-20">
+          {improvementReason ? (
             <FadeSlideIn className="w-full">
               <div className="bg-muted/10 p-3 rounded border text-sm  space-y-2 mx-auto text-left">
                 <span className="font-semibold text-muted-foreground mr-2">
@@ -209,11 +221,11 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                 )}
               </div>
             </FadeSlideIn>
+          ) : (
+            <h2 className="text-5xl font-bold mb-8">
+              What can I help you with ?
+            </h2>
           )}
-
-          <h2 className="text-5xl font-bold mb-8">
-            What can I help you with ?
-          </h2>
 
           {/* Input Area */}
           <form
@@ -267,6 +279,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               value={input}
               onKeyDown={handleKeyDown}
               onChange={handleInputChange}
+              onPaste={handlePaste}
               placeholder="Type your message..."
               className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] pb-[20px]"
             />
@@ -365,49 +378,49 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           >
             <div className="max-w-5xl mx-auto bg-background rounded-md">
               <div className="shadow-lg border overflow-hidden rounded-md">
-                <form onSubmit={handleFormSubmit} className="flex flex-col ">
-                  {filePreviews.length > 0 && (
-                    <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
-                      {filePreviews.map((preview, index) => (
+                {filePreviews.length > 0 && (
+                  <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
+                    {filePreviews.map((preview, index) => (
+                      <div
+                        key={index}
+                        className="bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] "
+                      >
                         <div
-                          key={index}
-                          className="bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] "
+                          className="text-left"
+                          onClick={() => {
+                            setFilePreviewForModal(preview);
+                            setShowModal(true);
+                          }}
                         >
-                          <div
-                            className="text-left"
-                            onClick={() => {
-                              setFilePreviewForModal(preview);
-                              setShowModal(true);
-                            }}
-                          >
-                            {preview
-                              .split("\n")
-                              .filter((line) => line.trim() !== "")
-                              .slice(0, 5)
-                              .map((line, index) => (
-                                <p key={index} className="text-xs truncate">
-                                  {line}
-                                </p>
-                              ))}
-                          </div>
-
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
-                            onClick={() =>
-                              setFilePreviews((prev) =>
-                                prev.filter((_, i) => i !== index)
-                              )
-                            }
-                          >
-                            ×
-                          </Button>
+                          {preview
+                            .split("\n")
+                            .filter((line) => line.trim() !== "")
+                            .slice(0, 5)
+                            .map((line, index) => (
+                              <p key={index} className="text-xs truncate">
+                                {line}
+                              </p>
+                            ))}
                         </div>
-                      ))}
-                    </div>
-                  )}
 
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
+                          onClick={() =>
+                            setFilePreviews((prev) =>
+                              prev.filter((_, i) => i !== index)
+                            )
+                          }
+                        >
+                          ×
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <form onSubmit={handleFormSubmit} className="flex flex-col ">
                   <Textarea
                     ref={inputRef}
                     value={input}
