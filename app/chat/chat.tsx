@@ -81,7 +81,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const pasteData = event.clipboardData.getData("text");
 
-    if (pasteData.length > 1000) {
+    if (pasteData.length > 1500) {
       event.preventDefault(); // prevent it from inserting into input
 
       if (filePreviews.includes(pasteData)) {
@@ -198,9 +198,9 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
       {/* Chat Area */}
       {messages.length === 0 ? (
-        <div className="flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full min-h-screen my-20">
+        <div className="flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full min-h-screen py-6">
           {improvementReason ? (
-            <FadeSlideIn className="w-full">
+            <FadeSlideIn className="w-full mt-16">
               <div className="bg-muted/10 p-3 rounded border text-sm  space-y-2 mx-auto text-left">
                 <span className="font-semibold text-muted-foreground mr-2">
                   Reasoning behind Prompt Improvement
@@ -420,11 +420,21 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                   </div>
                 )}
 
-                <form onSubmit={handleFormSubmit} className="flex flex-col ">
+                {/* <form onSubmit={handleFormSubmit} className="flex flex-col ">
                   <Textarea
                     ref={inputRef}
                     value={input}
-                    onChange={handleInputChange}
+                    onChange={(e) => {
+                      console.log(
+                        "e.target.scrollHeight is ",
+                        e.target.scrollHeight
+                      );
+
+                      const el = e.target;
+                      el.style.height = "auto";
+                      el.style.height = el.scrollHeight + "px";
+                      handleInputChange(e);
+                    }}
                     onKeyDown={handleKeyDown}
                     placeholder="Type your message..."
                     className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[40px] pb-[20px]"
@@ -447,7 +457,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                       </Button>
                     </motion.div>
                   </div>
-                </form>
+                </form> */}
               </div>
             </div>
           </div>

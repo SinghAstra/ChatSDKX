@@ -55,6 +55,7 @@ export async function improvePrompt(prompt: string) {
     }
 
     const parsed = JSON.parse(response.text);
+    console.log("parsed is ", parsed);
     return parsed;
   } catch (error) {
     if (error instanceof Error) {

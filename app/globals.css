@@ -206,3 +206,9 @@ pre > code {
     opacity: 1;
   }
 }
+
+.placeholder:empty:before {
+  content: attr(data-placeholder);
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+}
