@@ -1,5 +1,5 @@
 import { Role } from "@prisma/client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type ClientMessage = {
   id: string;
@@ -13,6 +13,10 @@ export default function useMessages(
   chatId: string
 ) {
   const [messages, setMessages] = useState<ClientMessage[]>(initialMessages);
+
+  useEffect(() => {
+    setMessages(initialMessages);
+  }, [chatId, initialMessages]);
 
   const sendMessage = async (input: string) => {
     const userMessage: ClientMessage = {

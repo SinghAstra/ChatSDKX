@@ -51,6 +51,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   );
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
 
+  console.log("chatId is ", chatId);
+
   const { setToastMessage } = useToastContext();
 
   const handleImprovePrompt = async () => {

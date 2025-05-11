@@ -18,11 +18,6 @@ const ChatPage = async ({ params }: { params: { id: string } }) => {
     notFound();
   }
 
-  console.log(
-    "In /chat/:id server component chat.messages.length is ",
-    chat.messages.length
-  );
-
   return (
     <Chat
       initialMessages={chat.messages}
