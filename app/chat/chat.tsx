@@ -1,5 +1,6 @@
 "use client";
 
+import FadeSlideIn from "@/components/global/fade-slide-in";
 import { useToastContext } from "@/components/providers/toast";
 import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
@@ -45,18 +46,27 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const [filePreviewForModal, setFilePreviewForModal] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
   const [originalPrompt, setOriginalPrompt] = useState<string | null>(null);
+  const [improvementReason, setImprovementReason] = useState<string | null>(
+    null
+  );
+  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
+
   const { setToastMessage } = useToastContext();
 
   const handleImprovePrompt = async () => {
     setOriginalPrompt(input); // Save original
-    const improved = await improvePrompt(input);
-    setInput(improved);
+    const res = await improvePrompt(input);
+    setInput(res.improved);
+    setImprovementReason(res.reasoning);
+    setSuggestedQuestions(res.suggestions);
   };
 
   const handleUndoImprove = () => {
     if (originalPrompt !== null) {
       setInput(originalPrompt);
       setOriginalPrompt(null);
+      setImprovementReason(null);
+      setSuggestedQuestions([]);
     }
   };
 
@@ -82,7 +92,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       if (input.trim()) {
         setInput("");
         scrollToBottom();
-        sendMessage(input);
+        const fullMessage = [...filePreviews, input].join("\n\n");
+        sendMessage(fullMessage);
         if (newChat) {
           console.log("Navigated to /chat/:id");
           window.history.replaceState({}, "", `/chat/${chatId}`);
@@ -97,7 +108,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     if (!input.trim()) return;
     setInput("");
     scrollToBottom();
-    sendMessage(input);
+    const fullMessage = [...filePreviews, input].join("\n\n");
+    sendMessage(fullMessage);
     // Navigate to /chat/:id
     if (newChat) {
       console.log("Navigated to /chat/:id");
@@ -154,7 +166,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       <div
         className={`flex items-center justify-between  p-2 fixed  ${
           open ? "left-[16rem]" : "left-0"
-        } top-0 right-0 backdrop-blur-sm `}
+        } top-0 right-0 backdrop-blur-sm z-[19]`}
       >
         <div className="flex items-center gap-2 ">
           <SidebarToggle />{" "}
@@ -175,9 +187,34 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       {/* Chat Area */}
       {messages.length === 0 ? (
         <div className="flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full min-h-screen">
+          {improvementReason && (
+            <FadeSlideIn className="w-full">
+              <div className="bg-muted/10 p-3 rounded border text-sm  space-y-2 mx-auto text-left">
+                <span className="font-semibold text-muted-foreground mr-2">
+                  Reasoning behind Prompt Improvement
+                </span>
+                <span>{improvementReason}</span>
+
+                {suggestedQuestions.length > 0 && (
+                  <div className="text-left">
+                    <p className="font-semibold mt-2 text-muted-foreground">
+                      Answer these questions in the prompt
+                    </p>
+                    <ul className="list-disc pl-4">
+                      {suggestedQuestions.map((q, i) => (
+                        <li key={i}>{q}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </FadeSlideIn>
+          )}
+
           <h2 className="text-5xl font-bold mb-8">
             What can I help you with ?
           </h2>
+
           {/* Input Area */}
           <form
             onSubmit={handleFormSubmit}
@@ -233,6 +270,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               placeholder="Type your message..."
               className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] pb-[20px]"
             />
+
             <div className="flex justify-end items-center gap-2 ">
               {originalPrompt ? (
                 <Button

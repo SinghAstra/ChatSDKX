@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { generateText } from "./ai";
+import { generateText } from "./gemini";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
