@@ -43,14 +43,14 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
             </GradientButton>
 
             <h1 className="text-foreground text-center py-6 text-5xl font-medium text-balance sm:text-6xl md:text-7xl lg:text-8xl  w-full">
-              Build{" "}
+              Build <br />
               <span className="text-transparent bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text inline-bloc">
-                AI Apps
+                Chat AI Apps
               </span>
             </h1>
 
             <p className="mb-4 text-lg tracking-tight text-muted-foreground md:text-xl text-balance">
-              Kickstart your project with a full-stack template powered by
+              Kickstart your project with a Chat AI template powered by
               <br />
               Gemini API
             </p>
@@ -112,8 +112,8 @@ const HeroSection = ({ isAuthenticated }: HeroSectionProps) => {
           >
             <h1 className="mt-8 text-foreground py-4  text-center text-4xl font-medium tracking-tight md:text-7xl">
               Build <br />
-              <span className="text-transparent bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text inline-bloc">
-                Full Stack AI Apps{" "}
+              <span className="text-transparent bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text inline-bloc text-6xl">
+                AI Chat Apps{" "}
               </span>
               <br />
               with Ease

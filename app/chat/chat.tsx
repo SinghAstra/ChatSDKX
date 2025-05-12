@@ -207,7 +207,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
       {/* Chat Area */}
       {messages.length === 0 ? (
-        <div className="flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full min-h-screen py-6">
+        <div className=" flex-1 flex flex-col  gap-4 items-center justify-center  text-center max-w-3xl mx-auto w-full py-6">
           {improvementReason ? (
             <FadeSlideIn className="w-full mt-16">
               <div className="bg-muted/10 p-3 rounded border text-sm  space-y-2 mx-auto text-left">
@@ -417,7 +417,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             )}
           </AnimatePresence>
           <div
-            className={`fixed z-[20] bottom-0 right-0 ${
+            className={`sticky z-[20] bottom-0 right-0 ${
               open ? "left-[16rem]" : "left-0"
             }  `}
           >
