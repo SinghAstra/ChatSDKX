@@ -22,6 +22,8 @@ const ChatLayout = async ({ children }: ChatLayoutProps) => {
 
   const { chats } = await fetchChats();
 
+  console.log("chats.length is ", chats.length);
+
   return (
     <SidebarProvider defaultOpen={initialSidebarState}>
       <AppSidebar user={session.user} initialChats={chats} />

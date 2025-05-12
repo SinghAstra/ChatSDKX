@@ -12,7 +12,7 @@ import useMessages, { ClientMessage } from "@/hooks/use-message";
 import { improvePrompt } from "@/lib/gemini";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Send, Sparkle, Undo2 } from "lucide-react";
+import { ChevronDown, Loader2, Send, Sparkle, Undo2 } from "lucide-react";
 import { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import React, {
@@ -45,6 +45,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
   const [filePreviewForModal, setFilePreviewForModal] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
+  const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
   const [originalPrompt, setOriginalPrompt] = useState<string | null>(null);
   const [improvementReason, setImprovementReason] = useState<string | null>(
     null
@@ -56,11 +57,13 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const { setToastMessage } = useToastContext();
 
   const handleImprovePrompt = async () => {
+    setIsImprovingPrompt(true);
     setOriginalPrompt(input); // Save original
     const res = await improvePrompt(input);
     setInput(res.improved);
     setImprovementReason(res.reasoning);
     setSuggestedQuestions(res.suggestions);
+    setIsImprovingPrompt(false);
   };
 
   const handleUndoImprove = () => {
@@ -230,10 +233,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           )}
 
           {/* Input Area */}
-          <form
-            onSubmit={handleFormSubmit}
-            className="flex flex-col w-full mx-auto shadow-lg rounded-md  border  relative "
-          >
+          <div className="flex flex-col w-full mx-auto shadow-lg rounded-md  border  relative ">
             {filePreviews.length > 0 && (
               <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
                 {filePreviews.map((preview, index) => (
@@ -287,18 +287,42 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             />
 
             <div className="flex justify-end items-center gap-2 ">
-              {originalPrompt ? (
-                <Button
-                  variant={"outline"}
-                  onClick={handleUndoImprove}
-                  className=" flex gap-2"
-                >
-                  <Undo2 className="w-3 h-3" /> Undo
-                </Button>
-              ) : (
+              {isImprovingPrompt ? (
                 <motion.div
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  <Button variant={"outline"} className=" flex gap-2 disabled">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Improving
+                    Prompt
+                  </Button>
+                </motion.div>
+              ) : originalPrompt ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                >
+                  <Button
+                    variant={"outline"}
+                    onClick={handleUndoImprove}
+                    className=" flex gap-2"
+                  >
+                    <Undo2 className="w-3 h-3" /> Undo
+                  </Button>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
                 >
                   <Button
                     variant={"outline"}
@@ -314,23 +338,26 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               )}
 
               <motion.div
+                initial={{ opacity: 0, scale: 0.7 }}
+                animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-2 mr-2  "
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="p-2 mr-2"
               >
                 <Button
-                  type="submit"
                   size="icon"
                   disabled={!input.trim()}
-                  className={`rounded-full ${
+                  className={`rounded-full  ${
                     !input.trim() ? "opacity-50" : "opacity-100"
                   }`}
+                  onClick={handleFormSubmit}
                 >
                   <Send className="h-5 w-5" />
                 </Button>
               </motion.div>
             </div>
-          </form>
+          </div>
         </div>
       ) : (
         <div
