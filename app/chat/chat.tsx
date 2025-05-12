@@ -417,7 +417,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             )}
           </AnimatePresence>
           <div
-            className={`sticky z-[20] bottom-0 right-0 ${
+            className={`fixed z-[20] bottom-0 right-0 ${
               open ? "left-[16rem]" : "left-0"
             }  `}
           >
@@ -475,59 +475,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               />
 
               <div className="flex justify-end items-center gap-2 ">
-                {isImprovingPrompt ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                  >
-                    <Button
-                      variant={"outline"}
-                      className=" flex gap-2 disabled"
-                    >
-                      <Loader2 className="w-3 h-3 animate-spin" /> Improving
-                      Prompt
-                    </Button>
-                  </motion.div>
-                ) : originalPrompt ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                  >
-                    <Button
-                      variant={"outline"}
-                      onClick={handleUndoImprove}
-                      className=" flex gap-2"
-                    >
-                      <Undo2 className="w-3 h-3" /> Undo
-                    </Button>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.7 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                  >
-                    <Button
-                      variant={"outline"}
-                      disabled={!input.trim()}
-                      onClick={handleImprovePrompt}
-                      className={` ${
-                        !input.trim() ? "opacity-50" : "opacity-100"
-                      } flex gap-2`}
-                    >
-                      <Sparkle className="w-3 h-3" /> Improve Prompt
-                    </Button>
-                  </motion.div>
-                )}
-
                 <motion.div
                   initial={{ opacity: 0, scale: 0.7 }}
                   animate={{ opacity: 1, scale: 1 }}
