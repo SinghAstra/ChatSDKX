@@ -108,7 +108,7 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       <ol className={cn("list-decimal ml-6", className)} {...props} />
     ),
     li: ({ className, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
-      <li className={cn("list-disc ml-6", className)} {...props} />
+      <li className={cn(" ml-6", className)} {...props} />
     ),
     a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
       <a
