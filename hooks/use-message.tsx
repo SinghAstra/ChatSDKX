@@ -13,12 +13,14 @@ export default function useMessages(
   chatId: string
 ) {
   const [messages, setMessages] = useState<ClientMessage[]>(initialMessages);
+  const [isStreaming, setIsStreaming] = useState(false);
 
   useEffect(() => {
     setMessages(initialMessages);
   }, [chatId, initialMessages]);
 
   const sendMessage = async (input: string) => {
+    setIsStreaming(true);
     const userMessage: ClientMessage = {
       id: crypto.randomUUID(),
       role: "user",
@@ -65,7 +67,9 @@ export default function useMessages(
           : msg
       )
     );
+
+    setIsStreaming(false);
   };
 
-  return { messages, sendMessage };
+  return { messages, sendMessage, isStreaming };
 }

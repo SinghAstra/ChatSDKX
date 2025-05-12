@@ -36,7 +36,10 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { open, setOpen } = useSidebar();
   const [input, setInput] = useState("");
-  const { messages, sendMessage } = useMessages(initialMessages, chatId);
+  const { messages, sendMessage, isStreaming } = useMessages(
+    initialMessages,
+    chatId
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -51,8 +54,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     null
   );
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
-
-  console.log("chatId is ", chatId);
 
   const { setToastMessage } = useToastContext();
 
@@ -85,10 +86,9 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
   const handlePaste = (event: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const pasteData = event.clipboardData.getData("text");
+    event.preventDefault(); // prevent it from inserting into input
 
     if (pasteData.length > 1500) {
-      event.preventDefault(); // prevent it from inserting into input
-
       if (filePreviews.includes(pasteData)) {
         setToastMessage("File Already Copied.");
         return;
@@ -96,13 +96,17 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
       setFilePreviews((prev) => [...prev, pasteData]);
     } else {
+      if (input.includes(pasteData)) {
+        setToastMessage("Text Already Copied.");
+        return;
+      }
       // If it's not too long, allow paste to input
       setInput((prev) => prev + pasteData);
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && !isStreaming) {
       e.preventDefault();
       if (input.trim()) {
         const fullMessage = [...filePreviews, input].join("\n\n");
@@ -181,9 +185,9 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   return (
     <div className="min-h-screen flex flex-col w-full relative overflow-x-hidden ">
       <div
-        className={`flex items-center justify-between  p-2 fixed  ${
+        className={`flex items-center justify-between  p-2 sticky  ${
           open ? "left-[16rem]" : "left-0"
-        } top-0 right-0 backdrop-blur-sm z-[19]`}
+        } top-0 right-0 backdrop-blur-sm z-[19]  bg-background  transition-all`}
       >
         <div className="flex items-center gap-2 ">
           <SidebarToggle />{" "}
@@ -283,7 +287,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               onChange={handleInputChange}
               onPaste={handlePaste}
               placeholder="Type your message..."
-              className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] pb-[20px]"
+              className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px]  pb-[20px]"
             />
 
             <div className="flex justify-end items-center gap-2 ">
@@ -347,7 +351,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               >
                 <Button
                   size="icon"
-                  disabled={!input.trim()}
+                  disabled={!input.trim() || isStreaming}
                   className={`rounded-full  ${
                     !input.trim() ? "opacity-50" : "opacity-100"
                   }`}
@@ -364,18 +368,30 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           className="flex-1 flex gap-2 flex-col px-2 overflow-y-auto pb-64 pt-16 relative overflow-x-hidden"
           ref={messagesRef}
         >
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`whitespace-pre-line overflow-hidden  border rounded p-2 max-w-[60%] ${
-                message.role === Role.user
-                  ? "self-end bg-muted/40 text-foreground/70"
-                  : "self-start bg-muted/20 text-foreground"
-              }`}
-            >
-              <Markdown>{message.content}</Markdown>
-            </div>
-          ))}
+          {messages.map((message) => {
+            if (!message.content.trim() && message.isStreaming) {
+              return (
+                <div
+                  key={message.id}
+                  className="self-start bg-muted/20 text-muted-foreground px-4 py-2 rounded text-sm"
+                >
+                  Thinking<span className="animate-pulse">...</span>
+                </div>
+              );
+            }
+            return (
+              <div
+                key={message.id}
+                className={`whitespace-pre-line overflow-hidden  border rounded p-2 max-w-[90%] sm:max-w-[60%] ${
+                  message.role === Role.user
+                    ? "self-end bg-muted/40 text-foreground/70"
+                    : "self-start bg-muted/20 text-foreground"
+                }`}
+              >
+                <Markdown>{message.content}</Markdown>
+              </div>
+            );
+          })}
           <div ref={messagesEndRef} />
           <AnimatePresence>
             {showScrollButton && (
@@ -403,90 +419,134 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           <div
             className={`fixed z-[20] bottom-0 right-0 ${
               open ? "left-[16rem]" : "left-0"
-            }  backdrop-blur-sm p-2`}
+            }  `}
           >
-            <div className="max-w-5xl mx-auto bg-background rounded-md">
-              <div className="shadow-lg border overflow-hidden rounded-md">
-                {filePreviews.length > 0 && (
-                  <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
-                    {filePreviews.map((preview, index) => (
+            <div className="border max-w-3xl mx-auto rounded-t-md backdrop-blur-md">
+              {filePreviews.length > 0 && (
+                <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
+                  {filePreviews.map((preview, index) => (
+                    <div
+                      key={index}
+                      className="bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] "
+                    >
                       <div
-                        key={index}
-                        className="bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] "
+                        className="text-left"
+                        onClick={() => {
+                          setFilePreviewForModal(preview);
+                          setShowModal(true);
+                        }}
                       >
-                        <div
-                          className="text-left"
-                          onClick={() => {
-                            setFilePreviewForModal(preview);
-                            setShowModal(true);
-                          }}
-                        >
-                          {preview
-                            .split("\n")
-                            .filter((line) => line.trim() !== "")
-                            .slice(0, 5)
-                            .map((line, index) => (
-                              <p key={index} className="text-xs truncate">
-                                {line}
-                              </p>
-                            ))}
-                        </div>
-
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
-                          onClick={() =>
-                            setFilePreviews((prev) =>
-                              prev.filter((_, i) => i !== index)
-                            )
-                          }
-                        >
-                          ×
-                        </Button>
+                        {preview
+                          .split("\n")
+                          .filter((line) => line.trim() !== "")
+                          .slice(0, 5)
+                          .map((line, index) => (
+                            <p key={index} className="text-xs truncate">
+                              {line}
+                            </p>
+                          ))}
                       </div>
-                    ))}
-                  </div>
+
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
+                        onClick={() =>
+                          setFilePreviews((prev) =>
+                            prev.filter((_, i) => i !== index)
+                          )
+                        }
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Textarea
+                ref={inputRef}
+                value={input}
+                onKeyDown={handleKeyDown}
+                onChange={handleInputChange}
+                onPaste={handlePaste}
+                placeholder="Type your message..."
+                className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px]  pb-[20px]"
+              />
+
+              <div className="flex justify-end items-center gap-2 ">
+                {isImprovingPrompt ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.7 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    <Button
+                      variant={"outline"}
+                      className=" flex gap-2 disabled"
+                    >
+                      <Loader2 className="w-3 h-3 animate-spin" /> Improving
+                      Prompt
+                    </Button>
+                  </motion.div>
+                ) : originalPrompt ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.7 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    <Button
+                      variant={"outline"}
+                      onClick={handleUndoImprove}
+                      className=" flex gap-2"
+                    >
+                      <Undo2 className="w-3 h-3" /> Undo
+                    </Button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.7 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    <Button
+                      variant={"outline"}
+                      disabled={!input.trim()}
+                      onClick={handleImprovePrompt}
+                      className={` ${
+                        !input.trim() ? "opacity-50" : "opacity-100"
+                      } flex gap-2`}
+                    >
+                      <Sparkle className="w-3 h-3" /> Improve Prompt
+                    </Button>
+                  </motion.div>
                 )}
 
-                {/* <form onSubmit={handleFormSubmit} className="flex flex-col ">
-                  <Textarea
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => {
-                      console.log(
-                        "e.target.scrollHeight is ",
-                        e.target.scrollHeight
-                      );
-
-                      const el = e.target;
-                      el.style.height = "auto";
-                      el.style.height = el.scrollHeight + "px";
-                      handleInputChange(e);
-                    }}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type your message..."
-                    className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[40px] pb-[20px]"
-                  />
-                  <div className="flex justify-end gap-2">
-                    <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="p-2 mr-2  "
-                    >
-                      <Button
-                        type="submit"
-                        size="icon"
-                        disabled={!input.trim()}
-                        className={`rounded-full ${
-                          !input.trim() ? "opacity-50" : "opacity-100"
-                        }`}
-                      >
-                        <Send className="h-5 w-5" />
-                      </Button>
-                    </motion.div>
-                  </div>
-                </form> */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="p-2 mr-2"
+                >
+                  <Button
+                    size="icon"
+                    disabled={!input.trim() || isStreaming}
+                    className={`rounded-full  ${
+                      !input.trim() ? "opacity-50" : "opacity-100"
+                    }`}
+                    onClick={handleFormSubmit}
+                  >
+                    <Send className="h-5 w-5" />
+                  </Button>
+                </motion.div>
               </div>
             </div>
           </div>
