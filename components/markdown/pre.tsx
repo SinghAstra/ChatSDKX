@@ -12,7 +12,7 @@ export default function Pre({
   const [showMaximize, setShowMaximize] = useState(false);
 
   return (
-    <div className=" relative bg-muted/20 rounded w-[550px]  border mx-auto ">
+    <div className=" relative bg-muted/20 rounded w-[550px]  border mx-auto my-10">
       <div className="text-sm px-3 py-1 border-b bg-muted/20 rounded-t flex items-center justify-between">
         {filename}
         <div className="ml-auto flex gap-2">

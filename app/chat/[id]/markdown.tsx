@@ -72,48 +72,62 @@ const normalizeLanguage = () => (tree: any) => {
 const NonMemoizedMarkdown = ({ children }: { children: string }) => {
   const components = {
     h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-      <h1 className={cn("font-heading text-4xl ", className)} {...props} />
+      <h1
+        className={cn(
+          "font-heading mt-2 scroll-m-20 text-4xl font-bold",
+          className
+        )}
+        {...props}
+      />
     ),
     h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
       <h2
-        className={cn("font-heading text-3xl font-medium  w-fit", className)}
+        className={cn(
+          "font-heading mt-16 scroll-m-20 border-b pb-4 text-xl font-semibold tracking-tight first:mt-0",
+          className
+        )}
         {...props}
       />
     ),
     h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-      <h3 className={cn("font-heading text-lg w-fit", className)} {...props} />
-    ),
-    h4: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-      <h4 className={cn("font-heading text-lg ", className)} {...props} />
-    ),
-    h5: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-      <h5 className={cn("scroll-m-20 text-lg ", className)} {...props} />
-    ),
-    h6: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-      <h6 className={cn(" text-base", className)} {...props} />
-    ),
-    strong: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-      <strong
-        className={cn("font-normal inline text-cyan-400", className)}
+      <h3
+        className={cn(
+          "font-heading mt-8 scroll-m-20 text-lg font-semibold tracking-tight",
+          className
+        )}
         {...props}
       />
     ),
-    em: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-      <em className={cn("not-italic", className)} {...props} />
+    h4: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+      <h4
+        className={cn(
+          "font-heading mt-8 scroll-m-20 text-lg font-semibold tracking-tight",
+          className
+        )}
+        {...props}
+      />
     ),
-    ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
-      <ul className={cn("ml-3 py-0 list-disc  my-0", className)} {...props} />
+    h5: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+      <h5
+        className={cn(
+          "mt-8 scroll-m-20 text-lg font-semibold tracking-tight",
+          className
+        )}
+        {...props}
+      />
     ),
-    ol: ({ className, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
-      <ol className={cn("list-decimal ml-6", className)} {...props} />
-    ),
-    li: ({ className, ...props }: React.HTMLAttributes<HTMLLIElement>) => (
-      <li className={cn(" ml-6", className)} {...props} />
+    h6: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+      <h6
+        className={cn(
+          "mt-8 scroll-m-20 text-base font-semibold tracking-tight",
+          className
+        )}
+        {...props}
+      />
     ),
     a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
       <a
         className={cn("font-medium underline underline-offset-4", className)}
-        target="_blank"
         {...props}
       />
     ),
@@ -121,7 +135,37 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       className,
       ...props
     }: React.HTMLAttributes<HTMLParagraphElement>) => (
-      <p className={cn(" py-0 m-0 font-thin", className)} {...props} />
+      <p
+        className={cn(
+          "leading-[1.65rem] [&:not(:first-child)]:mt-6",
+          className
+        )}
+        {...props}
+      />
+    ),
+    strong: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+      <strong className={cn("text-purple-400", className)} {...props} />
+    ),
+    ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
+      <ul className={cn("my-6 ml-6 list-disc", className)} {...props} />
+    ),
+    ol: ({ className, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
+      <ol className={cn("my-6 ml-6 list-decimal", className)} {...props} />
+    ),
+    li: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+      <li className={cn("mt-2", className)} {...props} />
+    ),
+    blockquote: ({
+      className,
+      ...props
+    }: React.HTMLAttributes<HTMLElement>) => (
+      <blockquote
+        className={cn("mt-6 border-l-2 pl-6 italic", className)}
+        {...props}
+      />
+    ),
+    hr: ({ ...props }: React.HTMLAttributes<HTMLHRElement>) => (
+      <hr className="my-4 md:my-8" {...props} />
     ),
     pre: Pre,
     code: ({ className, children, ...props }: ComponentProps<"code">) => {
@@ -134,6 +178,9 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
         </code>
       );
     },
+    em: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+      <em className={cn("not-italic", className)} {...props} />
+    ),
   };
 
   return (
