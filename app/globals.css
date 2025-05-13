@@ -33,18 +33,17 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    /* Radius */
     --radius: 0.875rem;
-    --sidebar-background: 240 5% 4%; /* Almost black */
-    --sidebar-foreground: 0 0% 95%; /* Light text for contrast */
+    --sidebar-background: 240 5% 4%;
+    --sidebar-foreground: 0 0% 95%;
 
-    --sidebar-primary: 224.3 76.3% 48%; /* Keep as-is if you want a vibrant accent color */
-    --sidebar-primary-foreground: 0 0% 100%; /* White for primary content */
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
 
-    --sidebar-accent: 240 3% 8%; /* Darker accent */
-    --sidebar-accent-foreground: 0 0% 95%; /* Slightly off-white for readability */
+    --sidebar-accent: 240 3% 8%;
+    --sidebar-accent-foreground: 0 0% 95%;
 
-    --sidebar-border: 240 2% 10%; /* Very dark border */
+    --sidebar-border: 240 2% 10%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -57,18 +56,16 @@ body {
     @apply bg-background text-foreground;
   }
 
-  /* Apply scrollbar styles globally */
   * {
     @apply border-border;
     scrollbar-width: thin;
     scrollbar-color: hsl(var(--secondary)) transparent;
   }
 
-  /* Target all elements that can scroll */
   *::-webkit-scrollbar {
     width: 6px;
     border-radius: 3px;
-    height: 6px; /* For horizontal scrollbars */
+    height: 6px;
   }
 
   *::-webkit-scrollbar-track {
@@ -85,7 +82,6 @@ body {
     cursor: grab;
   }
 
-  /* Specific styling for horizontal scrollbars */
   *::-webkit-scrollbar-corner {
     background: transparent;
   }
@@ -111,19 +107,19 @@ input:-webkit-autofill:not(:focus) {
 }
 
 .keyword {
-  color: #f97583; /* GitHub Light Red */
+  color: #f97583;
 }
 
 .function {
-  color: #d2a8ff; /* GitHub Light Purple */
+  color: #d2a8ff;
 }
 
 .punctuation {
-  color: #c9d1d9; /* GitHub Light Gray */
+  color: #c9d1d9;
 }
 
 .comment {
-  color: #8b949e; /* GitHub Muted Gray */
+  color: #8b949e;
 }
 
 .string,
@@ -131,26 +127,25 @@ input:-webkit-autofill:not(:focus) {
 .annotation,
 .boolean,
 .number {
-  color: #79c0ff; /* GitHub Light Blue */
+  color: #79c0ff;
 }
 
 .tag {
-  color: #a5d6ff; /* GitHub Cyan */
+  color: #a5d6ff;
 }
 
 .attr-name {
-  color: #d2a8ff; /* GitHub Light Purple */
+  color: #d2a8ff;
 }
 
 .attr-value {
-  color: #ffa657; /* GitHub Light Orange */
+  color: #ffa657;
 }
 
 pre > code {
   border: 0;
 }
 
-/* Custom animations for loading state */
 @layer utilities {
   .animate-fade-in {
     animation: fadeIn 0.6s ease-in-out;
@@ -205,10 +200,4 @@ pre > code {
   50% {
     opacity: 1;
   }
-}
-
-.placeholder:empty:before {
-  content: attr(data-placeholder);
-  color: hsl(var(--muted-foreground));
-  pointer-events: none;
 }

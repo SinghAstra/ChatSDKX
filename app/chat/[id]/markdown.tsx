@@ -102,7 +102,7 @@ const NonMemoizedMarkdown = ({ children }: { children: string }) => {
       <em className={cn("not-italic", className)} {...props} />
     ),
     ul: ({ className, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
-      <ul className={cn("ml-3 py-0  my-0", className)} {...props} />
+      <ul className={cn("ml-3 py-0 list-disc  my-0", className)} {...props} />
     ),
     ol: ({ className, ...props }: React.HTMLAttributes<HTMLOListElement>) => (
       <ol className={cn("list-decimal ml-6", className)} {...props} />

@@ -382,10 +382,10 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             return (
               <div
                 key={message.id}
-                className={`whitespace-pre-line overflow-hidden  border rounded p-2 max-w-[90%] sm:max-w-[60%] ${
+                className={`flex flex-col gap-8 border rounded p-2 max-w-[90%] sm:max-w-[60%] ${
                   message.role === Role.user
-                    ? "self-end bg-muted/40 text-foreground/70"
-                    : "self-start bg-muted/20 text-foreground"
+                    ? "ml-auto bg-muted/40 text-foreground/70"
+                    : "mr-auto bg-muted/20 text-foreground"
                 }`}
               >
                 <Markdown>{message.content}</Markdown>
@@ -421,79 +421,81 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               open ? "left-[16rem]" : "left-0"
             }  `}
           >
-            <div className="border max-w-3xl mx-auto rounded-t-md backdrop-blur-md">
-              {filePreviews.length > 0 && (
-                <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
-                  {filePreviews.map((preview, index) => (
-                    <div
-                      key={index}
-                      className="bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] "
-                    >
+            <div className="border border-p max-w-3xl mx-auto rounded-t-md backdrop-blur-md pt-2 px-2">
+              <div className="border w-full rounded-t-md bg-background ">
+                {filePreviews.length > 0 && (
+                  <div className="bg-muted/10 flex gap-2 p-2 overflow-x-auto">
+                    {filePreviews.map((preview, index) => (
                       <div
-                        className="text-left"
-                        onClick={() => {
-                          setFilePreviewForModal(preview);
-                          setShowModal(true);
-                        }}
+                        key={index}
+                        className="bg-muted/20 px-3 py-2 rounded mb-2 cursor-pointer relative w-[200px] "
                       >
-                        {preview
-                          .split("\n")
-                          .filter((line) => line.trim() !== "")
-                          .slice(0, 5)
-                          .map((line, index) => (
-                            <p key={index} className="text-xs truncate">
-                              {line}
-                            </p>
-                          ))}
+                        <div
+                          className="text-left"
+                          onClick={() => {
+                            setFilePreviewForModal(preview);
+                            setShowModal(true);
+                          }}
+                        >
+                          {preview
+                            .split("\n")
+                            .filter((line) => line.trim() !== "")
+                            .slice(0, 5)
+                            .map((line, index) => (
+                              <p key={index} className="text-xs truncate">
+                                {line}
+                              </p>
+                            ))}
+                        </div>
+
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
+                          onClick={() =>
+                            setFilePreviews((prev) =>
+                              prev.filter((_, i) => i !== index)
+                            )
+                          }
+                        >
+                          ×
+                        </Button>
                       </div>
+                    ))}
+                  </div>
+                )}
 
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="text-sm absolute top-1 right-2 rounded-full h-6 w-6"
-                        onClick={() =>
-                          setFilePreviews((prev) =>
-                            prev.filter((_, i) => i !== index)
-                          )
-                        }
-                      >
-                        ×
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
+                <Textarea
+                  ref={inputRef}
+                  value={input}
+                  onKeyDown={handleKeyDown}
+                  onChange={handleInputChange}
+                  onPaste={handlePaste}
+                  placeholder="Type your message..."
+                  className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px]  pb-[20px]"
+                />
 
-              <Textarea
-                ref={inputRef}
-                value={input}
-                onKeyDown={handleKeyDown}
-                onChange={handleInputChange}
-                onPaste={handlePaste}
-                placeholder="Type your message..."
-                className="flex-1  p-4 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px]  pb-[20px]"
-              />
-
-              <div className="flex justify-end items-center gap-2 ">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.7 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="p-2 mr-2"
-                >
-                  <Button
-                    size="icon"
-                    disabled={!input.trim() || isStreaming}
-                    className={`rounded-full  ${
-                      !input.trim() ? "opacity-50" : "opacity-100"
-                    }`}
-                    onClick={handleFormSubmit}
+                <div className="flex justify-end items-center gap-2 ">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.7 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="p-2 mr-2"
                   >
-                    <Send className="h-5 w-5" />
-                  </Button>
-                </motion.div>
+                    <Button
+                      size="icon"
+                      disabled={!input.trim() || isStreaming}
+                      className={`rounded-full  ${
+                        !input.trim() ? "opacity-50" : "opacity-100"
+                      }`}
+                      onClick={handleFormSubmit}
+                    >
+                      <Send className="h-5 w-5" />
+                    </Button>
+                  </motion.div>
+                </div>
               </div>
             </div>
           </div>
