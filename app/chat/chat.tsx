@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { siteConfig } from "@/config/site";
 import useMessages, { ClientMessage } from "@/hooks/use-message";
 import { improvePrompt } from "@/lib/gemini";
+import { Markdown } from "@/lib/markdown";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Loader2, Send, Sparkle, Undo2 } from "lucide-react";
@@ -22,7 +23,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { Markdown } from "./[id]/markdown";
 import { SidebarToggle } from "./sidebar-toggle";
 
 interface ChatProps {
@@ -382,7 +382,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             return (
               <div
                 key={message.id}
-                className={`flex flex-col gap-8 border rounded p-2 max-w-[90%] sm:max-w-[60%] ${
+                className={`flex flex-col gap-8 border rounded p-2 max-w-[60%] ${
                   message.role === Role.user
                     ? "ml-auto bg-muted/40 text-foreground/70"
                     : "mr-auto bg-muted/20 text-foreground"

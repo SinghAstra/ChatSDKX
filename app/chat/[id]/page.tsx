@@ -5,6 +5,18 @@ import React from "react";
 import Chat from "../chat";
 import { fetchChat } from "./action";
 
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const chat = await fetchChat(params.id);
+
+  if (!chat) {
+    return;
+  }
+
+  return {
+    title: chat.title,
+  };
+}
+
 const ChatPage = async ({ params }: { params: { id: string } }) => {
   const session = await getServerSession(authOptions);
 

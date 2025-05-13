@@ -1,3 +1,5 @@
+"use client";
+
 import { Maximize2 } from "lucide-react";
 import { ComponentProps, useState } from "react";
 import { Dialog, DialogContent } from "../ui/dialog";
@@ -12,9 +14,9 @@ export default function Pre({
   const [showMaximize, setShowMaximize] = useState(false);
 
   return (
-    <div className=" relative bg-muted/20 rounded w-[550px]  border mx-auto my-10">
-      <div className="text-sm px-3 py-1 border-b bg-muted/20 rounded-t flex items-center justify-between">
-        {filename}
+    <div className=" relative  rounded w-fit max-w-[600px] my-10  border mx-auto ">
+      <div className="text-sm bg-muted/30 px-3 py-1 border-b  rounded-t flex items-center justify-between">
+        <span className="tracking-widest ">{filename}</span>
         <div className="ml-auto flex gap-2">
           <div
             className="border w-6 h-6 flex items-center justify-center rounded cursor-pointer hover:bg-muted transition-all duration-200"
@@ -25,13 +27,13 @@ export default function Pre({
           <Copy content={raw!} fileName={filename} />
         </div>
       </div>
-      <div className="overflow-x-auto p-2">
+      <div className="overflow-x-auto p-2 ">
         <pre {...rest}>{children}</pre>
       </div>
 
       <Dialog open={showMaximize} onOpenChange={setShowMaximize}>
-        <DialogContent className="max-w-3xl border p-0">
-          <div className="max-h-[80vh] overflow-auto text-sm whitespace-pre-wrap px-3 py-2">
+        <DialogContent className=" border sm:rounded-none w-fit h-fit p-0   text-sm ">
+          <div className="max-w-[80vw] max-h-[80vh] overflow-auto py-4 px-3 pr-12 ">
             <pre {...rest}>{children}</pre>
           </div>
         </DialogContent>
