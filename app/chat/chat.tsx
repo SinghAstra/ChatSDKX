@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Textarea } from "@/components/ui/textarea";
+import { Typography } from "@/components/ui/typography";
 import { siteConfig } from "@/config/site";
 import useMessages, { ClientMessage } from "@/hooks/use-message";
 import { improvePrompt } from "@/lib/gemini";
@@ -115,7 +116,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         setFilePreviews([]);
         scrollToBottom();
         if (newChat) {
-          console.log("Navigated to /chat/:id");
           window.history.replaceState({}, "", `/chat/${chatId}`);
         }
       }
@@ -133,7 +133,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     scrollToBottom();
     // Navigate to /chat/:id
     if (newChat) {
-      console.log("Navigated to /chat/:id");
       window.history.replaceState({}, "", `/chat/${chatId}`);
     }
   };
@@ -382,13 +381,19 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             return (
               <div
                 key={message.id}
-                className={`flex flex-col gap-8 border rounded p-2 max-w-[60%] ${
+                className={`flex flex-col gap-8 border rounded  max-w-[60%] px-3 py-2  ${
                   message.role === Role.user
                     ? "ml-auto bg-muted/40 text-foreground/70"
-                    : "mr-auto bg-muted/20 text-foreground"
+                    : "mr-auto bg-muted/20 text-foreground w-full"
                 }`}
               >
-                <Markdown>{message.content}</Markdown>
+                {message.role === Role.user ? (
+                  message.content
+                ) : (
+                  <Typography>
+                    <Markdown>{message.content}</Markdown>
+                  </Typography>
+                )}
               </div>
             );
           })}
