@@ -4,12 +4,12 @@ ChatSDKX is a modern real-time chat application built with Next.js, featuring us
 
 Key features:
 
-🔒 User authentication
-💬 Real-time messaging interface
-⚙️ In-house message management with React state
-🧠 Google Gemini AI integration for intelligent responses
-🔁 Streaming AI responses for a smooth user experience
-✍️ Prompt enhancement tools to refine user inputs
+- 🔒 User authentication
+- 💬 Real-time messaging interface
+- ⚙️ In-house message management with React state
+- 🧠 Google Gemini AI integration for intelligent responses
+- 🔁 Streaming AI responses for a smooth user experience
+- ✍️ Prompt enhancement tools to refine user inputs
 
 ## 🧰 Technology Stack
 
