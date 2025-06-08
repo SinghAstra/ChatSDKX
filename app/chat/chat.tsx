@@ -381,10 +381,10 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             return (
               <div
                 key={message.id}
-                className={`flex flex-col gap-8 border rounded  max-w-[60%] px-3 py-2  ${
+                className={`flex flex-col gap-8 border rounded w-fit  max-w-[60%] px-3 py-2  ${
                   message.role === Role.user
                     ? "ml-auto bg-muted/40 text-foreground/70"
-                    : "mr-auto bg-muted/20 text-foreground w-full"
+                    : "mr-auto bg-muted/20 text-foreground "
                 }`}
               >
                 {message.role === Role.user ? (
