@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { generateText } from "./gemini";
+import { prisma } from "./prisma";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -14,7 +15,7 @@ export function generateID(): string {
   });
 }
 
-export async function generateTitleFromUserMessage(message: string) {
+export async function generateAndUpdateTitle(id: string, message: string) {
   const title = await generateText(
     `\n
     - you will generate a short title based on the first message a user begins a conversation with
@@ -23,6 +24,13 @@ export async function generateTitleFromUserMessage(message: string) {
     - do not use quotes or colons
     - This is the First Message Send by User : ${message}`
   );
+
+  await prisma.chat.update({
+    where: { id },
+    data: { title },
+  });
+
+  console.log("Title generated and updated:", title);
 
   return title;
 }

@@ -35,7 +35,6 @@ const ChatPage = async ({ params }: { params: { id: string } }) => {
       initialMessages={chat.messages}
       user={session.user}
       chatId={params.id}
-      newChat={false}
     />
   );
 };

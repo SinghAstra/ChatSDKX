@@ -30,10 +30,9 @@ interface ChatProps {
   user: User;
   initialMessages: ClientMessage[];
   chatId: string;
-  newChat: boolean;
 }
 
-const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
+const Chat = ({ user, initialMessages, chatId }: ChatProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { open, setOpen } = useSidebar();
   const [input, setInput] = useState("");
@@ -115,9 +114,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         setInput("");
         setFilePreviews([]);
         scrollToBottom();
-        if (newChat) {
-          window.history.replaceState({}, "", `/chat/${chatId}`);
-        }
       }
     }
     // if Shift+Enter, do nothing (allow newline)
@@ -131,10 +127,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     setInput("");
     setFilePreviews([]);
     scrollToBottom();
-    // Navigate to /chat/:id
-    if (newChat) {
-      window.history.replaceState({}, "", `/chat/${chatId}`);
-    }
   };
 
   const scrollToBottom = () => {

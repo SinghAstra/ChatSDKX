@@ -1,7 +1,7 @@
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { chatSystemPrompt } from "@/lib/prompt";
-import { generateTitleFromUserMessage } from "@/lib/utils";
+import { generateAndUpdateTitle } from "@/lib/utils";
 import { GoogleGenAI } from "@google/genai";
 import { Role } from "@prisma/client";
 import { getServerSession } from "next-auth";
@@ -17,12 +17,16 @@ export async function POST(
   const id = params.id;
   console.log("id is ", id);
   try {
-    const session = await getServerSession(authOptions);
+    // 1. Parallel authentication and request parsing
+    const [session, body] = await Promise.all([
+      getServerSession(authOptions),
+      req.json(),
+    ]);
+
     if (!session) {
       return new Response("Unauthorized", { status: 401 });
     }
-    const { message } = await req.json();
-
+    const { message } = body;
     console.log("message is ", message);
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
@@ -30,30 +34,37 @@ export async function POST(
       throw new Error("GEMINI_API_KEY is required.");
     }
 
-    let chat = await prisma.chat.findFirst({
-      where: {
-        id,
-      },
-    });
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+    // 3. Parallel database operations while streaming setup
+    const [existingChat, lastMessages] = await Promise.all([
+      prisma.chat.findFirst({ where: { id } }),
+      prisma.message.findMany({
+        where: { chatId: id },
+        orderBy: { createdAt: "asc" },
+        take: 10,
+      }),
+    ]);
 
+    console.log("lastMessages is ", lastMessages);
+
+    // 4. Handle chat creation asynchronously (don't block streaming)
+    let chat = existingChat;
     if (!chat) {
-      const title = await generateTitleFromUserMessage(message);
-
+      // Create chat with temporary title, update later
       chat = await prisma.chat.create({
         data: {
           id,
-          title,
+          title: "New Chat", // Temporary title
           userId: session.user.id,
           createdAt: new Date(),
         },
       });
 
-      console.log("new Chat is ", chat);
+      generateAndUpdateTitle(id, message);
     }
 
-    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-
-    const newUserMessage = await prisma.message.create({
+    // 5. Create user message asynchronously
+    const userMessagePromise = prisma.message.create({
       data: {
         chatId: id,
         role: Role.user,
@@ -61,27 +72,17 @@ export async function POST(
       },
     });
 
-    console.log("newUserMessage is ", newUserMessage);
-
-    const lastMessages = await prisma.message.findMany({
-      where: { chatId: id },
-      orderBy: { createdAt: "asc" },
-      take: 10,
-    });
-
+    // 6. Build history and start AI streaming immediately
     const history = lastMessages.map((msg) => ({
       role: msg.role === Role.user ? "user" : "model",
       parts: [{ text: msg.content }],
     }));
-
-    console.log("history.length is ", history.length);
 
     const aiChat = ai.chats.create({
       model: "gemini-2.0-flash",
       history,
     });
 
-    console.log("After Chat.");
     const stream = await aiChat.sendMessageStream({
       config: {
         systemInstruction: chatSystemPrompt,
@@ -90,7 +91,6 @@ export async function POST(
       message: message,
     });
 
-    console.log("After stream.");
     let fullResponse = "";
 
     const encoder = new TextEncoder();
@@ -104,14 +104,17 @@ export async function POST(
         }
         controller.close();
 
-        const newModelMessage = await prisma.message.create({
-          data: {
-            chatId: id,
-            role: Role.model,
-            content: fullResponse,
-          },
-        });
-        console.log("newModelMessage is ", newModelMessage);
+        // 8. Save responses asynchronously after streaming
+        await Promise.all([
+          userMessagePromise,
+          prisma.message.create({
+            data: {
+              chatId: id,
+              role: Role.model,
+              content: fullResponse,
+            },
+          }),
+        ]);
       },
     });
 
