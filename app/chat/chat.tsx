@@ -9,9 +9,10 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { Textarea } from "@/components/ui/textarea";
 import { Typography } from "@/components/ui/typography";
 import { siteConfig } from "@/config/site";
-import useMessages, { ClientMessage } from "@/hooks/use-message";
+import useMessages from "@/hooks/use-message";
 import { improvePrompt } from "@/lib/gemini";
 import { Markdown } from "@/lib/markdown";
+import { ClientMessage } from "@/lib/types";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Loader2, Send, Sparkle, Undo2 } from "lucide-react";
@@ -30,9 +31,10 @@ interface ChatProps {
   user: User;
   initialMessages: ClientMessage[];
   chatId: string;
+  newChat: boolean;
 }
 
-const Chat = ({ user, initialMessages, chatId }: ChatProps) => {
+const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { open, setOpen } = useSidebar();
   const [input, setInput] = useState("");
@@ -114,6 +116,9 @@ const Chat = ({ user, initialMessages, chatId }: ChatProps) => {
         setInput("");
         setFilePreviews([]);
         scrollToBottom();
+        if (newChat) {
+          window.history.replaceState({}, "", `/chat/${chatId}`);
+        }
       }
     }
     // if Shift+Enter, do nothing (allow newline)
@@ -127,6 +132,9 @@ const Chat = ({ user, initialMessages, chatId }: ChatProps) => {
     setInput("");
     setFilePreviews([]);
     scrollToBottom();
+    if (newChat) {
+      window.history.replaceState({}, "", `/chat/${chatId}`);
+    }
   };
 
   const scrollToBottom = () => {

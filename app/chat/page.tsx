@@ -20,7 +20,9 @@ const ChatPage = async () => {
 
   const id = generateID();
 
-  return <Chat initialMessages={[]} chatId={id} user={session.user} />;
+  return (
+    <Chat initialMessages={[]} chatId={id} user={session.user} newChat={true} />
+  );
 };
 
 export default ChatPage;

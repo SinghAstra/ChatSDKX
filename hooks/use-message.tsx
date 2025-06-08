@@ -1,12 +1,5 @@
-import { Role } from "@prisma/client";
+import { ClientMessage } from "@/lib/types";
 import { useEffect, useState } from "react";
-
-export type ClientMessage = {
-  id: string;
-  role: Role;
-  content: string;
-  isStreaming?: boolean;
-};
 
 export default function useMessages(
   initialMessages: ClientMessage[],
@@ -37,7 +30,11 @@ export default function useMessages(
 
     const res = await fetch(`/api/chat/${chatId}/ask`, {
       method: "POST",
-      body: JSON.stringify({ message: input }),
+      body: JSON.stringify({
+        message: input,
+        messages:
+          messages.length > 7 ? messages.slice(-8, -2) : messages.slice(0, -2),
+      }),
     });
 
     const reader = res.body?.getReader();

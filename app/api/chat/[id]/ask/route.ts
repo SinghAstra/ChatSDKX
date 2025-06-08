@@ -1,6 +1,7 @@
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { chatSystemPrompt } from "@/lib/prompt";
+import { ClientMessage } from "@/lib/types";
 import { generateAndUpdateTitle } from "@/lib/utils";
 import { GoogleGenAI } from "@google/genai";
 import { Role } from "@prisma/client";
@@ -26,8 +27,9 @@ export async function POST(
     if (!session) {
       return new Response("Unauthorized", { status: 401 });
     }
-    const { message } = body;
+    const { message, messages } = body;
     console.log("message is ", message);
+    console.log("messages is ", messages);
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     if (!GEMINI_API_KEY) {
@@ -36,16 +38,7 @@ export async function POST(
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     // 3. Parallel database operations while streaming setup
-    const [existingChat, lastMessages] = await Promise.all([
-      prisma.chat.findFirst({ where: { id } }),
-      prisma.message.findMany({
-        where: { chatId: id },
-        orderBy: { createdAt: "asc" },
-        take: 10,
-      }),
-    ]);
-
-    console.log("lastMessages is ", lastMessages);
+    const existingChat = await prisma.chat.findFirst({ where: { id } });
 
     // 4. Handle chat creation asynchronously (don't block streaming)
     let chat = existingChat;
@@ -63,17 +56,8 @@ export async function POST(
       generateAndUpdateTitle(id, message);
     }
 
-    // 5. Create user message asynchronously
-    const userMessagePromise = prisma.message.create({
-      data: {
-        chatId: id,
-        role: Role.user,
-        content: message,
-      },
-    });
-
-    // 6. Build history and start AI streaming immediately
-    const history = lastMessages.map((msg) => ({
+    // 5. Build history and start AI streaming immediately
+    const history = messages.map((msg: ClientMessage) => ({
       role: msg.role === Role.user ? "user" : "model",
       parts: [{ text: msg.content }],
     }));
@@ -104,17 +88,25 @@ export async function POST(
         }
         controller.close();
 
-        // 8. Save responses asynchronously after streaming
-        await Promise.all([
-          userMessagePromise,
-          prisma.message.create({
-            data: {
-              chatId: id,
-              role: Role.model,
-              content: fullResponse,
-            },
-          }),
-        ]);
+        // 5. Create user message asynchronously
+        const newUserMessage = await prisma.message.create({
+          data: {
+            chatId: id,
+            role: Role.user,
+            content: message,
+          },
+        });
+        console.log("newUserMessage is ", newUserMessage);
+
+        // 6. Save responses asynchronously after streaming
+        const newModelMessage = await prisma.message.create({
+          data: {
+            chatId: id,
+            role: Role.model,
+            content: fullResponse,
+          },
+        });
+        console.log("newModelMessage is ", newModelMessage);
       },
     });
 
