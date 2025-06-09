@@ -80,7 +80,7 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
 
             <div className="p-4">
               {/* Header */}
-              <div className="flex items-start gap-3 mb-3">
+              <div className="flex items-center gap-3 mb-3">
                 <div
                   className={`
                   flex-shrink-0 rounded-full p-1.5
@@ -131,9 +131,15 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
 
               {/* Content */}
               <div className="space-y-3">
-                <p className="text-muted-foreground text-xs leading-relaxed line-clamp-3">
-                  {reasoning}
-                </p>
+                {isExpanded ? (
+                  <p className="text-muted-foreground text-xs leading-relaxed">
+                    {reasoning}
+                  </p>
+                ) : (
+                  <p className="text-muted-foreground text-xs leading-relaxed line-clamp-3">
+                    {reasoning}
+                  </p>
+                )}
 
                 {/* Expand/Collapse for long content */}
                 {reasoning.length > 150 && (
@@ -144,22 +150,6 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
                     {isExpanded ? "Show less" : "Show more"}
                   </button>
                 )}
-
-                {/* Expanded content */}
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="space-y-3"
-                    >
-                      <p className="text-muted-foreground text-xs leading-relaxed">
-                        {reasoning}
-                      </p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
 
                 {/* Status indicator */}
                 {autoHideDuration > 0 && (

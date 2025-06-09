@@ -1,6 +1,5 @@
 "use client";
 
-import FadeSlideIn from "@/components/global/fade-slide-in";
 import { useToastContext } from "@/components/providers/toast";
 import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
