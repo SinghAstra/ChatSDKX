@@ -50,10 +50,9 @@ export function SuggestionsToggle({ suggestions }: SuggestionsToggleProps) {
           animate={{ opacity: 1, y: 0 }}
         >
           <Button
-            variant="ghost"
-            size="sm"
+            variant={"outline"}
             onClick={() => setIsOpen(!isOpen)}
-            className="h-7 px-2 text-xs bg-secondary/50 hover:bg-secondary gap-1.5 rounded-md"
+            className="p-2 gap-1.5 rounded"
           >
             <HelpCircle className="w-3 h-3" />
             <span>View Suggestions</span>
@@ -64,21 +63,19 @@ export function SuggestionsToggle({ suggestions }: SuggestionsToggleProps) {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm ">
             <motion.div
               ref={dialogRef}
-              className={` bg-background border border-border rounded-lg shadow-xl w-full max-w-md `}
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
+              className={` bg-background/80 backdrop-blur-md border rounded shadow-xl w-full max-w-md `}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
               transition={{
                 duration: 0.2,
                 ease: "easeOut",
               }}
             >
-              <div className="flex items-center justify-between p-3 border-b border-border bg-secondary/50">
+              <div className="flex items-center justify-between py-2 px-3 border-b border-border bg-muted/30">
                 <div className="flex items-center gap-2">
                   <HelpCircle className="w-4 h-4 text-primary" />
-                  <h2 className="text-sm font-medium">
-                    Consider answering these questions
-                  </h2>
+                  <h2>Consider answering these questions</h2>
                 </div>
                 <Button
                   variant="ghost"
@@ -103,7 +100,7 @@ export function SuggestionsToggle({ suggestions }: SuggestionsToggleProps) {
                         className="flex items-start gap-2 text-xs leading-relaxed"
                         initial={{ opacity: 0, x: -5 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
+                        transition={{ delay: index * 0.1 }}
                       >
                         <span className="text-primary mt-0.5">•</span>
                         <span>{suggestion}</span>
