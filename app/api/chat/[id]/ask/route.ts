@@ -36,9 +36,8 @@ export async function POST(
     }
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
-    // 3. Parallel database operations while streaming setup
 
-    // 5. Build history and start AI streaming immediately
+    // 2. Build history and start AI streaming immediately
     const history = messages.map((msg: ClientMessage) => ({
       role: msg.role === Role.user ? "user" : "model",
       parts: [{ text: msg.content }],
@@ -70,7 +69,7 @@ export async function POST(
         }
         controller.close();
 
-        // 5. Create user message asynchronously
+        // 3. Create user message asynchronously
         const newUserMessage = await prisma.message.create({
           data: {
             chatId: id,
@@ -80,7 +79,7 @@ export async function POST(
         });
         console.log("newUserMessage is ", newUserMessage);
 
-        // 6. Save responses asynchronously after streaming
+        // 4. Save responses asynchronously after streaming
         const newModelMessage = await prisma.message.create({
           data: {
             chatId: id,
