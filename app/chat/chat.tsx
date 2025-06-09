@@ -60,13 +60,19 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
   const { setToastMessage } = useToastContext();
 
+  console.log("filePreviews.length is ", filePreviews.length);
+
   const handleImprovePrompt = async () => {
     setIsImprovingPrompt(true);
     setOriginalPrompt(input);
-    const res = await improvePrompt(input);
-    setInput(res.improved);
-    setImprovementReason(res.reasoning);
-    setSuggestedQuestions(res.suggestions);
+    const { success, parsed } = await improvePrompt(input, filePreviews);
+    if (success) {
+      setInput(parsed.improved);
+      setImprovementReason(parsed.reasoning);
+      setSuggestedQuestions(parsed.suggestions);
+    } else {
+      setToastMessage("Failed to Improve Prompt. Please try again later.");
+    }
     setIsImprovingPrompt(false);
   };
 
@@ -97,12 +103,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         return;
       }
       setFilePreviews((prev) => [...prev, pasteData]);
-    } else {
-      if (input.includes(pasteData)) {
-        setToastMessage("Text Already Copied.");
-        return;
-      }
-      setInput((prev) => prev + pasteData);
     }
   };
 
