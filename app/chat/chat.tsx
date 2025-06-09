@@ -25,6 +25,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { createChatInDB } from "./[id]/action";
 import { SidebarToggle } from "./sidebar-toggle";
 
 interface ChatProps {
@@ -56,6 +57,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     null
   );
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
+  const [isNewChat, setIsNewChat] = useState(newChat);
 
   const { setToastMessage } = useToastContext();
 
@@ -107,18 +109,21 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey && !isStreaming) {
       e.preventDefault();
-      if (input.trim()) {
-        const fullMessage = [...filePreviews, input].join("\n\n");
-        sendMessage(fullMessage);
-        setInput("");
-        setFilePreviews([]);
-        scrollToBottom();
-        if (newChat) {
-          window.history.replaceState({}, "", `/chat/${chatId}`);
-        }
+      if (!input.trim()) return;
+      const fullMessage = [...filePreviews, input].join("\n\n");
+      if (isNewChat) {
+        await createChatInDB(chatId, user.id, fullMessage);
+      }
+      sendMessage(fullMessage);
+      setInput("");
+      setFilePreviews([]);
+      scrollToBottom();
+      if (isNewChat) {
+        window.history.replaceState({}, "", `/chat/${chatId}`);
+        setIsNewChat(false);
       }
     }
     // if Shift+Enter, do nothing (allow newline)
@@ -128,12 +133,16 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     e.preventDefault();
     if (!input.trim()) return;
     const fullMessage = [...filePreviews, input].join("\n\n");
+    if (isNewChat) {
+      await createChatInDB(chatId, user.id, fullMessage);
+    }
     sendMessage(fullMessage);
     setInput("");
     setFilePreviews([]);
     scrollToBottom();
-    if (newChat) {
+    if (isNewChat) {
       window.history.replaceState({}, "", `/chat/${chatId}`);
+      setIsNewChat(false);
     }
   };
 

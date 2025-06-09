@@ -30,6 +30,7 @@ const ChatPage = async ({ params }: { params: { id: string } }) => {
     notFound();
   }
 
+  console.log("In /chat/:id server page.");
   return (
     <Chat
       initialMessages={chat.messages}

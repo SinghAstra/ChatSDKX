@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { chatSystemPrompt } from "@/lib/prompt";
 import { ClientMessage } from "@/lib/types";
-import { generateAndUpdateTitle } from "@/lib/utils";
 import { GoogleGenAI } from "@google/genai";
 import { Role } from "@prisma/client";
 import { getServerSession } from "next-auth";
@@ -38,23 +37,6 @@ export async function POST(
 
     const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     // 3. Parallel database operations while streaming setup
-    const existingChat = await prisma.chat.findFirst({ where: { id } });
-
-    // 4. Handle chat creation asynchronously (don't block streaming)
-    let chat = existingChat;
-    if (!chat) {
-      // Create chat with temporary title, update later
-      chat = await prisma.chat.create({
-        data: {
-          id,
-          title: "New Chat", // Temporary title
-          userId: session.user.id,
-          createdAt: new Date(),
-        },
-      });
-
-      generateAndUpdateTitle(id, message);
-    }
 
     // 5. Build history and start AI streaming immediately
     const history = messages.map((msg: ClientMessage) => ({

@@ -1,5 +1,7 @@
+"use server";
 import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
+import { generateAndUpdateTitle } from "@/lib/utils";
 import { getServerSession } from "next-auth";
 
 export async function fetchChat(id: string) {
@@ -25,4 +27,20 @@ export async function fetchChat(id: string) {
   if (chat.userId === session.user.id) {
     return chat;
   }
+}
+
+export async function createChatInDB(
+  id: string,
+  userId: string,
+  message: string
+) {
+  await prisma.chat.create({
+    data: {
+      id,
+      title: "New Chat",
+      userId,
+      createdAt: new Date(),
+    },
+  });
+  generateAndUpdateTitle(id, message);
 }
