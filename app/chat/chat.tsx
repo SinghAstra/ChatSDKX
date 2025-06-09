@@ -27,6 +27,7 @@ import {
 } from "react";
 import { createChatInDB } from "./[id]/action";
 import FilePreviewCard from "./file-preview-card";
+import ReasoningToast from "./prompt-reasoning";
 import { SidebarToggle } from "./sidebar-toggle";
 
 interface ChatProps {
@@ -205,7 +206,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       {/* Main Chat Area */}
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full">
-          {improvementReason ? (
+          {/* {improvementReason ? (
             <FadeSlideIn className="w-full mb-8">
               <div className="bg-secondary/30 border border-border rounded-xl p-6 space-y-4">
                 <div className="flex items-start gap-3">
@@ -242,16 +243,16 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                 )}
               </div>
             </FadeSlideIn>
-          ) : (
-            <div className="text-center mb-12">
-              <h1 className="text-4xl font-bold text-foreground mb-2">
-                How can I assist you today?
-              </h1>
-              <p className="text-lg text-muted-foreground">
-                Start a conversation or paste content to get started
-              </p>
-            </div>
-          )}
+          ) : ( */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl font-bold text-foreground mb-2">
+              How can I assist you today?
+            </h1>
+            <p className="text-lg text-muted-foreground">
+              Start a conversation or paste content to get started
+            </p>
+          </div>
+          {/* )} */}
 
           {/* Enhanced Input Area for Welcome Screen - Using theme colors */}
           <div className="w-full max-w-3xl">
@@ -474,6 +475,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           </div>
         </div>
       )}
+
+      {improvementReason && <ReasoningToast reasoning={improvementReason} />}
     </div>
   );
 };
