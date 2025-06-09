@@ -1,8 +1,8 @@
+import Copy from "@/components/markdown/copy";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
-import React, { useState } from "react";
+import { Minimize2, X } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface FilePreviewCardProps {
   preview: string;
@@ -17,6 +17,34 @@ const FilePreviewCard = ({
 }: FilePreviewCardProps) => {
   const [filePreviewForModal, setFilePreviewForModal] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (divRef.current && !divRef.current.contains(event.target as Node)) {
+        setShowModal(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setShowModal(false);
+      }
+    };
+
+    if (showModal) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [showModal]);
 
   return (
     <>
@@ -58,21 +86,50 @@ const FilePreviewCard = ({
           <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
         </Button>
       </motion.div>
-      {/* File Preview Modal - Using theme colors */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-4xl max-h-[80vh] p-0 bg-card border-border">
-          <div className="border-b border-border px-6 py-4">
-            <h2 className="text-lg font-semibold text-foreground">
-              File Preview
-            </h2>
-          </div>
-          <div className="overflow-auto p-6">
-            <pre className="text-sm text-foreground whitespace-pre-wrap font-mono leading-relaxed">
-              {filePreviewForModal}
-            </pre>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <motion.div
+            className="bg-background rounded-xl border min-w-[60vw] w-fit max-w-[95vw] max-h-[90vh] flex flex-col shadow-2xl"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{
+              duration: 0.2,
+              ease: "easeOut",
+            }}
+            ref={divRef}
+          >
+            {/* Header */}
+            <div className="text-sm bg-muted/30 px-3 py-2 border-b rounded-t-xl flex items-center justify-between flex-shrink-0">
+              <span className="tracking-widest font-medium">Content</span>
+              <div className="ml-auto flex gap-2">
+                <div
+                  className="border w-6 h-6 flex items-center justify-center rounded cursor-pointer hover:bg-muted transition-all duration-200"
+                  onClick={() => setShowModal(false)}
+                  title="Minimize"
+                >
+                  <Minimize2 className="w-3 h-3 text-muted-foreground" />
+                </div>
+                <Copy content={filePreviewForModal} />
+              </div>
+            </div>
+
+            {/* Content with proper scrolling */}
+            <div className="flex-1 overflow-auto p-4">
+              <pre
+                className="text-sm leading-relaxed min-h-full"
+                style={{
+                  whiteSpace: "pre",
+                  wordWrap: "break-word",
+                  overflowWrap: "break-word",
+                }}
+              >
+                {filePreviewForModal}
+              </pre>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </>
   );
 };
