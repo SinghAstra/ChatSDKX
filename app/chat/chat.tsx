@@ -4,7 +4,6 @@ import FadeSlideIn from "@/components/global/fade-slide-in";
 import { useToastContext } from "@/components/providers/toast";
 import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Textarea } from "@/components/ui/textarea";
 import { Typography } from "@/components/ui/typography";
@@ -15,7 +14,7 @@ import { Markdown } from "@/lib/markdown";
 import type { ClientMessage } from "@/lib/types";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Loader2, Send, Sparkles, Undo2, X } from "lucide-react";
+import { ChevronDown, Loader2, Send, Sparkles, Undo2 } from "lucide-react";
 import type { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
@@ -27,6 +26,7 @@ import {
   useState,
 } from "react";
 import { createChatInDB } from "./[id]/action";
+import FilePreviewCard from "./file-preview-card";
 import { SidebarToggle } from "./sidebar-toggle";
 
 interface ChatProps {
@@ -50,8 +50,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [filePreviews, setFilePreviews] = useState<string[]>([]);
-  const [filePreviewForModal, setFilePreviewForModal] = useState<string>("");
-  const [showModal, setShowModal] = useState(false);
   const [isImprovingPrompt, setIsImprovingPrompt] = useState(false);
   const [originalPrompt, setOriginalPrompt] = useState<string | null>(null);
   const [improvementReason, setImprovementReason] = useState<string | null>(
@@ -183,54 +181,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     }
   }, [searchParams, router]);
 
-  // File preview component using theme colors
-  const FilePreviewCard = ({
-    preview,
-    index,
-  }: {
-    preview: string;
-    index: number;
-  }) => (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      key={index}
-      className="group relative bg-secondary/50 border border-border rounded-lg p-3 w-48 hover:bg-secondary/70 transition-colors"
-    >
-      <div
-        className="cursor-pointer"
-        onClick={() => {
-          setFilePreviewForModal(preview);
-          setShowModal(true);
-        }}
-      >
-        {preview
-          .split("\n")
-          .filter((line) => line.trim() !== "")
-          .slice(0, 4)
-          .map((line, lineIndex) => (
-            <p
-              key={lineIndex}
-              className="text-xs text-muted-foreground truncate leading-relaxed"
-            >
-              {line}
-            </p>
-          ))}
-      </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-background border border-border opacity-0 group-hover:opacity-100 transition-opacity shadow-sm hover:bg-destructive/10 hover:border-destructive/20"
-        onClick={() =>
-          setFilePreviews((prev) => prev.filter((_, i) => i !== index))
-        }
-      >
-        <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
-      </Button>
-    </motion.div>
-  );
-
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
       <header
@@ -313,14 +263,14 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="border-b border-border p-4"
                   >
-                    <div className="flex gap-3 overflow-x-auto pb-2">
+                    <div className="flex gap-3 overflow-x-auto p-2  ">
                       {filePreviews.map((preview, index) => (
                         <FilePreviewCard
                           key={index}
                           preview={preview}
                           index={index}
+                          setFilePreviews={setFilePreviews}
                         />
                       ))}
                     </div>
@@ -337,7 +287,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                   onChange={handleInputChange}
                   onPaste={handlePaste}
                   placeholder="Type your message here..."
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[120px] p-6 text-base placeholder:text-muted-foreground bg-transparent"
+                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[120px] p-3 text-base placeholder:text-muted-foreground bg-transparent"
                 />
 
                 {/* Action Buttons */}
@@ -437,7 +387,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                         {message.content}
                       </div>
                     ) : (
-                      <Typography className="text-sm leading-relaxed">
+                      <Typography>
                         <Markdown>{message.content}</Markdown>
                       </Typography>
                     )}
@@ -484,6 +434,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                       <div className="flex gap-3 overflow-x-auto pb-2">
                         {filePreviews.map((preview, index) => (
                           <FilePreviewCard
+                            setFilePreviews={setFilePreviews}
                             key={index}
                             preview={preview}
                             index={index}
@@ -522,22 +473,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           </div>
         </div>
       )}
-
-      {/* File Preview Modal - Using theme colors */}
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent className="max-w-4xl max-h-[80vh] p-0 bg-card border-border">
-          <div className="border-b border-border px-6 py-4">
-            <h2 className="text-lg font-semibold text-foreground">
-              File Preview
-            </h2>
-          </div>
-          <div className="overflow-auto p-6">
-            <pre className="text-sm text-foreground whitespace-pre-wrap font-mono leading-relaxed">
-              {filePreviewForModal}
-            </pre>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
