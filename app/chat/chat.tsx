@@ -28,6 +28,7 @@ import { createChatInDB } from "./[id]/action";
 import FilePreviewCard from "./file-preview-card";
 import ReasoningToast from "./prompt-reasoning";
 import { SidebarToggle } from "./sidebar-toggle";
+import { SuggestionsToggle } from "./suggestions-toggle";
 
 interface ChatProps {
   user: User;
@@ -115,6 +116,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         await createChatInDB(chatId, user.id, fullMessage);
       }
       sendMessage(fullMessage);
+      setSuggestedQuestions([]);
       setInput("");
       setFilePreviews([]);
       scrollToBottom();
@@ -133,6 +135,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       await createChatInDB(chatId, user.id, fullMessage);
     }
     sendMessage(fullMessage);
+    setSuggestedQuestions([]);
     setInput("");
     setFilePreviews([]);
     scrollToBottom();
@@ -181,6 +184,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     }
   }, [searchParams, router]);
 
+  console.log("improvementReason is ", improvementReason);
+
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
       <header
@@ -202,47 +207,10 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         <AvatarMenu user={user} />
       </header>
 
-      {/* Main Chat Area */}
+      <SuggestionsToggle suggestions={suggestedQuestions} />
+
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full">
-          {/* {improvementReason ? (
-            <FadeSlideIn className="w-full mb-8">
-              <div className="bg-secondary/30 border border-border rounded-xl p-6 space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="bg-primary/10 rounded-full p-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground mb-2">
-                      Prompt Enhancement
-                    </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">
-                      {improvementReason}
-                    </p>
-                  </div>
-                </div>
-
-                {suggestedQuestions.length > 0 && (
-                  <div className="border-t border-border pt-4">
-                    <p className="font-medium text-foreground mb-3 text-sm">
-                      Consider addressing these aspects:
-                    </p>
-                    <ul className="space-y-2">
-                      {suggestedQuestions.map((q, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-2 text-sm text-muted-foreground"
-                        >
-                          <div className="w-1.5 h-1.5 bg-primary/60 rounded-full mt-2 flex-shrink-0" />
-                          {q}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </FadeSlideIn>
-          ) : ( */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground mb-2">
               How can I assist you today?
@@ -251,9 +219,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               Start a conversation or paste content to get started
             </p>
           </div>
-          {/* )} */}
 
-          {/* Enhanced Input Area for Welcome Screen - Using theme colors */}
           <div className="w-full max-w-3xl">
             <div className=" border border-border rounded-2xl shadow-sm hover:shadow-2xl transition-shadow">
               {/* File Previews */}
@@ -399,7 +365,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Scroll to Bottom Button - Using theme colors */}
           <AnimatePresence>
             {showScrollButton && (
               <motion.button
@@ -415,7 +380,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             )}
           </AnimatePresence>
 
-          {/* Fixed Input Area for Chat - Using theme colors */}
           <div
             className={`fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border transition-all duration-200 ${
               open ? "left-64" : "left-0"
