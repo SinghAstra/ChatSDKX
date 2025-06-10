@@ -13,7 +13,7 @@ import { Markdown } from "@/lib/markdown";
 import type { ClientMessage } from "@/lib/types";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Loader2, Send, Sparkles, Undo2 } from "lucide-react";
+import { Loader2, Send, Sparkles, Undo2 } from "lucide-react";
 import type { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
@@ -207,30 +207,15 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         <AvatarMenu user={user} />
       </header>
 
-      <SuggestionsToggle suggestions={suggestedQuestions} />
-      {/* File Previews */}
-      {filePreviews.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          className="bg-muted/30"
-        >
-          <div className="flex gap-3 overflow-x-auto p-2  ">
-            {filePreviews.map((preview, index) => (
-              <FilePreviewCard
-                key={index}
-                preview={preview}
-                index={index}
-                setFilePreviews={setFilePreviews}
-              />
-            ))}
-          </div>
-        </motion.div>
-      )}
-
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full">
+          <div className={`flex justify-center mb-4`}>
+            <SuggestionsToggle
+              variant={"outline"}
+              size={"default"}
+              suggestions={suggestedQuestions}
+            />
+          </div>
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground mb-2">
               How can I assist you today?
@@ -241,8 +226,28 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           </div>
 
           <div className="w-full max-w-3xl border border-border rounded-2xl shadow-sm hover:shadow-2xl transition-shadow">
-            {/* Input Textarea */}
             <div className="relative">
+              {/* File Previews */}
+              {filePreviews.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="bg-muted/30"
+                >
+                  <div className="flex gap-3 overflow-x-auto p-2  ">
+                    {filePreviews.map((preview, index) => (
+                      <FilePreviewCard
+                        key={index}
+                        preview={preview}
+                        index={index}
+                        setFilePreviews={setFilePreviews}
+                      />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
               <Textarea
                 ref={inputRef}
                 value={input}
@@ -346,12 +351,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                 >
                   <div className="flex flex-col gap-1 max-w-[85%] md:max-w-[75%]">
                     <div
-                      className={`relative px-3 py-1 transition-all duration-200 rounded-sm
-                          ${
-                            message.role === Role.user
-                              ? "bg-muted/20 text-muted-foreground "
-                              : "bg-muted/40 text-muted-foreground "
-                          }
+                      className={`px-3 py-1 transition-all duration-200 rounded-sm
+                          bg-muted/20 text-muted-foreground
                       `}
                     >
                       <Typography>
@@ -386,7 +387,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               open ? "left-64" : "left-0"
             }`}
           >
-            <div className="max-w-2xl w-full mx-auto mb-3 border border-border rounded-xl shadow-sm hover:shadow-2xl transition-shadow">
+            <div className="max-w-2xl w-full mx-auto mb-3 border border-border rounded-xl shadow-sm hover:shadow-2xl transition-shadow bg-background/60 backdrop-blur-md">
               <AnimatePresence>
                 {filePreviews.length > 0 && (
                   <motion.div
@@ -408,7 +409,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <div className="relative">
+              <div className="relative ">
                 <Textarea
                   ref={inputRef}
                   value={input}
@@ -416,17 +417,23 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                   onChange={handleInputChange}
                   onPaste={handlePaste}
                   placeholder="Type your message here..."
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[60px] p-3 text-base placeholder:text-muted-foreground bg-transparent"
+                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] px-3 text-base placeholder:text-muted-foreground mt-2"
                 />
 
                 {/* Action Buttons */}
                 <div className="flex items-center justify-end px-4 py-2 gap-2 ">
                   <div className="flex items-center gap-2">
+                    <SuggestionsToggle
+                      size={"sm"}
+                      variant="outline"
+                      suggestions={suggestedQuestions}
+                    />
                     {isImprovingPrompt ? (
                       <Button
                         variant="outline"
+                        size={"sm"}
                         disabled
-                        className="gap-2 text-sm"
+                        className="gap-2 "
                       >
                         <Loader2 className="w-4 h-4 animate-spin" />
                         Enhancing...
@@ -434,8 +441,9 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                     ) : originalPrompt ? (
                       <Button
                         variant="outline"
+                        size={"sm"}
                         onClick={handleUndoImprove}
-                        className="gap-2 text-sm hover:bg-secondary"
+                        className="gap-2 "
                       >
                         <Undo2 className="w-4 h-4" />
                         Undo Enhancement
@@ -443,9 +451,10 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                     ) : (
                       <Button
                         variant="outline"
+                        size={"sm"}
                         disabled={!input.trim()}
                         onClick={handleImprovePrompt}
-                        className="gap-2 text-sm hover:bg-secondary disabled:opacity-50"
+                        className="gap-2 disabled:opacity-50"
                       >
                         <Sparkles className="w-4 h-4" />
                         Enhance Prompt
@@ -456,7 +465,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                   <Button
                     disabled={!input.trim() || isStreaming}
                     onClick={handleFormSubmit}
-                    className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 disabled:opacity-50"
+                    size={"sm"}
+                    className="gap-2 disabled:opacity-50"
                   >
                     <Send className="h-4 w-4" />
                     Send

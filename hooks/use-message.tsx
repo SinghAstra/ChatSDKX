@@ -14,13 +14,14 @@ export default function useMessages(
 
   const sendMessage = async (input: string) => {
     setIsStreaming(true);
+    const streamingMessageId = crypto.randomUUID();
     const userMessage: ClientMessage = {
       id: crypto.randomUUID(),
       role: "user",
       content: input,
     };
     const modelMessage: ClientMessage = {
-      id: "streaming",
+      id: streamingMessageId,
       role: "model",
       content: "",
       isStreaming: true,
@@ -57,7 +58,7 @@ export default function useMessages(
 
       setMessages((prev) =>
         prev.map((msg) =>
-          msg.id === "streaming"
+          msg.id === streamingMessageId
             ? { ...msg, content: msg.content + chunk }
             : msg
         )
@@ -67,9 +68,7 @@ export default function useMessages(
     // Remove the isStreaming flag so UI can render it as a full response
     setMessages((prev) =>
       prev.map((msg) =>
-        msg.id === "streaming"
-          ? { ...msg, id: crypto.randomUUID(), isStreaming: false }
-          : msg
+        msg.id === streamingMessageId ? { ...msg, isStreaming: false } : msg
       )
     );
 
