@@ -5,11 +5,9 @@ import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Textarea } from "@/components/ui/textarea";
-import { Typography } from "@/components/ui/typography";
 import { siteConfig } from "@/config/site";
 import useMessages from "@/hooks/use-message";
 import { improvePrompt } from "@/lib/gemini";
-import { Markdown } from "@/lib/markdown";
 import type { ClientMessage } from "@/lib/types";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
@@ -26,6 +24,7 @@ import {
 } from "react";
 import { createChatInDB } from "./[id]/action";
 import FilePreviewCard from "./file-preview-card";
+import { MessageContent } from "./message-content";
 import ReasoningToast from "./prompt-reasoning";
 import { SidebarToggle } from "./sidebar-toggle";
 import { SuggestionsToggle } from "./suggestions-toggle";
@@ -115,6 +114,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       }
       sendMessage(fullMessage);
       setSuggestedQuestions([]);
+      setOriginalPrompt(null);
       setInput("");
       setFilePreviews([]);
       scrollToBottom();
@@ -135,6 +135,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     sendMessage(fullMessage);
     setSuggestedQuestions([]);
     setInput("");
+    setOriginalPrompt(null);
     setFilePreviews([]);
     scrollToBottom();
     if (isNewChat) {
@@ -353,18 +354,16 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                   }`}
                 >
                   <div
-                    className={`flex flex-col gap-1 w-fit max-w-[90%] min-w-[60px]  ${
+                    className={`flex flex-col gap-1 w-fit max-w-[70%] min-w-[60px]  ${
                       message.content.length > 100 && "w-full"
                     }`}
                   >
                     <div
-                      className={`px-3 py-1 transition-all duration-200 rounded-sm
+                      className={` transition-all duration-200 rounded-sm
                           bg-muted/20 text-muted-foreground
                       `}
                     >
-                      <Typography>
-                        <Markdown>{message.content}</Markdown>
-                      </Typography>
+                      <MessageContent message={message} />
                     </div>
                   </div>
                 </motion.div>
