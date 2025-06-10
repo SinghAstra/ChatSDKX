@@ -208,6 +208,26 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       </header>
 
       <SuggestionsToggle suggestions={suggestedQuestions} />
+      {/* File Previews */}
+      {filePreviews.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="bg-muted/30"
+        >
+          <div className="flex gap-3 overflow-x-auto p-2  ">
+            {filePreviews.map((preview, index) => (
+              <FilePreviewCard
+                key={index}
+                preview={preview}
+                index={index}
+                setFilePreviews={setFilePreviews}
+              />
+            ))}
+          </div>
+        </motion.div>
+      )}
 
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full">
@@ -220,86 +240,61 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             </p>
           </div>
 
-          <div className="w-full max-w-3xl">
-            <div className=" border border-border rounded-2xl shadow-sm hover:shadow-2xl transition-shadow">
-              {/* File Previews */}
-              <AnimatePresence>
-                {filePreviews.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="bg-muted/30"
-                  >
-                    <div className="flex gap-3 overflow-x-auto p-2  ">
-                      {filePreviews.map((preview, index) => (
-                        <FilePreviewCard
-                          key={index}
-                          preview={preview}
-                          index={index}
-                          setFilePreviews={setFilePreviews}
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+          <div className="w-full max-w-3xl border border-border rounded-2xl shadow-sm hover:shadow-2xl transition-shadow">
+            {/* Input Textarea */}
+            <div className="relative">
+              <Textarea
+                ref={inputRef}
+                value={input}
+                onKeyDown={handleKeyDown}
+                onChange={handleInputChange}
+                onPaste={handlePaste}
+                placeholder="Type your message here..."
+                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[120px] p-3 text-base placeholder:text-muted-foreground bg-transparent"
+              />
 
-              {/* Input Textarea */}
-              <div className="relative">
-                <Textarea
-                  ref={inputRef}
-                  value={input}
-                  onKeyDown={handleKeyDown}
-                  onChange={handleInputChange}
-                  onPaste={handlePaste}
-                  placeholder="Type your message here..."
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[120px] p-3 text-base placeholder:text-muted-foreground bg-transparent"
-                />
-
-                {/* Action Buttons */}
-                <div className="flex items-center justify-end px-4 py-2 gap-2 ">
-                  <div className="flex items-center gap-2">
-                    {isImprovingPrompt ? (
-                      <Button
-                        variant="outline"
-                        disabled
-                        className="gap-2 text-sm"
-                      >
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Enhancing...
-                      </Button>
-                    ) : originalPrompt ? (
-                      <Button
-                        variant="outline"
-                        onClick={handleUndoImprove}
-                        className="gap-2 text-sm hover:bg-secondary"
-                      >
-                        <Undo2 className="w-4 h-4" />
-                        Undo Enhancement
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        disabled={!input.trim()}
-                        onClick={handleImprovePrompt}
-                        className="gap-2 text-sm hover:bg-secondary disabled:opacity-50"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        Enhance Prompt
-                      </Button>
-                    )}
-                  </div>
-
-                  <Button
-                    disabled={!input.trim() || isStreaming}
-                    onClick={handleFormSubmit}
-                    className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 disabled:opacity-50"
-                  >
-                    <Send className="h-4 w-4" />
-                    Send
-                  </Button>
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end px-4 py-2 gap-2 ">
+                <div className="flex items-center gap-2">
+                  {isImprovingPrompt ? (
+                    <Button
+                      variant="outline"
+                      disabled
+                      className="gap-2 text-sm"
+                    >
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Enhancing...
+                    </Button>
+                  ) : originalPrompt ? (
+                    <Button
+                      variant="outline"
+                      onClick={handleUndoImprove}
+                      className="gap-2 text-sm hover:bg-secondary"
+                    >
+                      <Undo2 className="w-4 h-4" />
+                      Undo Enhancement
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      disabled={!input.trim()}
+                      onClick={handleImprovePrompt}
+                      className="gap-2 text-sm hover:bg-secondary disabled:opacity-50"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Enhance Prompt
+                    </Button>
+                  )}
                 </div>
+
+                <Button
+                  disabled={!input.trim() || isStreaming}
+                  onClick={handleFormSubmit}
+                  className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 disabled:opacity-50"
+                >
+                  <Send className="h-4 w-4" />
+                  Send
+                </Button>
               </div>
             </div>
           </div>
@@ -351,16 +346,17 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                 >
                   <div className="flex flex-col gap-1 max-w-[85%] md:max-w-[75%]">
                     <div
-                      className={`relative px-3 py-1 transition-all duration-200 bg-muted text-muted-foreground 
-
+                      className={`relative px-3 py-1 transition-all duration-200 rounded-sm
+                          ${
+                            message.role === Role.user
+                              ? "bg-muted/20 text-muted-foreground "
+                              : "bg-muted/40 text-muted-foreground "
+                          }
                       `}
                     >
-                      {/* Content */}
-                      <div className="relative">
-                        <Typography>
-                          <Markdown>{message.content}</Markdown>
-                        </Typography>
-                      </div>
+                      <Typography>
+                        <Markdown>{message.content}</Markdown>
+                      </Typography>
                     </div>
                   </div>
                 </motion.div>
@@ -370,7 +366,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             <div ref={messagesEndRef} />
           </div>
 
-          <AnimatePresence>
+          {/* <AnimatePresence>
             {showScrollButton && (
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -383,60 +379,88 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                 <ChevronDown size={20} />
               </motion.button>
             )}
-          </AnimatePresence>
+          </AnimatePresence> */}
 
           <div
-            className={`fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-sm border-t border-border transition-all duration-200 ${
+            className={`fixed bottom-0 left-0 right-0  transition-all duration-200 ${
               open ? "left-64" : "left-0"
             }`}
           >
-            <div className="max-w-4xl mx-auto p-6">
-              <div className="bg-card border border-border rounded-2xl shadow-sm">
-                {/* File Previews in Chat Mode */}
-                <AnimatePresence>
-                  {filePreviews.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="border-b border-border p-4"
-                    >
-                      <div className="flex gap-3 overflow-x-auto pb-2">
-                        {filePreviews.map((preview, index) => (
-                          <FilePreviewCard
-                            setFilePreviews={setFilePreviews}
-                            key={index}
-                            preview={preview}
-                            index={index}
-                          />
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+            <div className="max-w-2xl w-full mx-auto mb-3 border border-border rounded-xl shadow-sm hover:shadow-2xl transition-shadow">
+              <AnimatePresence>
+                {filePreviews.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="bg-muted/30"
+                  >
+                    <div className="flex gap-3 overflow-x-auto p-2  ">
+                      {filePreviews.map((preview, index) => (
+                        <FilePreviewCard
+                          key={index}
+                          preview={preview}
+                          index={index}
+                          setFilePreviews={setFilePreviews}
+                        />
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <div className="relative">
+                <Textarea
+                  ref={inputRef}
+                  value={input}
+                  onKeyDown={handleKeyDown}
+                  onChange={handleInputChange}
+                  onPaste={handlePaste}
+                  placeholder="Type your message here..."
+                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[60px] p-3 text-base placeholder:text-muted-foreground bg-transparent"
+                />
 
-                <div className="relative">
-                  <Textarea
-                    ref={inputRef}
-                    value={input}
-                    onKeyDown={handleKeyDown}
-                    onChange={handleInputChange}
-                    onPaste={handlePaste}
-                    placeholder="Type your message..."
-                    className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[80px] p-4 text-base placeholder:text-muted-foreground bg-transparent"
-                  />
-
-                  <div className="flex justify-end p-4 border-t border-border">
-                    <Button
-                      size="lg"
-                      disabled={!input.trim() || isStreaming}
-                      onClick={handleFormSubmit}
-                      className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 disabled:opacity-50"
-                    >
-                      <Send className="h-4 w-4" />
-                      Send
-                    </Button>
+                {/* Action Buttons */}
+                <div className="flex items-center justify-end px-4 py-2 gap-2 ">
+                  <div className="flex items-center gap-2">
+                    {isImprovingPrompt ? (
+                      <Button
+                        variant="outline"
+                        disabled
+                        className="gap-2 text-sm"
+                      >
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Enhancing...
+                      </Button>
+                    ) : originalPrompt ? (
+                      <Button
+                        variant="outline"
+                        onClick={handleUndoImprove}
+                        className="gap-2 text-sm hover:bg-secondary"
+                      >
+                        <Undo2 className="w-4 h-4" />
+                        Undo Enhancement
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        disabled={!input.trim()}
+                        onClick={handleImprovePrompt}
+                        className="gap-2 text-sm hover:bg-secondary disabled:opacity-50"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        Enhance Prompt
+                      </Button>
+                    )}
                   </div>
+
+                  <Button
+                    disabled={!input.trim() || isStreaming}
+                    onClick={handleFormSubmit}
+                    className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 disabled:opacity-50"
+                  >
+                    <Send className="h-4 w-4" />
+                    Send
+                  </Button>
                 </div>
               </div>
             </div>
