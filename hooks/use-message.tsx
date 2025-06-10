@@ -31,12 +31,6 @@ export default function useMessages(
 
     setMessages((prev) => [...prev, userMessage, modelMessage]);
 
-    console.log("prevMessages.length is ", prevMessages.length);
-    console.log(
-      "prevMessages.slice(-6).length is ",
-      prevMessages.slice(-6).length
-    );
-
     const res = await fetch(`/api/chat/${chatId}/ask`, {
       method: "POST",
       body: JSON.stringify({

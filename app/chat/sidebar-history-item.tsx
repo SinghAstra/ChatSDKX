@@ -13,12 +13,12 @@ export const ChatItem = ({
   onDelete: (chatId: string) => void;
   setOpenMobile: (open: boolean) => void;
 }) => {
-  console.log("onDelete is ", onDelete);
   return (
     <SidebarMenuItem className="rounded-xs">
       <SidebarMenuButton className="rounded-xs" asChild isActive={isActive}>
         <Link href={`/chat/${chat.id}`} onClick={() => setOpenMobile(false)}>
           <span>{chat.title}</span>
+          {/* <Button className="hidden" onClick={() => onDelete(chat.id)}></Button> */}
         </Link>
       </SidebarMenuButton>
     </SidebarMenuItem>

@@ -57,6 +57,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   );
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
   const [isNewChat, setIsNewChat] = useState(newChat);
+  const [reRenderIO, setReRenderIO] = useState(false);
 
   const { setToastMessage } = useToastContext();
 
@@ -121,6 +122,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       if (isNewChat) {
         window.history.replaceState({}, "", `/chat/${chatId}`);
         setIsNewChat(false);
+        setReRenderIO(true);
       }
     }
   };
@@ -141,6 +143,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     if (isNewChat) {
       window.history.replaceState({}, "", `/chat/${chatId}`);
       setIsNewChat(false);
+      setReRenderIO(true);
     }
   };
 
@@ -149,8 +152,10 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   };
 
   useEffect(() => {
+    console.log("reRenderIO is ", reRenderIO);
     const observer = new IntersectionObserver(
       ([entry]) => {
+        console.log("entry.isIntersecting is ", entry.isIntersecting);
         setShowScrollButton(!entry.isIntersecting);
       },
       { threshold: 0.8 }
@@ -166,7 +171,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         observer.unobserve(val);
       }
     };
-  }, [messagesEndRef]);
+  }, [reRenderIO]);
 
   useEffect(() => {
     const newVal = searchParams.get("new");
@@ -183,9 +188,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       inputRef.current.focus();
     }
   }, [inputRef]);
-
-  console.log("suggestedQuestions.length is ", suggestedQuestions.length);
-  console.log("improvementReason.length is ", improvementReason?.length);
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
@@ -370,7 +372,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               );
             })}
 
-            <div ref={messagesEndRef} />
+            <div className="h-4" ref={messagesEndRef} />
           </div>
 
           <div
