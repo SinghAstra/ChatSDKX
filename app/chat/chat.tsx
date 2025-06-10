@@ -13,7 +13,7 @@ import { Markdown } from "@/lib/markdown";
 import type { ClientMessage } from "@/lib/types";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Send, Sparkles, Undo2 } from "lucide-react";
+import { ChevronDown, Loader2, Send, Sparkles, Undo2 } from "lucide-react";
 import type { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
@@ -349,10 +349,15 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                     message.role === Role.user ? "justify-end" : "justify-start"
                   }`}
                 >
-                  <div className="flex flex-col gap-1 max-w-[85%] md:max-w-[75%]">
+                  <div
+                    className={`flex flex-col gap-1 w-fit max-w-[90%] min-w-[60px]  ${
+                      message.content.length > 100 && "w-full"
+                    }`}
+                  >
                     <div
                       className={`px-3 py-1 transition-all duration-200 rounded-sm
                           bg-muted/20 text-muted-foreground
+                         
                       `}
                     >
                       <Typography>
@@ -367,26 +372,40 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* <AnimatePresence>
-            {showScrollButton && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={scrollToBottom}
-                className="fixed bottom-32 right-8 bg-card border border-border text-muted-foreground rounded-full p-3 shadow-lg hover:shadow-xl transition-all z-50 hover:bg-secondary"
-                aria-label="Scroll to bottom"
-              >
-                <ChevronDown size={20} />
-              </motion.button>
-            )}
-          </AnimatePresence> */}
-
           <div
-            className={`fixed bottom-0 left-0 right-0  transition-all duration-200 ${
+            className={`fixed flex flex-col gap-2 bottom-0 left-0 right-0  transition-all duration-200 ${
               open ? "left-64" : "left-0"
             }`}
           >
+            {showScrollButton && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                transition={{
+                  duration: 0.1,
+                  ease: "easeIn",
+                }}
+                onClick={scrollToBottom}
+                className="flex w-fit mx-auto bg-background/40 backdrop-blur-md  gap-2 px-2 py-1 items-center right-8 border text-muted-foreground rounded-md shadow-lg hover:shadow-xl transition-all z-50 cursor-pointer hover:shadow-4xl "
+                aria-label="Scroll to bottom"
+              >
+                <motion.div
+                  animate={{
+                    y: [0, -3, 0],
+                    scale: [1, 1.05, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <ChevronDown size={24} />
+                </motion.div>
+                <span>Scroll To Bottom</span>
+              </motion.div>
+            )}
             <div className="max-w-2xl w-full mx-auto mb-3 border border-border rounded-xl shadow-sm hover:shadow-2xl transition-shadow bg-background/60 backdrop-blur-md">
               <AnimatePresence>
                 {filePreviews.length > 0 && (
