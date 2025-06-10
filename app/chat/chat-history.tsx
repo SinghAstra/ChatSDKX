@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Chat } from "@prisma/client";
 import { isToday, isYesterday, subMonths, subWeeks } from "date-fns";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ChatItem } from "./sidebar-history-item";
@@ -69,8 +69,8 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
 
-  const router = useRouter();
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  // const router = useRouter();
+  // const [deleteId, setDeleteId] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -89,9 +89,9 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
 
     setShowDeleteDialog(false);
 
-    if (deleteId === id) {
-      router.push("/");
-    }
+    // if (deleteId === id) {
+    //   router.push("/");
+    // }
   };
 
   if (chats.length === 0) {
@@ -124,10 +124,10 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
                       key={chat.id}
                       chat={chat}
                       isActive={chat.id === id}
-                      onDelete={() => {
-                        setDeleteId(chat.id);
-                        setShowDeleteDialog(true);
-                      }}
+                      // onDelete={() => {
+                      //   setDeleteId(chat.id);
+                      //   setShowDeleteDialog(true);
+                      // }}
                       setOpenMobile={setOpenMobile}
                     />
                   ))}
@@ -144,10 +144,10 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
                       key={chat.id}
                       chat={chat}
                       isActive={chat.id === id}
-                      onDelete={() => {
-                        setDeleteId(chat.id);
-                        setShowDeleteDialog(true);
-                      }}
+                      // onDelete={() => {
+                      //   setDeleteId(chat.id);
+                      //   setShowDeleteDialog(true);
+                      // }}
                       setOpenMobile={setOpenMobile}
                     />
                   ))}
@@ -164,10 +164,10 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
                       key={chat.id}
                       chat={chat}
                       isActive={chat.id === id}
-                      onDelete={() => {
-                        setDeleteId(chat.id);
-                        setShowDeleteDialog(true);
-                      }}
+                      // onDelete={() => {
+                      //   setDeleteId(chat.id);
+                      //   setShowDeleteDialog(true);
+                      // }}
                       setOpenMobile={setOpenMobile}
                     />
                   ))}
@@ -184,10 +184,10 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
                       key={chat.id}
                       chat={chat}
                       isActive={chat.id === id}
-                      onDelete={() => {
-                        setDeleteId(chat.id);
-                        setShowDeleteDialog(true);
-                      }}
+                      // onDelete={() => {
+                      //   setDeleteId(chat.id);
+                      //   setShowDeleteDialog(true);
+                      // }}
                       setOpenMobile={setOpenMobile}
                     />
                   ))}
@@ -204,10 +204,10 @@ export function ChatHistory({ chats }: ChatHistoryProps) {
                       key={chat.id}
                       chat={chat}
                       isActive={chat.id === id}
-                      onDelete={() => {
-                        setDeleteId(chat.id);
-                        setShowDeleteDialog(true);
-                      }}
+                      // onDelete={() => {
+                      //   setDeleteId(chat.id);
+                      //   setShowDeleteDialog(true);
+                      // }}
                       setOpenMobile={setOpenMobile}
                     />
                   ))}

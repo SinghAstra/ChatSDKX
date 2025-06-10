@@ -11,7 +11,15 @@ import { improvePrompt } from "@/lib/gemini";
 import type { ClientMessage } from "@/lib/types";
 import { Role } from "@prisma/client";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Loader2, Send, Sparkles, Undo2 } from "lucide-react";
+import {
+  ChevronDown,
+  HelpCircle,
+  Loader2,
+  Send,
+  Sparkles,
+  Undo2,
+  X,
+} from "lucide-react";
 import type { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
@@ -27,7 +35,6 @@ import FilePreviewCard from "./file-preview-card";
 import { MessageContent } from "./message-content";
 import ReasoningToast from "./prompt-reasoning";
 import { SidebarToggle } from "./sidebar-toggle";
-import { SuggestionsToggle } from "./suggestions-toggle";
 
 interface ChatProps {
   user: User;
@@ -58,6 +65,9 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
   const [isNewChat, setIsNewChat] = useState(newChat);
   const [reRenderIO, setReRenderIO] = useState(false);
+  const [isSuggestedQuestionDialogOpen, setIsSuggestedQuestionDialogOpen] =
+    useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   const { setToastMessage } = useToastContext();
 
@@ -152,7 +162,33 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   };
 
   useEffect(() => {
-    console.log("reRenderIO is ", reRenderIO);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dialogRef.current &&
+        !dialogRef.current.contains(event.target as Node)
+      ) {
+        setIsSuggestedQuestionDialogOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsSuggestedQuestionDialogOpen(false);
+      }
+    };
+
+    if (isSuggestedQuestionDialogOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isSuggestedQuestionDialogOpen]);
+
+  useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         console.log("entry.isIntersecting is ", entry.isIntersecting);
@@ -212,13 +248,32 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full">
-          <div className={`flex justify-center mb-4`}>
-            <SuggestionsToggle
-              variant={"outline"}
-              size={"default"}
-              suggestions={suggestedQuestions}
-            />
-          </div>
+          {suggestedQuestions.length > 0 && (
+            <div className={`flex justify-center mb-4`}>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 1, scale: 0.8 }}
+                transition={{
+                  duration: 0.3,
+                }}
+              >
+                <Button
+                  variant={"outline"}
+                  size={"default"}
+                  onClick={() =>
+                    setIsSuggestedQuestionDialogOpen(
+                      !isSuggestedQuestionDialogOpen
+                    )
+                  }
+                  className="gap-2 "
+                >
+                  <HelpCircle className="w-3 h-3" />
+                  <span>View Suggestions</span>
+                </Button>
+              </motion.div>
+            </div>
+          )}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground mb-2">
               How can I assist you today?
@@ -376,7 +431,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           </div>
 
           <div
-            className={`fixed flex flex-col gap-2 bottom-0 left-0 right-0  transition-all duration-200 ${
+            className={`fixed  flex flex-col gap-2 bottom-0 left-0 right-0  transition-all duration-200 ${
               open ? "left-64" : "left-0"
             }`}
           >
@@ -390,7 +445,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                   ease: "easeIn",
                 }}
                 onClick={scrollToBottom}
-                className="flex w-fit mx-auto bg-background/40 backdrop-blur-md  gap-2 px-2 py-1 items-center right-8 border text-muted-foreground rounded-md shadow-lg hover:shadow-xl transition-all z-50 cursor-pointer hover:shadow-4xl "
+                className="flex max-w-2xl mx-auto bg-background/40 backdrop-blur-md  gap-2 px-2 py-1 items-center right-8 border text-muted-foreground rounded-md shadow-lg hover:shadow-xl transition-all z-50 cursor-pointer hover:shadow-4xl "
                 aria-label="Scroll to bottom"
               >
                 <motion.div
@@ -445,11 +500,30 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                 {/* Action Buttons */}
                 <div className="flex items-center justify-end px-4 py-2 gap-2 ">
                   <div className="flex items-center gap-2">
-                    <SuggestionsToggle
-                      size={"sm"}
-                      variant="outline"
-                      suggestions={suggestedQuestions}
-                    />
+                    {suggestedQuestions.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 1, scale: 0.8 }}
+                        transition={{
+                          duration: 0.3,
+                        }}
+                      >
+                        <Button
+                          variant={"outline"}
+                          size={"sm"}
+                          onClick={() =>
+                            setIsSuggestedQuestionDialogOpen(
+                              !isSuggestedQuestionDialogOpen
+                            )
+                          }
+                          className="gap-2 "
+                        >
+                          <HelpCircle className="w-3 h-3" />
+                          <span>View Suggestions</span>
+                        </Button>
+                      </motion.div>
+                    )}
                     {isImprovingPrompt ? (
                       <Button
                         variant="outline"
@@ -501,6 +575,59 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       )}
 
       {improvementReason && <ReasoningToast reasoning={improvementReason} />}
+      {isSuggestedQuestionDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <motion.div
+            ref={dialogRef}
+            className={` bg-background/80 backdrop-blur-md border rounded shadow-xl w-full max-w-md `}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{
+              duration: 0.2,
+              ease: "easeOut",
+            }}
+          >
+            <div className="flex items-center justify-between py-2 px-3 border-b border-border bg-muted/30">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-primary" />
+                <h2>Consider answering these questions</h2>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsSuggestedQuestionDialogOpen(false)}
+                className="h-6 w-6 p-0 hover:bg-muted"
+              >
+                <X className="w-3 h-3" />
+                <span className="sr-only">Close</span>
+              </Button>
+            </div>
+            <div className="p-3 max-h-[300px] overflow-y-auto">
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground mb-2">
+                  Including answers to these questions will help get better
+                  responses:
+                </p>
+                <ul className="space-y-2">
+                  {suggestedQuestions.map((suggestion, index) => (
+                    <motion.li
+                      key={index}
+                      className="flex items-start gap-2 text-xs leading-relaxed"
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>{suggestion}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
