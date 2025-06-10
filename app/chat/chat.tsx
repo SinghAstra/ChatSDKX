@@ -61,8 +61,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
   const { setToastMessage } = useToastContext();
 
-  console.log("filePreviews.length is ", filePreviews.length);
-
   const handleImprovePrompt = async () => {
     setIsImprovingPrompt(true);
     setOriginalPrompt(input);
@@ -149,11 +147,11 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (inputRef.current) {
+  //     inputRef.current.focus();
+  //   }
+  // }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -181,10 +179,12 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       const params = new URLSearchParams(searchParams.toString());
       params.delete("new");
       router.replace(`?${params.toString()}`, { scroll: false });
+      setIsNewChat(true);
     }
   }, [searchParams, router]);
 
-  console.log("improvementReason is ", improvementReason);
+  console.log("chatId is ", chatId);
+  console.log("messages.length is ", messages.length);
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
@@ -305,63 +305,68 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           </div>
         </div>
       ) : (
-        // Chat Messages Area - Using theme colors
         <div className="flex-1 overflow-y-auto pb-32" ref={messagesRef}>
-          <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
-            {messages.map((message) => {
+          <div className="w-full px-6 py-8 space-y-6">
+            {messages.map((message, index) => {
               if (!message.content.trim() && message.isStreaming) {
                 return (
-                  <div key={message.id} className="flex justify-start">
-                    <div className="bg-secondary text-muted-foreground px-4 py-3 rounded-2xl rounded-bl-md max-w-xs">
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="flex gap-1">
-                          <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" />
+                  <motion.div
+                    key={message.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex justify-start"
+                  >
+                    <div className="flex items-center gap-3 px-4 py-3 bg-secondary/50 backdrop-blur-sm rounded-xl border border-border/50">
+                      <div className="flex gap-1">
+                        {[0, 1, 2].map((i) => (
                           <div
-                            className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                            style={{ animationDelay: "0.1s" }}
+                            key={i}
+                            className="w-1.5 h-1.5 bg-muted-foreground/60 rounded-full animate-loading-dot"
+                            style={{ animationDelay: `${i * 0.2}s` }}
                           />
-                          <div
-                            className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"
-                            style={{ animationDelay: "0.2s" }}
-                          />
-                        </div>
-                        <span>Thinking</span>
+                        ))}
                       </div>
+                      <span className="text-xs text-muted-foreground tracking-wide">
+                        Thinking
+                      </span>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               }
 
               return (
                 <motion.div
                   key={message.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 15, scale: 0.8 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{
+                    duration: 0.3,
+                    delay: index * 0.05,
+                  }}
                   className={`flex ${
                     message.role === Role.user ? "justify-end" : "justify-start"
                   }`}
                 >
-                  <div
-                    className={`max-w-[75%] px-5 py-4 rounded-2xl ${
-                      message.role === Role.user
-                        ? "bg-primary text-primary-foreground rounded-br-md"
-                        : "bg-secondary text-foreground rounded-bl-md"
-                    }`}
-                  >
-                    {message.role === Role.user ? (
-                      <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                        {message.content}
+                  <div className="flex flex-col gap-1 max-w-[85%] md:max-w-[75%]">
+                    <div
+                      className={`relative px-3 py-1 transition-all duration-200 bg-muted text-muted-foreground 
+
+                      `}
+                    >
+                      {/* Content */}
+                      <div className="relative">
+                        <Typography>
+                          <Markdown>{message.content}</Markdown>
+                        </Typography>
                       </div>
-                    ) : (
-                      <Typography>
-                        <Markdown>{message.content}</Markdown>
-                      </Typography>
-                    )}
+                    </div>
                   </div>
                 </motion.div>
               );
             })}
+
             <div ref={messagesEndRef} />
           </div>
 

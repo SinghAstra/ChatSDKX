@@ -26,14 +26,22 @@ export default function useMessages(
       isStreaming: true,
     };
 
+    const prevMessages = [...messages];
+
     setMessages((prev) => [...prev, userMessage, modelMessage]);
+
+    console.log("prevMessages.length is ", prevMessages.length);
+    console.log(
+      "prevMessages.slice(-6).length is ",
+      prevMessages.slice(-6).length
+    );
 
     const res = await fetch(`/api/chat/${chatId}/ask`, {
       method: "POST",
       body: JSON.stringify({
         message: input,
         messages:
-          messages.length > 7 ? messages.slice(-8, -2) : messages.slice(0, -2),
+          prevMessages.length > 6 ? prevMessages.slice(-6) : prevMessages,
       }),
     });
 
