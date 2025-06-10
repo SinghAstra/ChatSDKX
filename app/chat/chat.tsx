@@ -147,12 +147,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // useEffect(() => {
-  //   if (inputRef.current) {
-  //     inputRef.current.focus();
-  //   }
-  // }, []);
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -171,7 +165,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         observer.unobserve(val);
       }
     };
-  }, []);
+  }, [messagesEndRef]);
 
   useEffect(() => {
     const newVal = searchParams.get("new");
@@ -183,8 +177,14 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     }
   }, [searchParams, router]);
 
-  console.log("chatId is ", chatId);
-  console.log("messages.length is ", messages.length);
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [inputRef]);
+
+  console.log("suggestedQuestions.length is ", suggestedQuestions.length);
+  console.log("improvementReason.length is ", improvementReason?.length);
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
@@ -305,7 +305,10 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           </div>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto pb-32" ref={messagesRef}>
+        <div
+          className={`flex-1 overflow-y-auto transition-all duration-200 pb-[50vh]`}
+          ref={messagesRef}
+        >
           <div className="w-full px-6 py-8 space-y-6">
             {messages.map((message, index) => {
               if (!message.content.trim() && message.isStreaming) {
@@ -357,7 +360,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                     <div
                       className={`px-3 py-1 transition-all duration-200 rounded-sm
                           bg-muted/20 text-muted-foreground
-                         
                       `}
                     >
                       <Typography>
