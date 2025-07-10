@@ -3,18 +3,17 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
-interface AuthLayoutProps {
+interface ProtectedLayoutProps {
   children: ReactNode;
 }
 
-const AuthLayout = async ({ children }: AuthLayoutProps) => {
+const ProtectedLayout = async ({ children }: ProtectedLayoutProps) => {
   const session = await getServerSession(authOptions);
-  const isLoggedIn = session ? true : false;
-
-  if (isLoggedIn) {
-    redirect("/chat");
+  if (!session) {
+    redirect("/");
   }
+
   return children;
 };
 
-export default AuthLayout;
+export default ProtectedLayout;

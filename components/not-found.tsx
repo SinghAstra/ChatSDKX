@@ -18,7 +18,7 @@ interface NotFoundProps {
 }
 
 const NotFound = ({ user }: NotFoundProps) => {
-  const href = user ? "/dashboard" : "/";
+  const href = user ? "/chat" : "/";
   const [showAuthDialog, setShowAuthDialog] = useState(false);
   const toggleAuthDialog = () => {
     setShowAuthDialog(!showAuthDialog);
@@ -51,7 +51,13 @@ const NotFound = ({ user }: NotFoundProps) => {
           </motion.p>
         </div>
         <motion.div variants={scaleInVariant}>
-          <Link href={href} className={buttonVariants({ variant: "outline" })}>
+          <Link
+            href={href}
+            className={buttonVariants({
+              variant: "outline",
+              className: "rounded font-normal",
+            })}
+          >
             Back to Home
           </Link>
         </motion.div>

@@ -146,58 +146,15 @@ pre > code {
   border: 0;
 }
 
-@layer utilities {
-  .animate-fade-in {
-    animation: fadeIn 0.6s ease-in-out;
-  }
-
-  .animate-width-grow {
-    animation: widthGrow 1.5s ease-in-out infinite;
-  }
-
-  .animate-loading-dot {
-    animation: loadingDot 1.4s infinite;
-  }
-
-  .animation-delay-200 {
-    animation-delay: 0.2s;
-  }
-
-  .animation-delay-400 {
-    animation-delay: 0.4s;
-  }
-}
-
-@keyframes fadeIn {
+@keyframes shine {
   from {
-    opacity: 0;
+    background-position: 0 0;
   }
   to {
-    opacity: 1;
+    background-position: -400% 0;
   }
 }
 
-@keyframes widthGrow {
-  0% {
-    width: 0;
-    opacity: 0.7;
-  }
-  50% {
-    width: 100%;
-    opacity: 1;
-  }
-  100% {
-    width: 0;
-    opacity: 0.7;
-  }
-}
-
-@keyframes loadingDot {
-  0%,
-  100% {
-    opacity: 0.2;
-  }
-  50% {
-    opacity: 1;
-  }
+.shine {
+  animation: shine 6s linear infinite;
 }

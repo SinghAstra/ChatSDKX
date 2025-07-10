@@ -2,7 +2,7 @@ import { authOptions } from "@/lib/auth-options";
 import { getServerSession } from "next-auth";
 import { notFound, redirect } from "next/navigation";
 import React from "react";
-import Chat from "../chat";
+import Chat from "../../../chat/chat";
 import { fetchChat } from "./action";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {

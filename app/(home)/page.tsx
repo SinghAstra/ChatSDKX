@@ -1,14 +1,14 @@
 "use client";
 
+import AuthDialog from "@/components/componentX/auth-dialog";
+import ConicGradientBackground from "@/components/componentX/conic-gradient-background";
 import GradientInsetBackground from "@/components/componentX/gradient-inset-background";
 import MovingBackground from "@/components/componentX/moving-background";
 import MovingGlow from "@/components/componentX/moving-glow";
 import RadialFadePulsatingBackground from "@/components/componentX/radial-fade-pulsating-background";
+import Footer from "@/components/home/footer";
 import Navbar from "@/components/home/navbar";
-import { BackgroundShine } from "@/components/ui/background-shine";
-import { BorderBeam } from "@/components/ui/border-beam";
-import GradientButton from "@/components/ui/gradient-button";
-import { LampContainer } from "@/components/ui/lamp";
+
 import { siteConfig } from "@/config/site";
 import {
   blurInVariant,
@@ -17,8 +17,6 @@ import {
 } from "@/lib/variants";
 import { ArrowRightIcon } from "lucide-react";
 import { motion } from "motion/react";
-import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import { FaGithub, FaTwitterSquare } from "react-icons/fa";
 
@@ -126,34 +124,41 @@ const LandingPage = () => {
           />
         </div> */}
 
-        {/* CTA Section */}
-        {/* <div className="mt-20 max-w-[100vw] overflow-x-hidden scrollbar-hide">
-          <LampContainer>
-            <motion.div
-              initial={{ opacity: 0.5, y: 100 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8, ease: "easeInOut" }}
-              className="flex flex-col items-center justify-center gap-8  "
+        <div className="min-h-screen relative px-4 sm:px-8 flex items-center">
+          <motion.div
+            variants={containerVariant}
+            initial="hidden"
+            whileInView="visible"
+            className="flex flex-col gap-4 sm:gap-8 sm:max-w-[60%] text-balance"
+          >
+            <motion.h1
+              variants={blurInVariant}
+              className="text-5xl text-balance leading-[1.3]"
             >
-              <h1 className="text-foreground text-center py-4 text-5xl font-medium text-balance sm:text-6xl md:text-7xl lg:text-8xl  w-full">
-                Start <br />
-                <span className="text-transparent bg-gradient-to-r from-violet-500 to-fuchsia-500 bg-clip-text inline-bloc ">
-                  Building <br /> AI Chat Web App
-                </span>
-              </h1>
-              <BackgroundShine>
-                <Link
-                  href={isAuthenticated ? "/chat" : "/auth/sign-in"}
-                  className="flex items-center "
-                >
-                  Get started
-                  <ArrowRightIcon className="w-4 h-4 ml-2" />
-                </Link>
-              </BackgroundShine>
+              Open Source LLM Chat with in house client side data management.
+            </motion.h1>
+            <motion.div
+              variants={scaleInVariant}
+              className="relative border px-6 py-2 text-xl rounded flex items-center group cursor-pointer w-fit"
+              onClick={toggleAuthDialog}
+            >
+              <MovingGlow />
+              <GradientInsetBackground />
+              Get started
+              <ArrowRightIcon
+                className="ml-1 size-4 transition-all duration-300 
+                group-hover:translate-x-1"
+              />
             </motion.div>
-          </LampContainer>
-        </div> */}
+          </motion.div>
+          <ConicGradientBackground />
+        </div>
       </motion.div>
+      <Footer />
+      <AuthDialog
+        isDialogVisible={showAuthDialog}
+        setIsDialogVisible={setShowAuthDialog}
+      />
     </>
   );
 };
