@@ -6,32 +6,32 @@ import { Clock, Pause, Play, Sparkles, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface ReasoningToastProps {
-  reasoning: string;
+  reasoning: string | null;
 }
 
 export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
-  const autoHideDuration = 8000;
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [progress, setProgress] = useState(100);
   const [isPaused, setIsPaused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const progressReComputeTimeIntervalInMilliSeconds = 100;
 
   useEffect(() => {
-    if (!autoHideDuration || isPaused) return;
+    if (isPaused) return;
 
     const interval = setInterval(() => {
       setProgress((prev) => {
-        const newProgress = prev - 100 / (autoHideDuration / 100);
+        const newProgress = prev - 1;
         if (newProgress <= 0) {
           handleDismiss();
           return 0;
         }
         return newProgress;
       });
-    }, 100);
+    }, progressReComputeTimeIntervalInMilliSeconds);
 
     return () => clearInterval(interval);
-  }, [autoHideDuration, isPaused]);
+  }, [isPaused]);
 
   const handleDismiss = () => {
     setIsVisible(false);
@@ -48,6 +48,15 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
   const togglePause = () => {
     setIsPaused(!isPaused);
   };
+
+  useEffect(() => {
+    setIsVisible(true);
+    setProgress(100);
+  }, [reasoning]);
+
+  if (!reasoning) {
+    return;
+  }
 
   return (
     <AnimatePresence>
@@ -69,7 +78,7 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
           `}
           >
             {/* Progress bar */}
-            {autoHideDuration > 0 && (
+            {progress > 0 && (
               <div className="absolute top-0 left-0 right-0 h-1 bg-secondary/30">
                 <motion.div
                   className={`h-full transition-all duration-100`}
@@ -98,7 +107,7 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
 
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {/* Pause/Play button */}
-                  {autoHideDuration > 0 && (
+                  {progress > 0 && (
                     <Button
                       variant="ghost"
                       size="sm"
@@ -152,7 +161,7 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
                 )}
 
                 {/* Status indicator */}
-                {autoHideDuration > 0 && (
+                {progress > 0 && (
                   <div className="flex items-center justify-between text-xs text-muted-foreground/70">
                     <div className="flex items-center gap-1">
                       <Clock className="h-2.5 w-2.5" />
@@ -160,8 +169,10 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
                         {isPaused
                           ? "Paused"
                           : `${Math.ceil(
-                              ((progress / 100) * autoHideDuration) / 1000
-                            )}s`}
+                              progress *
+                                (progressReComputeTimeIntervalInMilliSeconds /
+                                  1000)
+                            )} s`}
                       </span>
                     </div>
                     <span>Hover to pause</span>

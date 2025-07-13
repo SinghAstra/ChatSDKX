@@ -1,5 +1,6 @@
 "use client";
 
+import Dialog from "@/components/componentX/dialog";
 import { useToastContext } from "@/components/providers/toast";
 import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
@@ -67,7 +68,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   const [reRenderIO, setReRenderIO] = useState(false);
   const [isSuggestedQuestionDialogOpen, setIsSuggestedQuestionDialogOpen] =
     useState(false);
-  const dialogRef = useRef<HTMLDivElement>(null);
 
   const { setToastMessage } = useToastContext();
 
@@ -162,33 +162,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dialogRef.current &&
-        !dialogRef.current.contains(event.target as Node)
-      ) {
-        setIsSuggestedQuestionDialogOpen(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsSuggestedQuestionDialogOpen(false);
-      }
-    };
-
-    if (isSuggestedQuestionDialogOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [isSuggestedQuestionDialogOpen]);
-
-  useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         console.log("entry.isIntersecting is ", entry.isIntersecting);
@@ -224,6 +197,8 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       inputRef.current.focus();
     }
   }, [inputRef]);
+
+  console.log("improvementReason is ", improvementReason);
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
@@ -574,60 +549,49 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
         </div>
       )}
 
-      {improvementReason && <ReasoningToast reasoning={improvementReason} />}
-      {isSuggestedQuestionDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <motion.div
-            ref={dialogRef}
-            className={` bg-background/80 backdrop-blur-md border rounded shadow-xl w-full max-w-md `}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{
-              duration: 0.2,
-              ease: "easeOut",
-            }}
+      <ReasoningToast reasoning={improvementReason} />
+      <Dialog
+        isDialogVisible={isSuggestedQuestionDialogOpen}
+        setIsDialogVisible={setIsSuggestedQuestionDialogOpen}
+      >
+        <div className="flex items-center justify-between py-2 px-3 border-b border-border bg-muted/30">
+          <div className="flex items-center gap-2">
+            <HelpCircle className="w-4 h-4 text-primary" />
+            <h2>Consider answering these questions</h2>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsSuggestedQuestionDialogOpen(false)}
+            className="h-6 w-6 p-0 hover:bg-muted"
           >
-            <div className="flex items-center justify-between py-2 px-3 border-b border-border bg-muted/30">
-              <div className="flex items-center gap-2">
-                <HelpCircle className="w-4 h-4 text-primary" />
-                <h2>Consider answering these questions</h2>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsSuggestedQuestionDialogOpen(false)}
-                className="h-6 w-6 p-0 hover:bg-muted"
-              >
-                <X className="w-3 h-3" />
-                <span className="sr-only">Close</span>
-              </Button>
-            </div>
-            <div className="p-3 max-h-[300px] overflow-y-auto">
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground mb-2">
-                  Including answers to these questions will help get better
-                  responses:
-                </p>
-                <ul className="space-y-2">
-                  {suggestedQuestions.map((suggestion, index) => (
-                    <motion.li
-                      key={index}
-                      className="flex items-start gap-2 text-xs leading-relaxed"
-                      initial={{ opacity: 0, x: -5 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                    >
-                      <span className="text-primary mt-0.5">•</span>
-                      <span>{suggestion}</span>
-                    </motion.li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
+            <X className="w-3 h-3" />
+            <span className="sr-only">Close</span>
+          </Button>
         </div>
-      )}
+        <div className="p-3 max-h-[300px] overflow-y-auto">
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground mb-2">
+              Including answers to these questions will help get better
+              responses:
+            </p>
+            <ul className="space-y-2">
+              {suggestedQuestions.map((suggestion, index) => (
+                <motion.li
+                  key={index}
+                  className="flex items-start gap-2 text-xs leading-relaxed"
+                  initial={{ opacity: 0, x: -5 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <span className="text-primary mt-0.5">•</span>
+                  <span>{suggestion}</span>
+                </motion.li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 };
