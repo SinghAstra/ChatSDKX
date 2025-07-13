@@ -2,11 +2,9 @@
 
 import Dialog from "@/components/componentX/dialog";
 import { useToastContext } from "@/components/providers/toast";
-import { AvatarMenu } from "@/components/ui/avatar-menu";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
 import { Textarea } from "@/components/ui/textarea";
-import { siteConfig } from "@/config/site";
 import useMessages from "@/hooks/use-message";
 import { improvePrompt } from "@/lib/gemini";
 import type { ClientMessage } from "@/lib/types";
@@ -32,10 +30,10 @@ import {
   useState,
 } from "react";
 import { createChatInDB } from "./[id]/action";
+import ChatHeader from "./chat-header";
 import FilePreviewCard from "./file-preview-card";
 import { MessageContent } from "./message-content";
 import ReasoningToast from "./prompt-reasoning";
-import { SidebarToggle } from "./sidebar-toggle";
 
 interface ChatProps {
   user: User;
@@ -202,29 +200,12 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
-      <header
-        className={`flex items-center justify-between px-6 py-4 bg-background/80 backdrop-blur-sm sticky top-0 z-20 transition-all duration-200 ${
-          open ? "left-64" : "left-0"
-        }`}
-      >
-        <div className="flex items-center gap-4">
-          <SidebarToggle />
-          {!open && (
-            <h1
-              className="text-xl font-semibold text-foreground cursor-pointer hover:text-muted-foreground transition-colors"
-              onClick={() => setOpen(true)}
-            >
-              {siteConfig.name}
-            </h1>
-          )}
-        </div>
-        <AvatarMenu user={user} />
-      </header>
+      <ChatHeader open={open} setOpen={setOpen} user={user} />
 
       {messages.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full">
+        <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full px-2 sm:px-4">
           {suggestedQuestions.length > 0 && (
-            <div className={`flex justify-center mb-4`}>
+            <div className="flex justify-center mb-4">
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}

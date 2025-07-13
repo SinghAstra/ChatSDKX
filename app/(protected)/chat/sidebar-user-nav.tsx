@@ -20,7 +20,7 @@ export function SidebarUserNav({ user }: { user: User }) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant={"outline"}
+              variant="outline"
               className="bg-background h-10 rounded-sm w-full"
             >
               <Avatar className="h-6 w-6">

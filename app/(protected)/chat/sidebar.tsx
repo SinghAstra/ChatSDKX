@@ -20,7 +20,7 @@ import {
 import { siteConfig } from "@/config/site";
 import { fetcher } from "@/lib/utils";
 import { Chat } from "@prisma/client";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, SidebarIcon } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import useSWR from "swr";
@@ -34,7 +34,7 @@ interface AppSidebarProps {
 
 export function AppSidebar({ user, initialChats }: AppSidebarProps) {
   const router = useRouter();
-  const { setOpenMobile } = useSidebar();
+  const { setOpenMobile, toggleSidebar } = useSidebar();
   const pathname = usePathname();
   const { data: chats, mutate } = useSWR<Chat[]>(
     user ? "/api/chat" : null,
@@ -64,22 +64,36 @@ export function AppSidebar({ user, initialChats }: AppSidebarProps) {
                 {siteConfig.name}
               </span>
             </Link>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  type="button"
-                  className="p-2 h-fit"
-                  onClick={() => {
-                    setOpenMobile(false);
-                    router.push("/chat?new=true");
-                  }}
-                >
-                  <PlusIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent align="end">New Chat</TooltipContent>
-            </Tooltip>
+            <div className="flex gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="p-2 h-fit"
+                    onClick={toggleSidebar}
+                  >
+                    <SidebarIcon />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent align="start">Toggle Sidebar</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    className="p-2 h-fit"
+                    onClick={() => {
+                      setOpenMobile(false);
+                      router.push("/chat?new=true");
+                    }}
+                  >
+                    <PlusIcon />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent align="end">New Chat</TooltipContent>
+              </Tooltip>
+            </div>
           </div>
         </SidebarMenu>
       </SidebarHeader>

@@ -9,7 +9,7 @@ interface ReasoningToastProps {
   reasoning: string | null;
 }
 
-export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
+function ReasoningToast({ reasoning }: ReasoningToastProps) {
   const [isVisible, setIsVisible] = useState(true);
   const [progress, setProgress] = useState(100);
   const [isPaused, setIsPaused] = useState(false);
@@ -61,30 +61,21 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
         className={`fixed top-4 right-4 z-50 w-80 max-w-[calc(100vw-2rem)]`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        <div
-          className={`
-            relative overflow-hidden rounded-lg border backdrop-blur-sm
-            shadow-lg hover:shadow-xl transition-all duration-300
-            bg-card/95
-          `}
-        >
+        <div className="relative overflow-hidden rounded border backdrop-blur-sm transition-all duration-300">
           {/* Progress bar */}
-          {progress > 0 && (
-            <div className="absolute top-0 left-0 right-0 h-1">
-              <motion.div
-                className={`h-full transition-all duration-300 bg-primary`}
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-          )}
+          <div className="absolute top-0 left-0 right-0 h-1">
+            <motion.div
+              className={`h-full transition-all duration-300 bg-primary`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
 
-          <div className="p-4">
+          <div className="px-4 py-2">
             {/* Header */}
             <div className="flex items-center gap-3 mb-3">
               <Sparkles className={`h-3 w-3 `} />
@@ -154,3 +145,5 @@ export default function ReasoningToast({ reasoning }: ReasoningToastProps) {
     </AnimatePresence>
   );
 }
+
+export default ReasoningToast;
