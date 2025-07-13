@@ -205,41 +205,27 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full px-2 sm:px-4">
           {suggestedQuestions.length > 0 && (
-            <div className="flex justify-center mb-4">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 1, scale: 0.8 }}
-                transition={{
-                  duration: 0.3,
-                }}
-              >
-                <Button
-                  variant={"outline"}
-                  size={"default"}
-                  onClick={() =>
-                    setIsSuggestedQuestionDialogOpen(
-                      !isSuggestedQuestionDialogOpen
-                    )
-                  }
-                  className="gap-2 "
-                >
-                  <HelpCircle className="w-3 h-3" />
-                  <span>View Suggestions</span>
-                </Button>
-              </motion.div>
-            </div>
+            <Button
+              onClick={() =>
+                setIsSuggestedQuestionDialogOpen(!isSuggestedQuestionDialogOpen)
+              }
+              variant="outline"
+              className="gap-2 mb-4 rounded bg-muted/40 hover:bg-muted/60 transition-all duration-200"
+            >
+              <HelpCircle className="w-3 h-3" />
+              <span>View Suggestions</span>
+            </Button>
           )}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-foreground mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-1">
               How can I assist you today?
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground">
               Start a conversation or paste content to get started
             </p>
           </div>
 
-          <div className="w-full max-w-3xl border border-border rounded-2xl shadow-sm hover:shadow-2xl transition-shadow">
+          <div className="w-full max-w-3xl border rounded">
             <div className="relative">
               {/* File Previews */}
               {filePreviews.length > 0 && (
@@ -269,7 +255,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                 onChange={handleInputChange}
                 onPaste={handlePaste}
                 placeholder="Type your message here..."
-                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[120px] p-3 text-base placeholder:text-muted-foreground bg-transparent"
+                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[120px] p-3  placeholder:text-muted-foreground bg-transparent"
               />
 
               {/* Action Buttons */}
