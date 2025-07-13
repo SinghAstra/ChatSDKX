@@ -4,21 +4,12 @@ import Dialog from "@/components/componentX/dialog";
 import { useToastContext } from "@/components/providers/toast";
 import { Button } from "@/components/ui/button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { Textarea } from "@/components/ui/textarea";
 import useMessages from "@/hooks/use-message";
 import { improvePrompt } from "@/lib/gemini";
 import type { ClientMessage } from "@/lib/types";
 import { Role } from "@prisma/client";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  ChevronDown,
-  HelpCircle,
-  Loader2,
-  Send,
-  Sparkles,
-  Undo2,
-  X,
-} from "lucide-react";
+import { motion } from "framer-motion";
+import { ChevronDown, HelpCircle, X } from "lucide-react";
 import type { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
@@ -31,7 +22,7 @@ import {
 } from "react";
 import { createChatInDB } from "./[id]/action";
 import ChatHeader from "./chat-header";
-import FilePreviewCard from "./file-preview-card";
+import ChatInput from "./chat-input";
 import { MessageContent } from "./message-content";
 import ReasoningToast from "./prompt-reasoning";
 
@@ -114,29 +105,20 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   };
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey && !isStreaming) {
+    console.log(e.key);
+    if (
+      e.key === "Enter" &&
+      !e.shiftKey &&
+      !isStreaming &&
+      !isImprovingPrompt
+    ) {
+      console.log("Inside if");
       e.preventDefault();
-      if (!input.trim()) return;
-      const fullMessage = [...filePreviews, input].join("\n\n");
-      if (isNewChat) {
-        await createChatInDB(chatId, user.id, fullMessage);
-      }
-      sendMessage(fullMessage);
-      setSuggestedQuestions([]);
-      setOriginalPrompt(null);
-      setInput("");
-      setFilePreviews([]);
-      scrollToBottom();
-      if (isNewChat) {
-        window.history.replaceState({}, "", `/chat/${chatId}`);
-        setIsNewChat(false);
-        setReRenderIO(true);
-      }
+      await handleInputSubmitReset();
     }
   };
 
-  const handleFormSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleInputSubmitReset = async () => {
     if (!input.trim()) return;
     const fullMessage = [...filePreviews, input].join("\n\n");
     if (isNewChat) {
@@ -153,6 +135,11 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       setIsNewChat(false);
       setReRenderIO(true);
     }
+  };
+
+  const handleInputSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    await handleInputSubmitReset();
   };
 
   const scrollToBottom = () => {
@@ -203,7 +190,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       <ChatHeader open={open} setOpen={setOpen} user={user} />
 
       {messages.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full px-2 sm:px-4">
+        <div className="flex-1 flex flex-col items-center justify-center  max-w-4xl mx-auto w-full px-2 sm:px-4 text-center">
           {suggestedQuestions.length > 0 && (
             <Button
               onClick={() =>
@@ -224,89 +211,25 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               Start a conversation or paste content to get started
             </p>
           </div>
-
-          <div className="w-full max-w-3xl border rounded">
-            <div className="relative">
-              {/* File Previews */}
-              {filePreviews.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="bg-muted/30"
-                >
-                  <div className="flex gap-3 overflow-x-auto p-2  ">
-                    {filePreviews.map((preview, index) => (
-                      <FilePreviewCard
-                        key={index}
-                        preview={preview}
-                        index={index}
-                        setFilePreviews={setFilePreviews}
-                      />
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              <Textarea
-                ref={inputRef}
-                value={input}
-                onKeyDown={handleKeyDown}
-                onChange={handleInputChange}
-                onPaste={handlePaste}
-                placeholder="Type your message here..."
-                className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[120px] p-3  placeholder:text-muted-foreground bg-transparent"
-              />
-
-              {/* Action Buttons */}
-              <div className="flex items-center justify-end px-4 py-2 gap-2 ">
-                <div className="flex items-center gap-2">
-                  {isImprovingPrompt ? (
-                    <Button
-                      variant="outline"
-                      disabled
-                      className="gap-2 text-sm"
-                    >
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Enhancing...
-                    </Button>
-                  ) : originalPrompt ? (
-                    <Button
-                      variant="outline"
-                      onClick={handleUndoImprove}
-                      className="gap-2 text-sm hover:bg-secondary"
-                    >
-                      <Undo2 className="w-4 h-4" />
-                      Undo Enhancement
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      disabled={!input.trim()}
-                      onClick={handleImprovePrompt}
-                      className="gap-2 text-sm hover:bg-secondary disabled:opacity-50"
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      Enhance Prompt
-                    </Button>
-                  )}
-                </div>
-
-                <Button
-                  disabled={!input.trim() || isStreaming}
-                  onClick={handleFormSubmit}
-                  className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6 disabled:opacity-50"
-                >
-                  <Send className="h-4 w-4" />
-                  Send
-                </Button>
-              </div>
-            </div>
-          </div>
+          <ChatInput
+            filePreviews={filePreviews}
+            setFilePreviews={setFilePreviews}
+            inputRef={inputRef}
+            input={input}
+            handleKeyDown={handleKeyDown}
+            handleInputChange={handleInputChange}
+            handlePaste={handlePaste}
+            isImprovingPrompt={isImprovingPrompt}
+            originalPrompt={originalPrompt}
+            handleUndoImprove={handleUndoImprove}
+            isStreaming={isStreaming}
+            handleImprovePrompt={handleImprovePrompt}
+            handleInputSubmit={handleInputSubmit}
+          />
         </div>
       ) : (
         <div
-          className={`flex-1 overflow-y-auto transition-all duration-200 pb-[50vh]`}
+          className={`flex-1 overflow-y-auto transition-all duration-200 pb-[50vh] px-2 sm:px-4`}
           ref={messagesRef}
         >
           <div className="w-full px-6 py-8 space-y-6">
@@ -373,7 +296,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
           </div>
 
           <div
-            className={`fixed  flex flex-col gap-2 bottom-0 left-0 right-0  transition-all duration-200 ${
+            className={`fixed flex flex-col justify-center p-2 gap-2 bottom-0 right-0  transition-all duration-200 ${
               open ? "left-64" : "left-0"
             }`}
           >
@@ -406,112 +329,21 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
                 <span>Scroll To Bottom</span>
               </motion.div>
             )}
-            <div className="max-w-2xl w-full mx-auto mb-3 border border-border rounded-xl shadow-sm hover:shadow-2xl transition-shadow bg-background/60 backdrop-blur-md">
-              <AnimatePresence>
-                {filePreviews.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="bg-muted/30"
-                  >
-                    <div className="flex gap-3 overflow-x-auto p-2  ">
-                      {filePreviews.map((preview, index) => (
-                        <FilePreviewCard
-                          key={index}
-                          preview={preview}
-                          index={index}
-                          setFilePreviews={setFilePreviews}
-                        />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <div className="relative ">
-                <Textarea
-                  ref={inputRef}
-                  value={input}
-                  onKeyDown={handleKeyDown}
-                  onChange={handleInputChange}
-                  onPaste={handlePaste}
-                  placeholder="Type your message here..."
-                  className="border-0 focus-visible:ring-0 focus-visible:ring-offset-0 resize-none min-h-[100px] px-3 text-base placeholder:text-muted-foreground mt-2"
-                />
-
-                {/* Action Buttons */}
-                <div className="flex items-center justify-end px-4 py-2 gap-2 ">
-                  <div className="flex items-center gap-2">
-                    {suggestedQuestions.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 1, scale: 0.8 }}
-                        transition={{
-                          duration: 0.3,
-                        }}
-                      >
-                        <Button
-                          variant={"outline"}
-                          size={"sm"}
-                          onClick={() =>
-                            setIsSuggestedQuestionDialogOpen(
-                              !isSuggestedQuestionDialogOpen
-                            )
-                          }
-                          className="gap-2 "
-                        >
-                          <HelpCircle className="w-3 h-3" />
-                          <span>View Suggestions</span>
-                        </Button>
-                      </motion.div>
-                    )}
-                    {isImprovingPrompt ? (
-                      <Button
-                        variant="outline"
-                        size={"sm"}
-                        disabled
-                        className="gap-2 "
-                      >
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Enhancing...
-                      </Button>
-                    ) : originalPrompt ? (
-                      <Button
-                        variant="outline"
-                        size={"sm"}
-                        onClick={handleUndoImprove}
-                        className="gap-2 "
-                      >
-                        <Undo2 className="w-4 h-4" />
-                        Undo Enhancement
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size={"sm"}
-                        disabled={!input.trim()}
-                        onClick={handleImprovePrompt}
-                        className="gap-2 disabled:opacity-50"
-                      >
-                        <Sparkles className="w-4 h-4" />
-                        Enhance Prompt
-                      </Button>
-                    )}
-                  </div>
-
-                  <Button
-                    disabled={!input.trim() || isStreaming}
-                    onClick={handleFormSubmit}
-                    size={"sm"}
-                    className="gap-2 disabled:opacity-50"
-                  >
-                    <Send className="h-4 w-4" />
-                    Send
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <ChatInput
+              filePreviews={filePreviews}
+              setFilePreviews={setFilePreviews}
+              inputRef={inputRef}
+              input={input}
+              handleKeyDown={handleKeyDown}
+              handleInputChange={handleInputChange}
+              handlePaste={handlePaste}
+              isImprovingPrompt={isImprovingPrompt}
+              originalPrompt={originalPrompt}
+              handleUndoImprove={handleUndoImprove}
+              isStreaming={isStreaming}
+              handleImprovePrompt={handleImprovePrompt}
+              handleInputSubmit={handleInputSubmit}
+            />
           </div>
         </div>
       )}

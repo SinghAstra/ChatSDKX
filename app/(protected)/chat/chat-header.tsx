@@ -30,7 +30,9 @@ const ChatHeader = ({
           </h1>
         </div>
       )}
-      <AvatarMenu user={user} />
+      <div className="ml-auto">
+        <AvatarMenu user={user} />
+      </div>
     </header>
   );
 };
