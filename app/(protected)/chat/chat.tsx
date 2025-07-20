@@ -123,7 +123,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     setFilePreviews([]);
     scrollToBottom();
     if (isNewChat) {
-      window.history.replaceState({}, "", `/chat/${chatId}`);
+      // window.history.replaceState({}, "", `/chat/${chatId}`);
       setIsNewChat(false);
       setReRenderIO(true);
     }
