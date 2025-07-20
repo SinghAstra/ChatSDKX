@@ -29,9 +29,8 @@ async function sleep(times: number) {
 export async function improvePrompt(prompt: string, files: string[]) {
   for (let i = 0; i < 100; i++) {
     try {
-      const parsedPrompt = `userPrompt : ${prompt}, ${
-        files.length > 0 && `files: ${files}`
-      }`;
+      const parsedPrompt = `userPrompt : ${prompt},
+      ${files.length > 0 && `files for Context: ${files}`}`;
       const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
       const response = await ai.models.generateContent({
         model,

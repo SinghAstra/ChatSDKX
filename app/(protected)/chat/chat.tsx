@@ -13,13 +13,7 @@ import { ChevronDown, HelpCircle, X } from "lucide-react";
 import type { User } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import type React from "react";
-import {
-  type ChangeEvent,
-  type FormEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 import { createChatInDB } from "./[id]/action";
 import ChatHeader from "./chat-header";
 import ChatInput from "./chat-input";
@@ -83,7 +77,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     }
   };
 
-  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const { value } = event.target;
     if (originalPrompt !== null && value !== input) {
       setOriginalPrompt(null);
@@ -105,14 +99,12 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   };
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    console.log(e.key);
     if (
       e.key === "Enter" &&
       !e.shiftKey &&
       !isStreaming &&
       !isImprovingPrompt
     ) {
-      console.log("Inside if");
       e.preventDefault();
       await handleInputSubmitReset();
     }
@@ -137,7 +129,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     }
   };
 
-  const handleInputSubmit = async (e: FormEvent) => {
+  const handleInputSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await handleInputSubmitReset();
   };
@@ -183,7 +175,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     }
   }, [inputRef]);
 
-  console.log("improvementReason is ", improvementReason);
+  console.log("messages.length is ", messages.length);
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">

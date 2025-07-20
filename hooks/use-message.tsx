@@ -1,5 +1,5 @@
 import { ClientMessage } from "@/lib/types";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function useMessages(
   initialMessages: ClientMessage[],
@@ -7,10 +7,6 @@ export default function useMessages(
 ) {
   const [messages, setMessages] = useState<ClientMessage[]>(initialMessages);
   const [isStreaming, setIsStreaming] = useState(false);
-
-  useEffect(() => {
-    setMessages(initialMessages);
-  }, [chatId, initialMessages]);
 
   const sendMessage = async (input: string) => {
     setIsStreaming(true);
