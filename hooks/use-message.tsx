@@ -8,6 +8,12 @@ export default function useMessages(
   const [messages, setMessages] = useState<ClientMessage[]>(initialMessages);
   const [isStreaming, setIsStreaming] = useState(false);
 
+  console.log("-----------------------------");
+  console.log("in useMessages hook");
+  console.log("messages.length is ", messages.length);
+  console.log("chatId is ", chatId);
+  console.log("-----------------------------");
+
   const sendMessage = async (input: string) => {
     setIsStreaming(true);
     const streamingMessageId = crypto.randomUUID();

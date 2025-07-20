@@ -175,7 +175,11 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     }
   }, [inputRef]);
 
+  console.log("===========================");
+  console.log("in Chat Component");
   console.log("messages.length is ", messages.length);
+  console.log("chatId is ", chatId);
+  console.log("===========================");
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
