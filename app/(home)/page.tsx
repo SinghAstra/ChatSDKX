@@ -101,31 +101,7 @@ const LandingPage = () => {
             </motion.div>
           </div>
         </div>
-        {/* <div className="relative px-4 sm:px-8 ">
-          <div className="relative  overflow-hidden rounded-sm border">
-            <MovingGlow
-              animationDuration={12}
-              borderWidth={4}
-              initialTransparent={300}
-            />
-            <div
-              className="relative m-4 rounded-inherit "
-              style={{
-                maskImage:
-                  "linear-gradient(to bottom, black 80%, transparent 100%)",
-              }}
-            >
-              <DashboardPreview previewRepos={previewRepos} />
-            </div>
-          </div>
-          <div
-            className="absolute inset-x-0 bottom-0 h-1/4"
-            style={{
-              background:
-                "linear-gradient(180deg,hsla(var(--background)/0),hsl(var(--background)))",
-            }}
-          />
-        </div> */}
+        
 
         <div className="min-h-screen relative px-4 sm:px-8 flex items-center">
           <motion.div

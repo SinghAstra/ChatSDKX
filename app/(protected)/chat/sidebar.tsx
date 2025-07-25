@@ -85,7 +85,7 @@ export function AppSidebar({ user, initialChats }: AppSidebarProps) {
                     className="p-2 h-fit"
                     onClick={() => {
                       setOpenMobile(false);
-                      router.push("/chat?new=true");
+                      router.push("/chat/new");
                     }}
                   >
                     <PlusIcon />

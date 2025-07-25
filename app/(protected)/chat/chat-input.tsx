@@ -19,6 +19,7 @@ interface ChatInputProps {
   isStreaming: boolean;
   handleImprovePrompt: () => Promise<void>;
   handleInputSubmit: (e: React.FormEvent) => Promise<void>;
+  isSubmittingInput: boolean;
 }
 
 const ChatInput = ({
@@ -35,6 +36,7 @@ const ChatInput = ({
   isStreaming,
   handleImprovePrompt,
   handleInputSubmit,
+  isSubmittingInput,
 }: ChatInputProps) => {
   return (
     <div className="w-full max-w-3xl border rounded mx-auto bg-background">
@@ -93,7 +95,7 @@ const ChatInput = ({
           ) : (
             <Button
               variant="outline"
-              disabled={!input.trim()}
+              disabled={!input.trim() || isSubmittingInput}
               onClick={handleImprovePrompt}
               className="gap-2 text-sm rounded hover:bg-muted/20"
             >
@@ -103,12 +105,26 @@ const ChatInput = ({
           )}
 
           <Button
-            disabled={!input.trim() || isStreaming || isImprovingPrompt}
+            disabled={
+              !input.trim() ||
+              isStreaming ||
+              isImprovingPrompt ||
+              isSubmittingInput
+            }
             onClick={handleInputSubmit}
-            className="gap-2 bg-primary hover:bg-primary/90 px-6 disabled:opacity-50 rounded"
+            className="bg-primary hover:bg-primary/90 px-6 disabled:opacity-50 rounded"
           >
-            <Send className="h-4 w-4" />
-            Send
+            {isSubmittingInput ? (
+              <div className="flex gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Wait....
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Send className="h-4 w-4" />
+                Send
+              </div>
+            )}
           </Button>
         </div>
       </div>

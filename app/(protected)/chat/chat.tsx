@@ -24,13 +24,14 @@ interface ChatProps {
   user: User;
   initialMessages: ClientMessage[];
   chatId: string;
-  newChat: boolean;
 }
 
-const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
+const Chat = ({ user, initialMessages, chatId }: ChatProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const { open, setOpen } = useSidebar();
   const [input, setInput] = useState("");
+  const [isSubmittingInput, setIsSubmittingInput] = useState(false);
+
   const { messages, sendMessage, isStreaming } = useMessages(
     initialMessages,
     chatId
@@ -47,7 +48,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     null
   );
   const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
-  const [isNewChat, setIsNewChat] = useState(newChat);
   const [reRenderIO, setReRenderIO] = useState(false);
   const [isSuggestedQuestionDialogOpen, setIsSuggestedQuestionDialogOpen] =
     useState(false);
@@ -111,10 +111,12 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
   };
 
   const handleInputSubmitReset = async () => {
+    setIsSubmittingInput(true);
     if (!input.trim()) return;
     const fullMessage = [...filePreviews, input].join("\n\n");
-    if (isNewChat) {
+    if (messages.length === 0) {
       await createChatInDB(chatId, user.id, fullMessage);
+      setReRenderIO(true);
     }
     sendMessage(fullMessage);
     setSuggestedQuestions([]);
@@ -122,11 +124,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
     setOriginalPrompt(null);
     setFilePreviews([]);
     scrollToBottom();
-    if (isNewChat) {
-      // window.history.replaceState({}, "", `/chat/${chatId}`);
-      setIsNewChat(false);
-      setReRenderIO(true);
-    }
+    setIsSubmittingInput(false);
   };
 
   const handleInputSubmit = async (e: React.FormEvent) => {
@@ -165,7 +163,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       const params = new URLSearchParams(searchParams.toString());
       params.delete("new");
       router.replace(`?${params.toString()}`, { scroll: false });
-      setIsNewChat(true);
     }
   }, [searchParams, router]);
 
@@ -174,12 +171,6 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
       inputRef.current.focus();
     }
   }, [inputRef]);
-
-  console.log("===========================");
-  console.log("in Chat Component");
-  console.log("messages.length is ", messages.length);
-  console.log("chatId is ", chatId);
-  console.log("===========================");
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
@@ -221,6 +212,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
             isStreaming={isStreaming}
             handleImprovePrompt={handleImprovePrompt}
             handleInputSubmit={handleInputSubmit}
+            isSubmittingInput={isSubmittingInput}
           />
         </div>
       ) : (
@@ -339,6 +331,7 @@ const Chat = ({ user, initialMessages, chatId, newChat }: ChatProps) => {
               isStreaming={isStreaming}
               handleImprovePrompt={handleImprovePrompt}
               handleInputSubmit={handleInputSubmit}
+              isSubmittingInput={isSubmittingInput}
             />
           </div>
         </div>

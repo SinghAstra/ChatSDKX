@@ -19,10 +19,9 @@ const ChatPage = async () => {
   }
 
   const id = generateID();
+  console.log("in /chat server component");
 
-  return (
-    <Chat initialMessages={[]} chatId={id} user={session.user} newChat={true} />
-  );
+  return <Chat initialMessages={[]} chatId={id} user={session.user} />;
 };
 
 export default ChatPage;
