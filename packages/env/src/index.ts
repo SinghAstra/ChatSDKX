@@ -18,7 +18,6 @@ export const apiEnvSchema = baseSchema.extend({
     .transform((val) => parseInt(val, 10))
     .default(5001),
   FRONTEND_URL: z.url("FRONTEND_URL must be a valid absolute URI"),
-  REDIS_URL: z.url("REDIS_URL is required for queues"),
   JWT_SECRET: z
     .string()
     .min(32, "JWT_SECRET must be at least 32 characters long"),
@@ -37,16 +36,6 @@ export const apiEnvSchema = baseSchema.extend({
   SMTP_FROM_EMAIL: z
     .email("SMTP_FROM_EMAIL must be a valid email structure")
     .optional(),
-});
-
-/**
- * 4. Worker Schema
- */
-export const workerEnvSchema = baseSchema.extend({
-  REDIS_URL: z.url("REDIS_URL is required for worker operations"),
-  GROQ_API_KEYS: z
-    .string()
-    .min(1, "GROQ_API_KEYS is required for AI summarization tasks"),
 });
 
 /**
@@ -95,10 +84,6 @@ function validate<T>(
 
 export function validateApiEnv(): z.infer<typeof apiEnvSchema> {
   return validate(apiEnvSchema, process.env, "api");
-}
-
-export function validateWorkerEnv(): z.infer<typeof workerEnvSchema> {
-  return validate(workerEnvSchema, process.env, "worker");
 }
 
 export function validateWebEnv(): z.infer<typeof webEnvSchema> {
