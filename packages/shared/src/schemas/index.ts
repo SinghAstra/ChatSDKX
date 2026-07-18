@@ -1,2 +1,3 @@
-export * from "./api.schema.js";
-export * from "./auth/index.js";
+export * from "./api.schema";
+export * from "./auth";
+export * from "./chat";
