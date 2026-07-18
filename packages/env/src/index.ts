@@ -21,6 +21,9 @@ export const apiEnvSchema = baseSchema.extend({
   JWT_SECRET: z
     .string()
     .min(32, "JWT_SECRET must be at least 32 characters long"),
+  GEMINI_API_KEY: z
+    .string()
+    .min(1, "GEMINI_API_KEY validation token is required"),
   SMTP_HOST: z.string().default("smtp.gmail.com"),
   SMTP_PORT: z
     .string()
