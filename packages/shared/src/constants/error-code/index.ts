@@ -1,3 +1,4 @@
-export * from "./auth-error-codes.js";
-export * from "./common-error-codes.js";
-export * from "./user-error-codes.js";
+export * from "./auth-error-codes";
+export * from "./chat-error-codes";
+export * from "./common-error-codes";
+export * from "./user-error-codes";
