@@ -10,73 +10,75 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
-import { STATUS_BORDER_MAP } from "@/lib/constants";
 import { cn } from "@/lib/utils";
-import { RepositoryStatus } from "@repo/shared";
-import { GitFork, Trash2 } from "lucide-react";
+import { MessageSquare, Trash2 } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 
-interface SidebarRepoItemProps {
-  repo: {
+interface SidebarChatItemProps {
+  chat: {
     id: string;
-    name: string;
-    avatar?: string | null;
-    status: RepositoryStatus;
+    title: string | null;
+    isLoading?: boolean;
   };
   isActive: boolean;
   isDeleting: boolean;
   targetUrl: string;
   onCloseMobile: () => void;
   onDelete: (id: string) => void;
-  buttonStyles: string;
+  buttonStyles?: string;
 }
 
-export function SidebarRepoItem({
-  repo,
+export function SidebarChatItem({
+  chat,
   isActive,
   isDeleting,
   targetUrl,
   onCloseMobile,
   onDelete,
   buttonStyles,
-}: SidebarRepoItemProps) {
+}: SidebarChatItemProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleDeleteConfirm = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    onDelete(repo.id);
+    onDelete(chat.id);
     setIsDialogOpen(false);
   };
 
+  // 1. Pure Structural Skeleton View (Renders while chat is creating/naming)
+  if (chat.isLoading) {
+    return (
+      <SidebarMenuItem className="flex items-center w-full px-2 py-1.5 gap-2.5">
+        {/* Icon Skeleton */}
+        <div className="h-6 w-6 shrink-0 rounded-md bg-sidebar-foreground/10 animate-pulse" />
+        {/* Text Line Skeleton */}
+        <div className="h-3.5 w-2/3 rounded bg-sidebar-foreground/10 animate-pulse" />
+      </SidebarMenuItem>
+    );
+  }
+
+  // 2. Standard Interactive Chat View
   return (
-    <SidebarMenuItem className="group relative flex items-center w-full">
+    <SidebarMenuItem className="group/menu-item relative flex items-center w-full">
       <SidebarMenuButton
         asChild
         isActive={isActive}
-        className={cn(buttonStyles, "w-full pr-10")}
+        className={cn(buttonStyles, "w-full pr-10 transition-all duration-200")}
       >
         <Link
           href={targetUrl}
           onClick={onCloseMobile}
           className="cursor-pointer flex items-center gap-2.5 w-full"
         >
-          <Avatar className="h-6 w-6 shrink-0 transition-all">
-            <AvatarImage
-              src={repo.avatar || undefined}
-              alt={`${repo.name} identity asset`}
-              className={cn("object-cover", STATUS_BORDER_MAP[repo.status])}
-            />
-            <AvatarFallback className="rounded bg-background flex items-center justify-center text-muted-foreground">
-              <GitFork className="size-3 text-muted-foreground/60" />
-            </AvatarFallback>
-          </Avatar>
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-background border text-muted-foreground">
+            <MessageSquare className="size-3.5" />
+          </div>
 
           <span className="truncate text-sm font-medium tracking-tight">
-            {repo.name}
+            {chat.title || "Untitled Chat"}
           </span>
         </Link>
       </SidebarMenuButton>
@@ -91,7 +93,7 @@ export function SidebarRepoItem({
               setIsDialogOpen(true);
             }}
             disabled={isDeleting}
-            aria-label="Delete repository"
+            aria-label="Delete chat thread"
           >
             <Trash2 className="size-3.5" />
           </button>
@@ -99,11 +101,14 @@ export function SidebarRepoItem({
 
         <AlertDialogContent onClick={(e) => e.stopPropagation()}>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete conversation thread?</AlertDialogTitle>
             <AlertDialogDescription>
               This action cannot be undone. This will permanently delete the{" "}
-              <span className="font-semibold text-foreground">{repo.name}</span>{" "}
-              repository and remove its data from our servers.
+              <span className="font-semibold text-foreground">
+                {chat.title || "Untitled Chat"}
+              </span>{" "}
+              chat history and remove all associated message records from our
+              servers.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="p-2">
@@ -120,7 +125,7 @@ export function SidebarRepoItem({
               onClick={handleDeleteConfirm}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete Repository
+              Delete Chat
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

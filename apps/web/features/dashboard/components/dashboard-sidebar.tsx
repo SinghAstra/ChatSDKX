@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { siteConfig } from "@/config/site";
-import { useDeleteRepository } from "@/features/repo/hooks/use-delete-repo";
-import { useUserRepositories } from "@/features/repo/hooks/use-repos";
+import { useChats } from "@/features/chat/hooks/use-chats";
+import { useDeleteChat } from "@/features/chat/hooks/use-delete-chat";
 import { ROUTES } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
@@ -23,19 +23,17 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Logo } from "./logo";
-import { SidebarRepoItem } from "./sidebar-repo-item";
+import { SidebarChatItem } from "./sidebar-chat-item";
 
-const navItems = [{ title: "New", url: ROUTES.DASHBOARD, icon: Plus }];
+const navItems = [{ title: "New Chat", url: ROUTES.CHAT, icon: Plus }];
 
-export function DashboardSidebar() {
+export function ChatSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
 
-  const { data: repositories = [], isLoading: isReposLoading } =
-    useUserRepositories();
-  const { mutateAsync: deleteRepo, isPending: isDeleting } =
-    useDeleteRepository();
+  const { data: chats = [], isLoading: isChatsLoading } = useChats();
+  const { mutateAsync: deleteChat, isPending: isDeleting } = useDeleteChat();
 
   const getButtonStyles = (isActive: boolean): string => {
     return cn(
@@ -52,14 +50,14 @@ export function DashboardSidebar() {
   };
 
   const handleDeleteExecution = async (id: string) => {
-    toast.promise(deleteRepo(id), {
-      loading: "Deleting Repository...",
-      success: "Repository deleted successfully",
-      error: "Failed to delete repository",
+    toast.promise(deleteChat(id), {
+      loading: "Deleting chat history...",
+      success: "Chat deleted successfully",
+      error: "Failed to delete chat",
     });
 
-    if (pathname === `/repo/${id}`) {
-      router.push(ROUTES.DASHBOARD);
+    if (pathname === `/chat/${id}`) {
+      router.push(ROUTES.CHAT);
     }
   };
 
@@ -132,7 +130,7 @@ export function DashboardSidebar() {
           <SidebarGroup className="border-t border-sidebar-border/40 pt-2 animate-in fade-in duration-700">
             <SidebarGroupContent className="mt-1">
               <SidebarMenu className="flex flex-col gap-0.5">
-                {isReposLoading ? (
+                {isChatsLoading ? (
                   Array.from({ length: 4 }).map((_, index) => (
                     <SidebarMenuItem key={index} className="w-full">
                       <div className="flex items-center gap-2.5 w-full p-2">
@@ -141,19 +139,19 @@ export function DashboardSidebar() {
                       </div>
                     </SidebarMenuItem>
                   ))
-                ) : repositories.length === 0 ? (
+                ) : chats.length === 0 ? (
                   <div className="px-3 py-4 text-xs italic text-muted-foreground/40 font-sans tracking-wide select-none">
-                    No repositories yet.
+                    No recent chats.
                   </div>
                 ) : (
-                  repositories.map((repo) => {
-                    const targetUrl = `/repo/${repo.id}`;
+                  chats.map((chat) => {
+                    const targetUrl = `/chat/${chat.id}`;
                     const isActive = pathname === targetUrl;
 
                     return (
-                      <SidebarRepoItem
-                        key={repo.id}
-                        repo={repo}
+                      <SidebarChatItem
+                        key={chat.id}
+                        chat={chat}
                         isActive={isActive}
                         isDeleting={isDeleting}
                         targetUrl={targetUrl}
