@@ -7,13 +7,13 @@ interface ErrorProps {
   reset: () => void;
 }
 
-export default function DashboardError({ error, reset }: ErrorProps) {
+export default function ChatError({ error, reset }: ErrorProps) {
   return (
     <ErrorFallback
-      pageName="Dashboard"
+      pageName="Chat"
       error={error}
       reset={reset}
-      fallbackHref="/dashboard"
+      fallbackHref="/chat"
     />
   );
 }

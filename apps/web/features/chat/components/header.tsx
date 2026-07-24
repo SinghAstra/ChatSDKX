@@ -20,13 +20,13 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "./logo";
 
-export function DashboardHeader() {
+export function ChatHeader() {
   const { toggleSidebar } = useSidebar();
   const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
 
-  const isRootDashboard = pathname === ROUTES.DASHBOARD;
+  const isRootChat = pathname === ROUTES.CHAT;
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: ROUTES.SIGN_IN });
@@ -46,14 +46,14 @@ export function DashboardHeader() {
     <header className="sticky top-0 z-40">
       <div className="p-2 px-3 flex items-center justify-between">
         <div className="flex items-center gap-1">
-          {!isRootDashboard && (
+          {!isRootChat && (
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => router.back()}
               className={cn(
-                "hidden md:inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-all duration-200 cursor-pointer rounded border hover:bg-muted/50 select-none"
+                "hidden md:inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-all duration-200 cursor-pointer rounded border hover:bg-muted/50 select-none",
               )}
             >
               <ArrowLeft className="size-4 animate-in fade-in duration-300" />
@@ -68,7 +68,7 @@ export function DashboardHeader() {
             <Menu className="w-5 h-5 text-foreground" />
           </button>
           <Link
-            href={ROUTES.DASHBOARD}
+            href={ROUTES.CHAT}
             className="flex items-center gap-2 md:hidden"
           >
             <div className="p-1.5 rounded-lg bg-background">

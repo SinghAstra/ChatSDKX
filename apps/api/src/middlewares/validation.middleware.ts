@@ -48,3 +48,29 @@ export const validateQuery = (schema: z.ZodTypeAny) => {
     }
   };
 };
+
+export const validateParams = (schema: z.ZodTypeAny) => {
+  return async (
+    req: Request,
+    _res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const parsed = await schema.parseAsync(req.params);
+      for (const key in req.params) {
+        delete req.params[key];
+      }
+      Object.assign(req.params, parsed);
+
+      next();
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const primaryMessage =
+          error.issues[0]?.message ||
+          "The link you followed seems to be invalid or broken.";
+        return next(new ValidationError(primaryMessage));
+      }
+      next(error);
+    }
+  };
+};
