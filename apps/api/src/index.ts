@@ -8,10 +8,12 @@ import { authRouter } from "./routes/auth.routes.js";
 const app = express();
 
 app.use(cors());
+
 app.use(express.json());
 
 app.get("/", (_, res) => {
   console.log("Health check endpoint accessed");
+
   res.json({ status: "healthy" });
 });
 

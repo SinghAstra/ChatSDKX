@@ -1,8 +1,8 @@
 import { prisma } from "@repo/db";
 import {
-    CHAT_ERROR_CODES,
-    DeleteChatPayload,
-    GetChatsPayload
+  CHAT_ERROR_CODES,
+  DeleteChatPayload,
+  GetChatsPayload,
 } from "@repo/shared";
 import { AppError } from "../errors/api-errors.js";
 

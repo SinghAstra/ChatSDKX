@@ -43,8 +43,11 @@ export function SidebarChatItem({
 
   const handleDeleteConfirm = (e: React.MouseEvent) => {
     e.preventDefault();
+
     e.stopPropagation();
+
     onDelete(chat.id);
+
     setIsDialogOpen(false);
   };
 
@@ -89,7 +92,9 @@ export function SidebarChatItem({
             className="opacity-0 group-hover/menu-item:opacity-100 p-1 rounded hover:bg-sidebar-accent text-muted-foreground hover:text-destructive transition-all duration-150 ease-in-out scale-95 group-hover/menu-item:scale-100 focus:opacity-100 cursor-pointer outline-none animate-in fade-in slide-in-from-right-1"
             onClick={(e) => {
               e.preventDefault();
+
               e.stopPropagation();
+
               setIsDialogOpen(true);
             }}
             disabled={isDeleting}
@@ -115,7 +120,9 @@ export function SidebarChatItem({
             <AlertDialogCancel
               onClick={(e) => {
                 e.preventDefault();
+
                 e.stopPropagation();
+
                 setIsDialogOpen(false);
               }}
             >

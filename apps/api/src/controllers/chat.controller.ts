@@ -19,6 +19,7 @@ export const chatController = {
       }
 
       const responseData = await chatService.getChats(req.user.id);
+
       res.status(200).json(successResponse(responseData));
     } catch (error) {
       next(error);
@@ -41,6 +42,7 @@ export const chatController = {
       const { id: chatId } = req.params;
 
       const responseData = await chatService.deleteChat(req.user.id, chatId);
+
       res.status(200).json(successResponse(responseData));
     } catch (error) {
       next(error);

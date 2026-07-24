@@ -29,10 +29,13 @@ const navItems = [{ title: "New Chat", url: ROUTES.CHAT, icon: Plus }];
 
 export function ChatSidebar() {
   const { state, isMobile, setOpenMobile } = useSidebar();
+
   const pathname = usePathname();
+
   const router = useRouter();
 
   const { data: chats = [], isLoading: isChatsLoading } = useChats();
+
   const { mutateAsync: deleteChat, isPending: isDeleting } = useDeleteChat();
 
   const getButtonStyles = (isActive: boolean): string => {
@@ -99,6 +102,7 @@ export function ChatSidebar() {
             <SidebarMenu className="flex flex-col gap-1">
               {navItems.map((item) => {
                 const isActive = pathname === item.url;
+
                 const Icon = item.icon;
 
                 return (
@@ -146,6 +150,7 @@ export function ChatSidebar() {
                 ) : (
                   chats.map((chat) => {
                     const targetUrl = `/chat/${chat.id}`;
+
                     const isActive = pathname === targetUrl;
 
                     return (
