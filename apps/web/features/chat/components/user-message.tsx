@@ -47,7 +47,7 @@ export function UserMessage({ content }: UserMessageProps) {
             <div className="absolute bottom-2 right-3">
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="flex items-center justify-center size-7 rounded-full bg-background/60 hover:bg-background border border-border/40 backdrop-blur-sm text-foreground transition-all shadow-sm focus:outline-none"
+                className="flex cursor-pointer items-center justify-center size-7 rounded-full bg-muted/50 hover:bg-muted border border-border/40 backdrop-blur-sm text-foreground transition-all shadow-sm focus:outline-none"
                 aria-label={isExpanded ? "Show less" : "Show more"}
               >
                 <ChevronDown
@@ -63,7 +63,7 @@ export function UserMessage({ content }: UserMessageProps) {
         <div className="flex items-center gap-1 mt-1.5 mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleCopy}
-            className="flex items-center justify-center size-8 rounded-md hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+            className="flex items-center justify-center size-8 rounded-md cursor-pointer  bg-muted/50 hover:bg-muted/70 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
             title="Copy message"
           >
             {isCopied ? (
