@@ -1,15 +1,16 @@
-import type { Metadata } from "next";
+import { ChatEmptyState } from "@/features/chat/components/chat-empty-state";
+import { ChatInputForm } from "@/features/chat/components/chat-input-form";
 
-export const dynamic = "force-dynamic";
-
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description:
-    "Analyze your GitHub repositories, view file summaries, and map out your code architecture.",
-};
-
-export default function DashboardPage() {
+export default function ChatPage() {
   return (
-    <div className="flex-1 w-full h-full flex flex-col items-center justify-center py-12 md:py-20 lg:py-24"></div>
+    <div className="flex flex-col fllex-1  max-w-4xl mx-auto w-full">
+      <div className="flex-1 flex flex-col justify-center overflow-y-auto p-4">
+        <ChatEmptyState />
+      </div>
+
+      <div className="p-4 bg-background">
+        <ChatInputForm />
+      </div>
+    </div>
   );
 }
