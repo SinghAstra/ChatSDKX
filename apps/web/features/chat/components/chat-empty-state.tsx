@@ -8,7 +8,7 @@ import { getSuggestionIcon } from "../utils/get-suggestion-icon";
 import { ChatEmptyStateSkeleton } from "./chat-empty-state-skeleton";
 
 interface ChatEmptyStateProps {
-  onSelectPrompt?: (prompt: string) => void;
+  onSelectPrompt: (prompt: string) => void;
 }
 
 export function ChatEmptyState({ onSelectPrompt }: ChatEmptyStateProps) {
@@ -45,7 +45,7 @@ export function ChatEmptyState({ onSelectPrompt }: ChatEmptyStateProps) {
             <Card
               key={index}
               className="p-4 rounded flex flex-col gap-2 cursor-pointer bg-muted/70 hover:bg-muted/30 transition-colors border-border/50 group"
-              onClick={() => onSelectPrompt?.(suggestion.prompt)}
+              onClick={() => onSelectPrompt(suggestion.prompt)}
             >
               <div className="flex items-center gap-2 text-foreground font-medium">
                 <div className="p-1.5 rounded-md bg-primary/10 text-primary group-hover:bg-muted/50 transition-colors">

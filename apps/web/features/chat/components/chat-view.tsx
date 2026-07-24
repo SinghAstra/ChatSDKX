@@ -158,7 +158,7 @@ Everything is running smoothly!
           }`}
         >
           {messages.length === 0 ? (
-            <ChatEmptyState />
+            <ChatEmptyState onSelectPrompt={handleSendMessage} />
           ) : (
             <ChatMessageList
               messages={messages}
