@@ -15,7 +15,7 @@ const ContinueWithGoogle = () => {
 
       await signIn("google", {
         redirect: true,
-        callbackUrl: ROUTES.DASHBOARD,
+        callbackUrl: ROUTES.CHAT,
       });
     } catch (error) {
       logError(error);
