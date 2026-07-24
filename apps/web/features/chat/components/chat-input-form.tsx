@@ -130,7 +130,7 @@ export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
 
         <div className="text-center mt-3">
           <p className="text-xs text-foreground/40">
-            ${siteConfig.name} can make mistakes. Consider verifying important
+            {siteConfig.name} can make mistakes. Consider verifying important
             information.
           </p>
         </div>

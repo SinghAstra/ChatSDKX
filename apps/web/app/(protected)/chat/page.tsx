@@ -34,21 +34,25 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex flex-col flex-1 w-full max-w-4xl mx-auto overflow-hidden">
-      <div
-        className={`flex flex-col flex-1 overflow-y-auto p-4 ${
-          messages.length === 0 ? "justify-center" : "justify-start"
-        }`}
-      >
-        {messages.length === 0 ? (
-          <ChatEmptyState />
-        ) : (
-          <ChatMessageList messages={messages} />
-        )}
+    <div className="flex flex-col flex-1 w-full overflow-hidden">
+      <div className="flex flex-col flex-1 w-full overflow-y-auto">
+        <div
+          className={`flex flex-col w-full max-w-4xl mx-auto p-4 flex-1 ${
+            messages.length === 0 ? "justify-center" : "justify-start"
+          }`}
+        >
+          {messages.length === 0 ? (
+            <ChatEmptyState />
+          ) : (
+            <ChatMessageList messages={messages} />
+          )}
+        </div>
       </div>
 
-      <div className="p-4 bg-background shrink-0">
-        <ChatInputForm onSubmit={handleNewChatSubmit} />
+      <div className="w-full bg-background shrink-0">
+        <div className="w-full max-w-4xl mx-auto p-4">
+          <ChatInputForm onSubmit={handleNewChatSubmit} />
+        </div>
       </div>
     </div>
   );
