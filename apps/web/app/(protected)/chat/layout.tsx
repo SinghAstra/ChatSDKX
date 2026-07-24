@@ -1,14 +1,14 @@
 import { ChatHeader } from "@/features/chat/components/header";
 
-const ChatLayout = ({ children }: { children: React.ReactNode }) => {
+interface ChatLayoutProps {
+  children: React.ReactNode;
+}
+
+const ChatLayout = ({ children }: ChatLayoutProps) => {
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex flex-col flex-1 overflow-hidden">
       <ChatHeader />
-      <main className="flex-1 overflow-y-auto">
-        <div className="p-4 md:p-6 lg:p-8 w-full min-h-full flex flex-col">
-          {children}
-        </div>
-      </main>
+      <main className="flex flex-col flex-1 overflow-hidden">{children}</main>
     </div>
   );
 };

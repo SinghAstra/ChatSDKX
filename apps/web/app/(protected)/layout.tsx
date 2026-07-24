@@ -7,12 +7,9 @@ interface ProtectedLayoutProps {
 export default async function ProtectedLayout({
   children,
 }: ProtectedLayoutProps) {
-  // const queryClient = new QueryClient();
-
-  // await queryClient.prefetchQuery({
-  //   queryKey: repoKeys.lists(),
-  //   queryFn: repoListQueryFn,
-  // });
-
-  return <div className="flex h-screen bg-background w-full">{children}</div>;
+  return (
+    <div className="flex flex-col h-screen w-full bg-background overflow-hidden border border-green-400">
+      {children}
+    </div>
+  );
 }
