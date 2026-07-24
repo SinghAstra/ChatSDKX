@@ -1,5 +1,6 @@
 import { Check, Copy } from "lucide-react";
 import { useState } from "react";
+import { MarkdownRenderer } from "./markdown-renderer";
 
 interface AiMessageProps {
   content: string;
@@ -18,19 +19,19 @@ export function AiMessage({ content }: AiMessageProps) {
 
   return (
     <div className="flex w-full justify-start group">
-      <div className="flex flex-col w-full">
-        <div className="text-[15px] leading-relaxed bg-transparent text-foreground w-full py-2">
-          {content}
+      <div className="flex flex-col w-full max-w-[95%]">
+        <div className="w-full py-2">
+          <MarkdownRenderer content={content} />
         </div>
 
-        <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
             onClick={handleCopy}
-            className="flex items-center justify-center size-8 rounded-md hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Copy message"
+            className="flex items-center justify-center size-8 rounded-md bg-muted hover:bg-muted/70 text-muted-foreground hover:text-foreground transition-colors focus:outline-none"
+            title="Copy message"
           >
             {isCopied ? (
-              <Check className="size-4 text-green-500" />
+              <Check className="size-4" />
             ) : (
               <Copy className="size-4" />
             )}
