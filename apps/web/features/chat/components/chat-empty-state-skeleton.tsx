@@ -12,7 +12,7 @@ export function ChatEmptyStateSkeleton() {
         {[1, 2, 3, 4].map((i) => (
           <Card
             key={i}
-            className="p-4 flex flex-col gap-3 bg-muted/30 border-border/50"
+            className="p-4 flex flex-col gap-3 bg-muted/30 border-border/50 rounded"
           >
             <div className="flex items-center gap-2">
               <div className="size-7 rounded-md bg-muted/70 animate-pulse" />

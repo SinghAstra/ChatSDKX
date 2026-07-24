@@ -16,32 +16,41 @@ export function useSimulatedEnhancePrompt() {
     originalPrompt: "",
   });
 
-  const enhance = (prompt: string) => {
-    if (!prompt.trim()) return;
+  const enhance = async (prompt: string): Promise<EnhancementResult> => {
+    if (!prompt.trim()) return result;
 
     setResult({ status: "loading", originalPrompt: prompt });
 
-    // Simulate network delay
-    setTimeout(() => {
-      if (prompt.split(" ").length < 4) {
-        setResult({
-          status: "needs_info",
-          originalPrompt: prompt,
-          questions: [
-            "What specific framework or language are you using?",
-            "Can you provide a brief example of what you are trying to achieve?",
-          ],
-        });
-      } else {
-        setResult({
-          status: "improved",
-          originalPrompt: prompt,
-          enhancedPrompt: `Can you act as a senior software engineer and help me with: ${prompt}. Please include code snippets and best practices.`,
-          rationale:
-            "Added persona constraint and requested specific outputs (code snippets and best practices) to get a more structured answer.",
-        });
-      }
-    }, 1500);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        if (prompt.split(" ").length < 4) {
+          const newResult: EnhancementResult = {
+            status: "needs_info",
+            originalPrompt: prompt,
+            questions: [
+              "What specific framework or language are you using?",
+              "Can you provide a brief example of what you are trying to achieve?",
+            ],
+          };
+
+          setResult(newResult);
+
+          resolve(newResult);
+        } else {
+          const newResult: EnhancementResult = {
+            status: "improved",
+            originalPrompt: prompt,
+            enhancedPrompt: `Can you act as a senior software engineer and help me with: ${prompt}. Please include code snippets and best practices.`,
+            rationale:
+              "Added persona constraint and requested specific outputs (code snippets and best practices) to get a more structured answer.",
+          };
+
+          setResult(newResult);
+
+          resolve(newResult);
+        }
+      }, 1500);
+    });
   };
 
   const undo = () => {

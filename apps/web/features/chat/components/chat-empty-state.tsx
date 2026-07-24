@@ -29,7 +29,7 @@ export function ChatEmptyState() {
           return (
             <Card
               key={index}
-              className="p-4 flex flex-col gap-2 cursor-pointer bg-muted/70 hover:bg-muted/30 transition-colors border-border/50 group"
+              className="p-4 rounded flex flex-col gap-2 cursor-pointer bg-muted/70 hover:bg-muted/30 transition-colors border-border/50 group"
               // onClick={() => handleSuggestionClick(suggestion.prompt)}
             >
               <div className="flex items-center gap-2 text-foreground font-medium">

@@ -1,57 +1,133 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { SendHorizonal } from "lucide-react";
-import { useState } from "react";
+import { ArrowUp, Loader2, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useSimulatedEnhancePrompt } from "../hooks/use-simulated-enhance-prompt";
+import { ContextualActionBar } from "./contextual-action-bar";
+import { siteConfig } from "@/config/site";
 
 export function ChatInputForm() {
-  const [input, setInput] = useState("");
+  const [inputValue, setInputValue] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    if (!input.trim()) return;
+  const enhancer = useSimulatedEnhancePrompt();
 
-    console.log("Sending:", input);
+  // Auto-resize the textarea dynamically based on content
+  const adjustHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
 
-    // TODO: Create chat mutation and route to /chat/:id
-    setInput("");
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  };
+
+  useEffect(() => {
+    adjustHeight();
+  }, [inputValue]);
+
+  const handleUndo = () => {
+    setInputValue(enhancer.originalPrompt);
+
+    enhancer.undo();
+  };
+
+  const handleDismiss = () => {
+    enhancer.reset();
+  };
+
+  const handleEnhance = async () => {
+    if (!inputValue.trim()) return;
+
+    const response = await enhancer.enhance(inputValue);
+
+    if (response.status === "improved" && response.enhancedPrompt) {
+      setInputValue(response.enhancedPrompt);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!inputValue.trim() || enhancer.status === "loading") return;
+
+    console.log("Submitting message:", inputValue);
+
+    setInputValue("");
+
+    enhancer.reset();
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+
+      textareaRef.current.focus();
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
-      handleSubmit(e);
+      handleSubmit();
     }
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="relative flex items-end w-full max-w-3xl mx-auto bg-muted/40 border rounded-2xl focus-within:ring-1 focus-within:ring-primary/50 focus-within:border-primary/50 overflow-hidden transition-all"
-    >
-      <Textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Send a message..."
-        className="min-h-15 max-h-50 w-full resize-none border-0 bg-transparent py-4 pl-4 pr-12 focus-visible:ring-0 shadow-none text-base sm:text-sm"
-        rows={1}
-      />
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full max-w-3xl">
+        <ContextualActionBar
+          result={enhancer}
+          onUndo={handleUndo}
+          onDismiss={handleDismiss}
+        />
 
-      <div className="absolute right-2 bottom-2">
-        <Button
-          type="submit"
-          size="icon"
-          disabled={!input.trim()}
-          className="size-8 rounded-xl transition-opacity disabled:opacity-30"
-        >
-          <SendHorizonal className="size-4" />
-          <span className="sr-only">Send message</span>
-        </Button>
+        <div className="relative flex flex-col w-full rounded border border-foreground/10 bg-background shadow-sm focus-within:ring-1 focus-within:ring-primary/30 transition-shadow">
+          <textarea
+            ref={textareaRef}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask anything..."
+            disabled={enhancer.status === "loading"}
+            rows={1}
+            className="w-full max-h-50 min-h-14 resize-none bg-transparent px-4 py-4 text-[15px] outline-none placeholder:text-foreground/40 disabled:opacity-50 scrollbar-thin scrollbar-thumb-foreground/10"
+          />
+
+          <div className="flex items-center justify-between p-2 pt-0">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleEnhance}
+              disabled={!inputValue.trim() || enhancer.status === "loading"}
+              className="h-8 gap-1.5 rounded text-foreground/60 hover:text-primary hover:bg-primary/5 transition-colors disabled:opacity-40"
+            >
+              {enhancer.status === "loading" ? (
+                <Loader2 className="size-3.5 animate-spin text-primary" />
+              ) : (
+                <Sparkles className="size-3.5" />
+              )}
+              <span className="text-xs font-medium">Enhance</span>
+            </Button>
+
+            <Button
+              type="button"
+              size="icon"
+              onClick={handleSubmit}
+              disabled={!inputValue.trim() || enhancer.status === "loading"}
+              className="size-8 rounded-xl bg-foreground text-background hover:bg-foreground/90 disabled:opacity-30 disabled:hover:bg-foreground transition-all"
+            >
+              <ArrowUp className="size-4" />
+            </Button>
+          </div>
+        </div>
+
+        <div className="text-center mt-3">
+          <p className="text-xs text-foreground/40">
+            ${siteConfig.name} can make mistakes. Consider verifying important
+            information.
+          </p>
+        </div>
       </div>
-    </form>
+    </div>
   );
 }

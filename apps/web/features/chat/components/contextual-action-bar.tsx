@@ -19,7 +19,7 @@ export function ContextualActionBar({
 
   if (result.status === "improved") {
     return (
-      <div className="flex items-start justify-between w-full p-3 mb-2 rounded-lg border border-primary/20 bg-primary/5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="flex items-start justify-between w-full p-3 mb-2 rounded border border-primary/20 bg-primary/5 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div className="flex gap-3 items-start">
           <div className="p-1.5 rounded-md bg-primary/20 text-primary shrink-0 mt-0.5">
             <Sparkles className="size-4" />
@@ -35,19 +35,19 @@ export function ContextualActionBar({
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-4">
           <Button
-            variant="ghost"
+            variant="outline"
             size="sm"
             onClick={onUndo}
-            className="h-8 px-2 text-foreground/70 hover:text-foreground hover:bg-foreground/5"
+            className="h-8 px-2 bg-transparent text-foreground/70 hover:text-foreground hover:bg-foreground/5"
           >
             <RotateCcw className="size-3.5 mr-1.5" />
             Undo
           </Button>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={onDismiss}
-            className="size-8 text-foreground/50 hover:text-foreground hover:bg-foreground/5"
+            className="size-8 text-foreground/50 bg-transparent hover:text-foreground hover:bg-foreground/5"
           >
             <X className="size-4" />
           </Button>
@@ -58,7 +58,7 @@ export function ContextualActionBar({
 
   if (result.status === "needs_info") {
     return (
-      <div className="flex items-start justify-between w-full p-3 mb-2 rounded-lg border border-destructive/20 bg-destructive/5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+      <div className="flex items-start justify-between w-full p-3 mb-2 rounded border border-destructive/20 bg-destructive/5 animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div className="flex gap-3 items-start">
           <div className="p-1.5 rounded-md bg-destructive/20 text-destructive shrink-0 mt-0.5">
             <AlertCircle className="size-4" />
