@@ -6,6 +6,23 @@ import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import remarkGfm from "remark-gfm";
 
+// helper function to recursively extract text from highlighted React nodes
+function extractTextFromNode(node: React.ReactNode): string {
+  if (typeof node === "string") return node;
+
+  if (typeof node === "number") return String(node);
+
+  if (Array.isArray(node)) return node.map(extractTextFromNode).join("");
+
+  if (React.isValidElement(node)) {
+    const element = node as React.ReactElement<{ children?: React.ReactNode }>;
+
+    return extractTextFromNode(element.props.children);
+  }
+
+  return "";
+}
+
 interface MarkdownRendererProps {
   content: string;
 }
@@ -107,10 +124,10 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
 
             const language = /language-(\w+)/.exec(className)?.[1] ?? "text";
 
-            const rawText = String(codeElement?.props?.children ?? "").replace(
-              /\n$/,
-              ""
-            );
+            // 2. Use the helper function here instead of String()
+            const rawText = extractTextFromNode(
+              codeElement?.props?.children
+            ).replace(/\n$/, "");
 
             const isCopied = copiedCode === rawText;
 
