@@ -7,7 +7,12 @@ import { useSimulatedEnhancePrompt } from "../hooks/use-simulated-enhance-prompt
 import { ContextualActionBar } from "./contextual-action-bar";
 import { siteConfig } from "@/config/site";
 
-export function ChatInputForm() {
+interface ChatInputFormProps {
+  chatId?: string;
+  onSubmit: (message: string) => void;
+}
+
+export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
   const [inputValue, setInputValue] = useState("");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -40,7 +45,7 @@ export function ChatInputForm() {
   const handleEnhance = async () => {
     if (!inputValue.trim()) return;
 
-    const response = await enhancer.enhance(inputValue);
+    const response = await enhancer.enhance(inputValue, chatId);
 
     if (response.status === "improved" && response.enhancedPrompt) {
       setInputValue(response.enhancedPrompt);
@@ -51,6 +56,8 @@ export function ChatInputForm() {
     if (!inputValue.trim() || enhancer.status === "loading") return;
 
     console.log("Submitting message:", inputValue);
+
+    onSubmit(inputValue);
 
     setInputValue("");
 

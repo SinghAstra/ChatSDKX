@@ -16,8 +16,15 @@ export function useSimulatedEnhancePrompt() {
     originalPrompt: "",
   });
 
-  const enhance = async (prompt: string): Promise<EnhancementResult> => {
+  const enhance = async (
+    prompt: string,
+    chatId?: string
+  ): Promise<EnhancementResult> => {
     if (!prompt.trim()) return result;
+
+    console.log(
+      `[Simulated Backend] Enhancing prompt. ChatID: ${chatId || "None (New Chat)"}`
+    );
 
     setResult({ status: "loading", originalPrompt: prompt });
 
