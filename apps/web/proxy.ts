@@ -15,7 +15,7 @@ export async function proxy(request: NextRequest) {
   );
 
   if (token && (isAuthRoute || pathname === ROUTES.HOME)) {
-    return NextResponse.redirect(new URL(ROUTES.DASHBOARD, request.url));
+    return NextResponse.redirect(new URL(ROUTES.CHAT, request.url));
   }
 
   if (!token && isProtectedRoute) {

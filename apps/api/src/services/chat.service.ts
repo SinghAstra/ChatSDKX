@@ -4,7 +4,7 @@ import {
   DeleteChatPayload,
   GetChatsPayload,
 } from "@repo/shared";
-import { AppError } from "../errors/api-errors.js";
+import { AppError } from "../errors/api-errors";
 
 export const chatService = {
   getChats: async (userId: string): Promise<GetChatsPayload> => {
