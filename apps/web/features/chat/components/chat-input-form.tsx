@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowUp, Loader2, Sparkles } from "lucide-react";
+import { ArrowUp, Loader2, Sparkles, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSimulatedEnhancePrompt } from "../hooks/use-simulated-enhance-prompt";
 import { ContextualActionBar } from "./contextual-action-bar";
@@ -10,9 +10,16 @@ import { siteConfig } from "@/config/site";
 interface ChatInputFormProps {
   chatId?: string;
   onSubmit: (message: string) => void;
+  isStreaming?: boolean;
+  onStop?: () => void;
 }
 
-export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
+export function ChatInputForm({
+  chatId,
+  onSubmit,
+  isStreaming,
+  onStop,
+}: ChatInputFormProps) {
   const [inputValue, setInputValue] = useState("");
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -43,7 +50,7 @@ export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
   };
 
   const handleEnhance = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isStreaming) return;
 
     const response = await enhancer.enhance(inputValue, chatId);
 
@@ -53,6 +60,12 @@ export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
   };
 
   const handleSubmit = () => {
+    if (isStreaming) {
+      onStop?.();
+
+      return;
+    }
+
     if (!inputValue.trim() || enhancer.status === "loading") return;
 
     console.log("Submitting message:", inputValue);
@@ -74,7 +87,9 @@ export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
 
-      handleSubmit();
+      if (!isStreaming) {
+        handleSubmit();
+      }
     }
   };
 
@@ -94,7 +109,7 @@ export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask anything..."
-            disabled={enhancer.status === "loading"}
+            disabled={enhancer.status === "loading" || isStreaming}
             rows={1}
             className="w-full max-h-50 min-h-14 resize-none bg-transparent px-4 py-4 text-[15px] outline-none placeholder:text-foreground/40 disabled:opacity-50 scrollbar-thin scrollbar-thumb-foreground/10"
           />
@@ -105,7 +120,11 @@ export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
               variant="ghost"
               size="sm"
               onClick={handleEnhance}
-              disabled={!inputValue.trim() || enhancer.status === "loading"}
+              disabled={
+                !inputValue.trim() ||
+                enhancer.status === "loading" ||
+                isStreaming
+              }
               className="h-8 gap-1.5 rounded text-foreground/60 hover:text-primary hover:bg-primary/5 transition-colors disabled:opacity-40"
             >
               {enhancer.status === "loading" ? (
@@ -119,11 +138,18 @@ export function ChatInputForm({ chatId, onSubmit }: ChatInputFormProps) {
             <Button
               type="button"
               size="icon"
-              onClick={handleSubmit}
-              disabled={!inputValue.trim() || enhancer.status === "loading"}
-              className="size-8 rounded-xl bg-foreground text-background hover:bg-foreground/90 disabled:opacity-30 disabled:hover:bg-foreground transition-all"
+              onClick={isStreaming ? onStop : handleSubmit}
+              disabled={
+                (!inputValue.trim() && !isStreaming) ||
+                enhancer.status === "loading"
+              }
+              className="size-8 rounded bg-muted/80 border text-background hover:bg-muted/90 disabled:opacity-30 disabled:hover:bg-muted/90 transition-all"
             >
-              <ArrowUp className="size-4" />
+              {isStreaming ? (
+                <Square className="size-3.5 fill-foreground" />
+              ) : (
+                <ArrowUp className="size-4 text-foreground" />
+              )}
             </Button>
           </div>
         </div>

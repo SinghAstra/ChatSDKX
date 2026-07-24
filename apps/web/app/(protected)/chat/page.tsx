@@ -3,26 +3,48 @@
 import { ChatEmptyState } from "@/features/chat/components/chat-empty-state";
 import { ChatInputForm } from "@/features/chat/components/chat-input-form";
 import { ChatMessageList } from "@/features/chat/components/chat-message-list";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>(
     []
   );
 
+  const [isStreaming, setIsStreaming] = useState(false);
+
+  const streamIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Cleanup interval if the component unmounts mid-stream
+  useEffect(() => {
+    return () => {
+      if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
+    };
+  }, []);
+
+  const handleStopStreaming = () => {
+    if (streamIntervalRef.current) {
+      clearInterval(streamIntervalRef.current);
+
+      streamIntervalRef.current = null;
+    }
+
+    setIsStreaming(false);
+  };
+
   const handleNewChatSubmit = async (prompt: string) => {
-    // 1. Optimistic Update: Push User Message AND an empty AI Message for the "Thinking" state
+    setIsStreaming(true);
+
+    // 1. Optimistic Update
     setMessages((prev) => [
       ...prev,
       { role: "user", content: prompt },
-      { role: "assistant", content: "" }, // Empty content triggers TextShine
+      { role: "assistant", content: "" },
     ]);
 
-    // 2. Simulate ID generation & Shallow Routing
+    // 2. Simulate ID generation
     // const newChatId = `chat_${Math.random().toString(36).substring(2, 9)}`;
     // window.history.pushState(null, "", `/chat/${newChatId}`);
 
-    // 3. The exact Markdown string to stream
     const markdownSimulation = `
 # Markdown Rendering Test
 
@@ -52,18 +74,17 @@ export function Counter() {
 1. Sent message optimistically.
 2. Updated URL via shallow routing.
 3. Rendered Markdown response.
-4. Test the copy buttons!
+4. Test the stop button!
 `;
 
-    // 4. Simulate network latency (thinking time), then start streaming
+    // Wait 1.5 seconds in "Thinking..." mode before streaming
     setTimeout(() => {
       let currentIndex = 0;
 
-      const chunkSize = 5; // How many characters to push per tick
+      const chunkSize = 5;
 
-      const streamInterval = setInterval(() => {
+      streamIntervalRef.current = setInterval(() => {
         if (currentIndex < markdownSimulation.length) {
-          // Grab the next chunk of characters
           const nextChunk = markdownSimulation.slice(
             currentIndex,
             currentIndex + chunkSize
@@ -74,7 +95,6 @@ export function Counter() {
 
             const lastMessageIndex = newMessages.length - 1;
 
-            // Append chunk to the last message (the AI message)
             newMessages[lastMessageIndex] = {
               ...newMessages[lastMessageIndex],
               content: newMessages[lastMessageIndex].content + nextChunk,
@@ -85,11 +105,10 @@ export function Counter() {
 
           currentIndex += chunkSize;
         } else {
-          // Stop streaming when we reach the end of the string
-          clearInterval(streamInterval);
+          handleStopStreaming();
         }
-      }, 20); // Push a chunk every 20ms
-    }, 1500); // Wait 1.5 seconds in "Thinking..." mode before streaming
+      }, 20);
+    }, 1500);
   };
 
   return (
@@ -110,7 +129,11 @@ export function Counter() {
 
       <div className="w-full bg-background shrink-0">
         <div className="w-full max-w-4xl mx-auto p-4">
-          <ChatInputForm onSubmit={handleNewChatSubmit} />
+          <ChatInputForm
+            onSubmit={handleNewChatSubmit}
+            isStreaming={isStreaming}
+            onStop={handleStopStreaming}
+          />
         </div>
       </div>
     </div>
