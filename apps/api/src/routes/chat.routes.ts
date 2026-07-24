@@ -8,6 +8,8 @@ export const chatRouter: Router = Router();
 
 chatRouter.use(authMiddleware);
 
+chatRouter.get("/suggestions", chatController.getPromptSuggestions);
+
 chatRouter.get("/", chatController.getChats);
 
 chatRouter.delete(

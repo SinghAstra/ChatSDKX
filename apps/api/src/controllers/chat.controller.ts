@@ -5,6 +5,27 @@ import { chatService } from "../services/chat.service.js";
 import { successResponse } from "../utils/response.js";
 
 export const chatController = {
+  getPromptSuggestions: async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError(
+          COMMON_ERROR_CODES.UNAUTHORIZED,
+          "Please sign in to view suggestions."
+        );
+      }
+
+      const responseData = await chatService.generatePromptSuggestions();
+
+      res.status(200).json(successResponse(responseData));
+    } catch (error) {
+      next(error);
+    }
+  },
+
   getChats: async (
     req: Request,
     res: Response,
