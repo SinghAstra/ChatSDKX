@@ -12,6 +12,18 @@ chatRouter.get("/suggestions", chatController.getPromptSuggestions);
 
 chatRouter.get("/", chatController.getChats);
 
+chatRouter.post(
+  "/:id/messages",
+  validateParams(deleteChatParamsSchema),
+  chatController.streamMessage
+);
+
+chatRouter.get(
+  "/:id",
+  validateParams(deleteChatParamsSchema),
+  chatController.getChatThread
+);
+
 chatRouter.delete(
   "/:id",
   validateParams(deleteChatParamsSchema),

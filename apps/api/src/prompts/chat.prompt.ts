@@ -32,3 +32,14 @@ EXAMPLE OUTPUT:
   }
 ]
 `;
+
+export const buildTitleGenerationPrompt = (firstMessage: string) => `
+Generate a short, descriptive title (maximum 4 to 5 words) for a chat that starts with the following message.
+
+CRITICAL RULES:
+- NEVER wrap the generated title in quotation marks.
+- Apostrophes are completely fine to use (e.g., User's Guide, Developer's Tool).
+- Return ONLY the title string, nothing else.
+
+Message: "${firstMessage}"
+`;
