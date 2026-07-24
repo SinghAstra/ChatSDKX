@@ -8,26 +8,32 @@ interface ChatThreadPageProps {
   params: Promise<{ id: string }>;
 }
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+  isError?: boolean;
+}
+
 export default function ChatThreadPage({ params }: ChatThreadPageProps) {
   const resolvedParams = use(params);
 
   const chatId = resolvedParams.id;
 
-  // Mock initial history based on the chatId
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
-    [
-      {
-        role: "user",
-        content: `Hello! Can you help me with thread ID: ${chatId}?`,
-      },
-      {
-        role: "assistant",
-        content: `Welcome back to thread **${chatId}**. I have loaded your historical conversation successfully. How can I assist you further today?`,
-      },
-    ]
-  );
+  // Mock initial history using strict role types
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "user",
+      content: `Hello! Can you help me with thread ID: ${chatId}?`,
+    },
+    {
+      role: "assistant",
+      content: `Welcome back to thread **${chatId}**. I have loaded your historical conversation successfully. How can I assist you further today?`,
+    },
+  ]);
 
   const [isStreaming, setIsStreaming] = useState(false);
+
+  const [editingPrompt, setEditingPrompt] = useState<string>("");
 
   const streamIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -49,6 +55,8 @@ export default function ChatThreadPage({ params }: ChatThreadPageProps) {
 
   const handleSendMessage = async (prompt: string) => {
     setIsStreaming(true);
+
+    setEditingPrompt(""); // Reset edit state on submit
 
     // 1. Optimistic Update
     setMessages((prev) => [
@@ -107,11 +115,33 @@ Everything is running smoothly!
     }, 1200);
   };
 
+  const handleEditMessage = (content: string) => {
+    setEditingPrompt(content);
+  };
+
+  const handleRetryMessage = () => {
+    setMessages((prev) => {
+      const lastUserMsg = prev[prev.length - 2];
+
+      const sliced = prev.slice(0, prev.length - 2);
+
+      if (lastUserMsg) {
+        handleSendMessage(lastUserMsg.content);
+      }
+
+      return sliced;
+    });
+  };
+
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">
       <div className="flex flex-col flex-1 w-full overflow-y-auto">
         <div className="flex flex-col w-full max-w-4xl mx-auto p-4 flex-1 justify-start">
-          <ChatMessageList messages={messages} />
+          <ChatMessageList
+            messages={messages}
+            onEditMessage={handleEditMessage}
+            onRetryMessage={handleRetryMessage}
+          />
         </div>
       </div>
 
@@ -119,6 +149,7 @@ Everything is running smoothly!
         <div className="w-full max-w-4xl mx-auto p-4">
           <ChatInputForm
             chatId={chatId}
+            initialValue={editingPrompt}
             onSubmit={handleSendMessage}
             isStreaming={isStreaming}
             onStop={handleStopStreaming}

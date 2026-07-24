@@ -6,11 +6,13 @@ import { ChatMessageList } from "@/features/chat/components/chat-message-list";
 import { useState, useRef, useEffect } from "react";
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>(
-    []
-  );
+  const [messages, setMessages] = useState<
+    { role: "user" | "assistant"; content: string; isError?: boolean }[]
+  >([]);
 
   const [isStreaming, setIsStreaming] = useState(false);
+
+  const [editingPrompt, setEditingPrompt] = useState<string>("");
 
   const streamIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -33,6 +35,8 @@ export default function ChatPage() {
 
   const handleNewChatSubmit = async (prompt: string) => {
     setIsStreaming(true);
+
+    setEditingPrompt(""); // Reset edit state on submit
 
     // 1. Optimistic Update
     setMessages((prev) => [
@@ -75,7 +79,7 @@ export function Counter() {
 1. Sent message optimistically.
 2. Updated URL via shallow routing.
 3. Rendered Markdown response.
-4. Test the stop button!
+4. Test the stop button & polish features!
 `;
 
     // Wait 1.5 seconds in "Thinking..." mode before streaming
@@ -112,6 +116,25 @@ export function Counter() {
     }, 1500);
   };
 
+  const handleEditMessage = (content: string) => {
+    setEditingPrompt(content);
+  };
+
+  const handleRetryMessage = () => {
+    // Remove the last error assistant message and re-trigger submission with the previous user prompt
+    setMessages((prev) => {
+      const lastUserMsg = prev[prev.length - 2];
+
+      const sliced = prev.slice(0, prev.length - 2);
+
+      if (lastUserMsg) {
+        handleNewChatSubmit(lastUserMsg.content);
+      }
+
+      return sliced;
+    });
+  };
+
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">
       <div className="flex flex-col flex-1 w-full overflow-y-auto">
@@ -123,7 +146,11 @@ export function Counter() {
           {messages.length === 0 ? (
             <ChatEmptyState />
           ) : (
-            <ChatMessageList messages={messages} />
+            <ChatMessageList
+              messages={messages}
+              onEditMessage={handleEditMessage}
+              onRetryMessage={handleRetryMessage}
+            />
           )}
         </div>
       </div>
@@ -131,6 +158,7 @@ export function Counter() {
       <div className="w-full bg-background shrink-0">
         <div className="w-full max-w-4xl mx-auto p-4">
           <ChatInputForm
+            initialValue={editingPrompt}
             onSubmit={handleNewChatSubmit}
             isStreaming={isStreaming}
             onStop={handleStopStreaming}

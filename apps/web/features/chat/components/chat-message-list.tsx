@@ -3,16 +3,24 @@ import { ArrowDown } from "lucide-react";
 import { AiMessage } from "./ai-message";
 import { UserMessage } from "./user-message";
 
-interface Message {
-  role: string;
+export interface MessageItem {
+  id?: string;
+  role: "user" | "assistant";
   content: string;
+  isError?: boolean;
 }
 
 interface ChatMessageListProps {
-  messages: Message[];
+  messages: MessageItem[];
+  onEditMessage?: (content: string) => void;
+  onRetryMessage?: () => void;
 }
 
-export function ChatMessageList({ messages }: ChatMessageListProps) {
+export function ChatMessageList({
+  messages,
+  onEditMessage,
+  onRetryMessage,
+}: ChatMessageListProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -41,13 +49,22 @@ export function ChatMessageList({ messages }: ChatMessageListProps) {
 
   return (
     <div className="flex flex-col space-y-6 pb-4 w-full relative">
-      {messages.map((m, i) => {
-        if (m.role === "user") {
-          return <UserMessage key={i} content={m.content} />;
-        }
-
-        return <AiMessage key={i} content={m.content} />;
-      })}
+      {messages.map((msg, index) =>
+        msg.role === "user" ? (
+          <UserMessage
+            key={index}
+            content={msg.content}
+            onEdit={onEditMessage}
+          />
+        ) : (
+          <AiMessage
+            key={index}
+            content={msg.content}
+            isError={msg.isError}
+            onRetry={onRetryMessage}
+          />
+        )
+      )}
 
       <div ref={bottomRef} className="h-px w-full shrink-0" />
 

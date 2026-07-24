@@ -9,6 +9,7 @@ import { siteConfig } from "@/config/site";
 
 interface ChatInputFormProps {
   chatId?: string;
+  initialValue?: string;
   onSubmit: (message: string) => void;
   isStreaming?: boolean;
   onStop?: () => void;
@@ -16,17 +17,25 @@ interface ChatInputFormProps {
 
 export function ChatInputForm({
   chatId,
+  initialValue = "",
   onSubmit,
   isStreaming,
   onStop,
 }: ChatInputFormProps) {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(initialValue);
+
+  const [prevInitialValue, setPrevInitialValue] = useState(initialValue);
+
+  if (initialValue !== prevInitialValue) {
+    setPrevInitialValue(initialValue);
+
+    setInputValue(initialValue);
+  }
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const enhancer = useSimulatedEnhancePrompt();
 
-  // Auto-resize the textarea dynamically based on content
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -38,6 +47,12 @@ export function ChatInputForm({
   useEffect(() => {
     adjustHeight();
   }, [inputValue]);
+
+  useEffect(() => {
+    if (initialValue && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [initialValue]);
 
   const handleUndo = () => {
     setInputValue(enhancer.originalPrompt);
@@ -67,8 +82,6 @@ export function ChatInputForm({
     }
 
     if (!inputValue.trim() || enhancer.status === "loading") return;
-
-    console.log("Submitting message:", inputValue);
 
     onSubmit(inputValue);
 
@@ -143,7 +156,7 @@ export function ChatInputForm({
                 (!inputValue.trim() && !isStreaming) ||
                 enhancer.status === "loading"
               }
-              className="size-8 rounded bg-muted/80 border text-background hover:bg-muted/90 disabled:opacity-30 disabled:hover:bg-muted/90 transition-all"
+              className="size-8 rounded border bg-muted/70 hover:bg-muted/90 disabled:opacity-30 disabled:hover:bg-muted/90 transition-all"
             >
               {isStreaming ? (
                 <Square className="size-3.5 fill-foreground" />
