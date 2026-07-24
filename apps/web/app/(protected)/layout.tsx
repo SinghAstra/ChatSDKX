@@ -8,7 +8,7 @@ export default async function ProtectedLayout({
   children,
 }: ProtectedLayoutProps) {
   return (
-    <div className="flex flex-col h-screen w-full bg-background overflow-hidden border border-green-400">
+    <div className="flex flex-col h-screen w-full bg-background overflow-hidden">
       {children}
     </div>
   );
