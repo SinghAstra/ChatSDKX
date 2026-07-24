@@ -122,7 +122,7 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
                   </span>
                   <button
                     onClick={() => copyToClipboard(rawText)}
-                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
                   >
                     {isCopied ? (
                       <>

@@ -5,8 +5,8 @@ import type { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "sonner";
 import "./globals.css";
-
 import { Geist_Mono } from "next/font/google";
+import "highlight.js/styles/vs2015.css";
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
