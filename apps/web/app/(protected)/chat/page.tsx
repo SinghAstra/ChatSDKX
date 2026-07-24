@@ -15,8 +15,6 @@ export default async function ChatPage() {
     queryFn: async () => {
       const res = await getPromptSuggestionsAction();
 
-      console.log("res is ", res);
-
       return res.success ? res.data : [];
     },
   });

@@ -1,25 +1,33 @@
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from "@tanstack/react-query";
+import { getChatThreadAction } from "@/features/chat/actions/get-chat-thread";
+import { chatKeys } from "@/features/chat/api/query-keys";
 import { ChatView } from "@/features/chat/components/chat-view";
-import { use } from "react";
 
 interface ChatThreadPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function ChatThreadPage({ params }: ChatThreadPageProps) {
-  const resolvedParams = use(params);
+export default async function ChatThreadPage({ params }: ChatThreadPageProps) {
+  const { id: chatId } = await params;
 
-  const chatId = resolvedParams.id;
+  const queryClient = new QueryClient();
 
-  const initialMessages = [
-    {
-      role: "user" as const,
-      content: `Hello! Can you help me with thread ID: ${chatId}?`,
+  await queryClient.prefetchQuery({
+    queryKey: chatKeys.detail(chatId),
+    queryFn: async () => {
+      const res = await getChatThreadAction(chatId);
+
+      return res.success ? res.data : null;
     },
-    {
-      role: "assistant" as const,
-      content: `Welcome back to thread **${chatId}**. How can I help you today?`,
-    },
-  ];
+  });
 
-  return <ChatView chatId={chatId} initialMessages={initialMessages} />;
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <ChatView chatId={chatId} />
+    </HydrationBoundary>
+  );
 }

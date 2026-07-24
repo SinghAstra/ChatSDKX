@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import { type ApiResponse } from "@repo/shared";
+import { ChatThread, chatThreadSchema, type ApiResponse } from "@repo/shared";
 import {
   getPromptSuggestionsResponseSchema,
   type GetPromptSuggestionsResponse,
@@ -13,5 +13,8 @@ export const chatApi = {
       "/api/chats/suggestions",
       getPromptSuggestionsResponseSchema
     );
+  },
+  getChatThread: (chatId: string): Promise<ApiResponse<ChatThread>> => {
+    return apiClient.get(`/chats/${chatId}`, chatThreadSchema);
   },
 };

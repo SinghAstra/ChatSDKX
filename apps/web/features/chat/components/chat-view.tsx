@@ -3,132 +3,59 @@
 import { ChatEmptyState } from "@/features/chat/components/chat-empty-state";
 import { ChatInputForm } from "@/features/chat/components/chat-input-form";
 import { ChatMessageList } from "@/features/chat/components/chat-message-list";
-import { useState, useRef, useEffect } from "react";
-
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-  isError?: boolean;
-}
+import { ChatThreadSkeleton } from "@/features/chat/components/chat-thread-skeleton";
+import { useChatThread } from "@/features/chat/hooks/use-chat-thread";
+import { chatKeys } from "@/features/chat/api/query-keys";
+import { CHAT_ROLE, type ChatThread } from "@repo/shared";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface ChatViewProps {
   chatId?: string;
-  initialMessages?: Message[];
 }
 
-export function ChatView({ chatId, initialMessages = [] }: ChatViewProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+export function ChatView({ chatId: initialChatId }: ChatViewProps) {
+  const queryClient = useQueryClient();
 
-  const [isStreaming, setIsStreaming] = useState(false);
+  // If visiting /chat (no ID), generate a client-side session ID immediately
+  const [chatId] = useState<string>(
+    initialChatId || `chat_${Math.random().toString(36).substring(2, 9)}`
+  );
 
   const [editingPrompt, setEditingPrompt] = useState<string>("");
 
-  const streamIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
-    };
-  }, []);
-
-  const handleStopStreaming = () => {
-    if (streamIntervalRef.current) {
-      clearInterval(streamIntervalRef.current);
-
-      streamIntervalRef.current = null;
-    }
-
-    setIsStreaming(false);
-  };
+  const { thread, isLoading, sendMessage, isStreaming } = useChatThread(chatId);
 
   const handleSendMessage = async (prompt: string) => {
-    setIsStreaming(true);
-
     setEditingPrompt("");
 
-    // Optimistic Update
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: prompt },
-      { role: "assistant", content: "" }, // Thinking state
-    ]);
-
-    // If it's a new chat, simulate a generated ID for the URL
-    if (!chatId) {
-      const newChatId = `chat_${Math.random().toString(36).substring(2, 9)}`;
-
-      window.history.pushState(null, "", `/chat/${newChatId}`);
+    // If it's a new chat, update the browser URL without a full page reload
+    if (!initialChatId && window.location.pathname === "/chat") {
+      window.history.pushState(null, "", `/chat/${chatId}`);
     }
 
-    // Error simulation check
-    const shouldSimulateError = prompt.toLowerCase().includes("error");
+    await sendMessage({
+      prompt,
+      onChunk: (accumulatedText) => {
+        // Live-update the TanStack Query cache token-by-token as chunks arrive from the server stream
+        queryClient.setQueryData<ChatThread>(chatKeys.detail(chatId), (old) => {
+          if (!old) return old;
 
-    setTimeout(() => {
-      if (shouldSimulateError) {
-        setIsStreaming(false);
+          const messages = [...old.messages];
 
-        setMessages((prev) => {
-          const newMessages = [...prev];
+          const lastMsg = messages[messages.length - 1];
 
-          const lastIndex = newMessages.length - 1;
-
-          newMessages[lastIndex] = {
-            role: "assistant",
-            content: "",
-            isError: true,
-          };
-
-          return newMessages;
-        });
-
-        return;
-      }
-
-      const simulatedReply = `
-I received your message${chatId ? ` in session \`${chatId}\`` : ""}:
-
-> "${prompt}"
-
-\`\`\`typescript
-export const chatConfig = {
-  version: "1.0.0",
-  status: "active"
-};
-\`\`\`
-
-Everything is running smoothly!
-`;
-
-      let currentIndex = 0;
-
-      const chunkSize = 5;
-
-      streamIntervalRef.current = setInterval(() => {
-        if (currentIndex < simulatedReply.length) {
-          const nextChunk = simulatedReply.slice(
-            currentIndex,
-            currentIndex + chunkSize
-          );
-
-          setMessages((prev) => {
-            const newMessages = [...prev];
-
-            const lastMessageIndex = newMessages.length - 1;
-
-            newMessages[lastMessageIndex] = {
-              ...newMessages[lastMessageIndex],
-              content: newMessages[lastMessageIndex].content + nextChunk,
+          if (lastMsg && lastMsg.role === CHAT_ROLE.ASSISTANT) {
+            messages[messages.length - 1] = {
+              ...lastMsg,
+              content: accumulatedText,
             };
+          }
 
-            return newMessages;
-          });
-
-          currentIndex += chunkSize;
-        } else {
-          handleStopStreaming();
-        }
-      }, 20);
-    }, 1200);
+          return { ...old, messages };
+        });
+      },
+    });
   };
 
   const handleEditMessage = (content: string) => {
@@ -136,28 +63,32 @@ Everything is running smoothly!
   };
 
   const handleRetryMessage = () => {
-    setMessages((prev) => {
-      const lastUserMsg = prev[prev.length - 2];
+    if (!thread || thread.messages.length < 2) return;
 
-      const sliced = prev.slice(0, prev.length - 2);
+    const lastUserMessage = thread.messages[thread.messages.length - 2];
 
-      if (lastUserMsg) {
-        handleSendMessage(lastUserMsg.content);
-      }
-
-      return sliced;
-    });
+    if (lastUserMessage && lastUserMessage.role === CHAT_ROLE.USER) {
+      handleSendMessage(lastUserMessage.content);
+    }
   };
+
+  const messages = thread?.messages ?? [];
+
+  const isInitialLoading = isLoading && !thread;
 
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">
       <div className="flex flex-col flex-1 w-full overflow-y-auto">
         <div
           className={`flex flex-col w-full max-w-4xl mx-auto p-4 flex-1 ${
-            messages.length === 0 ? "justify-center" : "justify-start"
+            isInitialLoading || messages.length === 0
+              ? "justify-center"
+              : "justify-start"
           }`}
         >
-          {messages.length === 0 ? (
+          {isInitialLoading ? (
+            <ChatThreadSkeleton />
+          ) : messages.length === 0 ? (
             <ChatEmptyState onSelectPrompt={handleSendMessage} />
           ) : (
             <ChatMessageList
@@ -170,13 +101,12 @@ Everything is running smoothly!
       </div>
 
       <div className="w-full shrink-0 p-1">
-        <div className="w-full max-w-4xl mx-auto ">
+        <div className="w-full max-w-4xl mx-auto">
           <ChatInputForm
             chatId={chatId}
             initialValue={editingPrompt}
             onSubmit={handleSendMessage}
             isStreaming={isStreaming}
-            onStop={handleStopStreaming}
           />
         </div>
       </div>
