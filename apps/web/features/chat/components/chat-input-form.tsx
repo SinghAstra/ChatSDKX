@@ -115,7 +115,7 @@ export function ChatInputForm({
           onDismiss={handleDismiss}
         />
 
-        <div className="relative flex flex-col w-full rounded border border-foreground/10 bg-background shadow-sm focus-within:ring-1 focus-within:ring-primary/30 transition-shadow">
+        <div className="relative flex flex-col w-full rounded border border-foreground/10 shadow-sm focus-within:ring-1 focus-within:ring-primary/30 transition-shadow">
           <textarea
             ref={textareaRef}
             value={inputValue}
