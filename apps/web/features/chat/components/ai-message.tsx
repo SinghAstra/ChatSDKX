@@ -31,7 +31,7 @@ export function AiMessage({ content, isError, onRetry }: AiMessageProps) {
             {onRetry && (
               <button
                 onClick={onRetry}
-                className="flex items-center gap-1 ml-2 text-xs font-semibold underline underline-offset-2 hover:opacity-80 transition-opacity"
+                className="flex items-center cursor-pointer gap-1 ml-2 text-xs font-semibold underline underline-offset-2 hover:opacity-80 transition-opacity"
               >
                 <RefreshCw className="size-3" />
                 Retry

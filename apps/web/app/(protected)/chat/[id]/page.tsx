@@ -27,7 +27,7 @@ export default function ChatThreadPage({ params }: ChatThreadPageProps) {
     },
     {
       role: "assistant",
-      content: `Welcome back to thread **${chatId}**. I have loaded your historical conversation successfully. How can I assist you further today?`,
+      content: `Welcome back to thread **${chatId}**. I have loaded your historical conversation successfully. Type something with the word **"error"** to test the failure and retry state!`,
     },
   ]);
 
@@ -65,7 +65,35 @@ export default function ChatThreadPage({ params }: ChatThreadPageProps) {
       { role: "assistant", content: "" }, // Thinking state
     ]);
 
-    const simulatedReply = `
+    // Check if user prompt triggers an intentional error simulation
+    const shouldSimulateError = prompt.toLowerCase().includes("error");
+
+    console.log("prompt.toLowerCase() is ", prompt.toLowerCase());
+
+    setTimeout(() => {
+      if (shouldSimulateError) {
+        // Simulate an API failure state
+        setIsStreaming(false);
+
+        setMessages((prev) => {
+          const newMessages = [...prev];
+
+          const lastIndex = newMessages.length - 1;
+
+          newMessages[lastIndex] = {
+            role: "assistant",
+            content: "",
+            isError: true, // Trigger error UI & Retry button
+          };
+
+          return newMessages;
+        });
+
+        return;
+      }
+
+      // Normal successful stream simulation
+      const simulatedReply = `
 I received your message in chat session \`${chatId}\`:
 
 > "${prompt}"
@@ -82,7 +110,6 @@ export async function fetchChatSession(id: string) {
 Everything is running smoothly!
 `;
 
-    setTimeout(() => {
       let currentIndex = 0;
 
       const chunkSize = 5;

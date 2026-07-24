@@ -1,14 +1,35 @@
 "use client";
 
-import { ChatEmptyState } from "@/features/chat/components/chat-empty-state";
 import { ChatInputForm } from "@/features/chat/components/chat-input-form";
 import { ChatMessageList } from "@/features/chat/components/chat-message-list";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, use } from "react";
 
-export default function ChatPage() {
-  const [messages, setMessages] = useState<
-    { role: "user" | "assistant"; content: string; isError?: boolean }[]
-  >([]);
+interface ChatThreadPageProps {
+  params: Promise<{ id: string }>;
+}
+
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+  isError?: boolean;
+}
+
+export default function ChatThreadPage({ params }: ChatThreadPageProps) {
+  const resolvedParams = use(params);
+
+  const chatId = resolvedParams.id;
+
+  // Mock initial history using strict role types
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "user",
+      content: `Hello! Can you help me with thread ID: ${chatId}?`,
+    },
+    {
+      role: "assistant",
+      content: `Welcome back to thread **${chatId}**. I have loaded your historical conversation successfully. Type something with the word **"error"** to test the failure and retry state!`,
+    },
+  ]);
 
   const [isStreaming, setIsStreaming] = useState(false);
 
@@ -16,7 +37,6 @@ export default function ChatPage() {
 
   const streamIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Cleanup interval if the component unmounts mid-stream
   useEffect(() => {
     return () => {
       if (streamIntervalRef.current) clearInterval(streamIntervalRef.current);
@@ -33,7 +53,7 @@ export default function ChatPage() {
     setIsStreaming(false);
   };
 
-  const handleNewChatSubmit = async (prompt: string) => {
+  const handleSendMessage = async (prompt: string) => {
     setIsStreaming(true);
 
     setEditingPrompt(""); // Reset edit state on submit
@@ -42,55 +62,59 @@ export default function ChatPage() {
     setMessages((prev) => [
       ...prev,
       { role: "user", content: prompt },
-      { role: "assistant", content: "" },
+      { role: "assistant", content: "" }, // Thinking state
     ]);
 
-    // 2. Simulate ID generation
-    const newChatId = `chat_${Math.random().toString(36).substring(2, 9)}`;
+    // Check if user prompt triggers an intentional error simulation
+    const shouldSimulateError = prompt.toLowerCase().includes("error");
 
-    window.history.pushState(null, "", `/chat/${newChatId}`);
+    setTimeout(() => {
+      if (shouldSimulateError) {
+        // Simulate an API failure state
+        setIsStreaming(false);
 
-    const markdownSimulation = `
-# Markdown Rendering Test
+        setMessages((prev) => {
+          const newMessages = [...prev];
 
-This is a simulated response to demonstrate the capabilities of your new **MarkdownRenderer**. 
+          const lastIndex = newMessages.length - 1;
 
-## Code Formatting
-Here is a practical example of a React component written in TypeScript:
+          newMessages[lastIndex] = {
+            role: "assistant",
+            content: "",
+            isError: true, // Trigger error UI & Retry button
+          };
 
-\`\`\`tsx
-import React, { useState } from 'react';
+          return newMessages;
+        });
 
-export function Counter() {
-  const [count, setCount] = useState(0);
+        return;
+      }
 
-  return (
-    <div className="p-4 border rounded-md">
-      <p>Current count: {count}</p>
-      <button onClick={() => setCount(prev => prev + 1)}>
-        Increment
-      </button>
-    </div>
-  );
+      // Normal successful stream simulation
+      const simulatedReply = `
+I received your message in chat session \`${chatId}\`:
+
+> "${prompt}"
+
+Here is a quick markdown code example to verify formatting on existing threads:
+
+\`\`\`typescript
+export async function fetchChatSession(id: string) {
+  console.log("Fetching session:", id);
+  return { success: true, chatId: id };
 }
 \`\`\`
 
-### Task List
-1. Sent message optimistically.
-2. Updated URL via shallow routing.
-3. Rendered Markdown response.
-4. Test the stop button & polish features!
+Everything is running smoothly!
 `;
 
-    // Wait 1.5 seconds in "Thinking..." mode before streaming
-    setTimeout(() => {
       let currentIndex = 0;
 
       const chunkSize = 5;
 
       streamIntervalRef.current = setInterval(() => {
-        if (currentIndex < markdownSimulation.length) {
-          const nextChunk = markdownSimulation.slice(
+        if (currentIndex < simulatedReply.length) {
+          const nextChunk = simulatedReply.slice(
             currentIndex,
             currentIndex + chunkSize
           );
@@ -113,7 +137,7 @@ export function Counter() {
           handleStopStreaming();
         }
       }, 20);
-    }, 1500);
+    }, 1200);
   };
 
   const handleEditMessage = (content: string) => {
@@ -121,14 +145,13 @@ export function Counter() {
   };
 
   const handleRetryMessage = () => {
-    // Remove the last error assistant message and re-trigger submission with the previous user prompt
     setMessages((prev) => {
       const lastUserMsg = prev[prev.length - 2];
 
       const sliced = prev.slice(0, prev.length - 2);
 
       if (lastUserMsg) {
-        handleNewChatSubmit(lastUserMsg.content);
+        handleSendMessage(lastUserMsg.content);
       }
 
       return sliced;
@@ -138,28 +161,21 @@ export function Counter() {
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">
       <div className="flex flex-col flex-1 w-full overflow-y-auto">
-        <div
-          className={`flex flex-col w-full max-w-4xl mx-auto p-4 flex-1 ${
-            messages.length === 0 ? "justify-center" : "justify-start"
-          }`}
-        >
-          {messages.length === 0 ? (
-            <ChatEmptyState />
-          ) : (
-            <ChatMessageList
-              messages={messages}
-              onEditMessage={handleEditMessage}
-              onRetryMessage={handleRetryMessage}
-            />
-          )}
+        <div className="flex flex-col w-full max-w-4xl mx-auto p-4 flex-1 justify-start">
+          <ChatMessageList
+            messages={messages}
+            onEditMessage={handleEditMessage}
+            onRetryMessage={handleRetryMessage}
+          />
         </div>
       </div>
 
       <div className="w-full bg-background shrink-0">
         <div className="w-full max-w-4xl mx-auto p-4">
           <ChatInputForm
+            chatId={chatId}
             initialValue={editingPrompt}
-            onSubmit={handleNewChatSubmit}
+            onSubmit={handleSendMessage}
             isStreaming={isStreaming}
             onStop={handleStopStreaming}
           />
