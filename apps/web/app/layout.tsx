@@ -6,12 +6,12 @@ import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-import { Space_Grotesk } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 
-const spaceGrotesk = Space_Grotesk({
+const geistMono = Geist_Mono({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-space",
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -62,9 +62,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
+    <html lang="en" className={`${geistMono.variable}`}>
       <body
-        className={`${spaceGrotesk.className} font-sans antialiased min-h-screen bg-background`}
+        className={`${geistMono.className} font-sans antialiased min-h-screen bg-background`}
         suppressHydrationWarning
       >
         <Providers>
@@ -83,7 +83,7 @@ export default function RootLayout({
             richColors={true}
             toastOptions={{
               style: {
-                fontFamily: "var(--font-space), sans-serif",
+                fontFamily: "var(--font-mono), monospace",
                 color: "var(--foreground)",
                 letterSpacing: "0.05em",
                 fontSize: ".95rem",
