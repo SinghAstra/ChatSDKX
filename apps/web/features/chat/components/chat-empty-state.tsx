@@ -1,11 +1,26 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import { useEffect } from "react";
+import { toast } from "sonner";
+import { usePromptSuggestions } from "../hooks/use-prompt-suggestions";
+import { getSuggestionIcon } from "../utils/get-suggestion-icon";
 import { ChatEmptyStateSkeleton } from "./chat-empty-state-skeleton";
-import { useSimulatedSuggestions } from "../hooks/use-simulated-suggestions";
 
-export function ChatEmptyState() {
-  const { data, isLoading } = useSimulatedSuggestions();
+interface ChatEmptyStateProps {
+  onSelectPrompt?: (prompt: string) => void;
+}
+
+export function ChatEmptyState({ onSelectPrompt }: ChatEmptyStateProps) {
+  const { suggestions, isLoading, isError, error } = usePromptSuggestions();
+
+  console.log("suggestions is ", suggestions);
+
+  useEffect(() => {
+    if (isError) {
+      toast.error(error?.message || "Failed to load suggestions.");
+    }
+  }, [isError, error]);
 
   if (isLoading) {
     return <ChatEmptyStateSkeleton />;
@@ -23,14 +38,14 @@ export function ChatEmptyState() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
-        {data?.map((suggestion, index) => {
-          const Icon = suggestion.icon;
+        {suggestions.map((suggestion, index) => {
+          const Icon = getSuggestionIcon(suggestion.iconName);
 
           return (
             <Card
               key={index}
               className="p-4 rounded flex flex-col gap-2 cursor-pointer bg-muted/70 hover:bg-muted/30 transition-colors border-border/50 group"
-              // onClick={() => handleSuggestionClick(suggestion.prompt)}
+              onClick={() => onSelectPrompt?.(suggestion.prompt)}
             >
               <div className="flex items-center gap-2 text-foreground font-medium">
                 <div className="p-1.5 rounded-md bg-primary/10 text-primary group-hover:bg-muted/50 transition-colors">

@@ -10,7 +10,7 @@ export const chatApi = {
     ApiResponse<GetPromptSuggestionsResponse>
   > => {
     return apiClient.get(
-      "/chats/suggestions",
+      "/api/chats/suggestions",
       getPromptSuggestionsResponseSchema
     );
   },
