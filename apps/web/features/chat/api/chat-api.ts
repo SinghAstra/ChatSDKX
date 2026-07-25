@@ -1,5 +1,13 @@
 import { apiClient } from "@/lib/api-client";
-import { ChatThread, chatThreadSchema, type ApiResponse } from "@repo/shared";
+import {
+  ChatThread,
+  chatThreadSchema,
+  EnhancePromptResponse,
+  enhancePromptResponseSchema,
+  UpdateChatTitleResponse,
+  updateChatTitleResponseSchema,
+  type ApiResponse,
+} from "@repo/shared";
 import {
   getPromptSuggestionsResponseSchema,
   type GetPromptSuggestionsResponse,
@@ -14,7 +22,30 @@ export const chatApi = {
       getPromptSuggestionsResponseSchema
     );
   },
+
   getChatThread: (chatId: string): Promise<ApiResponse<ChatThread>> => {
     return apiClient.get(`/api/chats/${chatId}`, chatThreadSchema);
+  },
+
+  enhancePrompt: (
+    prompt: string,
+    chatId?: string
+  ): Promise<ApiResponse<EnhancePromptResponse>> => {
+    return apiClient.post(
+      "/api/chats/enhance",
+      { prompt, chatId },
+      enhancePromptResponseSchema
+    );
+  },
+
+  updateChatTitle: (
+    chatId: string,
+    title: string
+  ): Promise<ApiResponse<UpdateChatTitleResponse>> => {
+    return apiClient.put(
+      `/api/chats/${chatId}/title`,
+      { title },
+      updateChatTitleResponseSchema
+    );
   },
 };
