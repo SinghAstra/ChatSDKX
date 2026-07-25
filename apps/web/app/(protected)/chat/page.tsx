@@ -6,6 +6,7 @@ import {
 import { getPromptSuggestionsAction } from "@/features/chat/actions/get-prompt-suggestions";
 import { chatKeys } from "@/features/chat/api/query-keys";
 import { ChatView } from "@/features/chat/components/chat-view";
+import { ChatHeader } from "@/features/chat/components/chat-header";
 
 export default async function ChatPage() {
   const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ export default async function ChatPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
+      <ChatHeader />
       <ChatView />
     </HydrationBoundary>
   );

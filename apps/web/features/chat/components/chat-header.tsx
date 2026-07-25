@@ -18,17 +18,22 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "./logo";
+import { useChatThread } from "../hooks/use-chat-thread";
 
 interface ChatHeaderProps {
-  title?: string | null;
+  chatId?: string;
 }
 
-export function ChatHeader({ title }: ChatHeaderProps) {
+export function ChatHeader({ chatId }: ChatHeaderProps) {
   const { toggleSidebar } = useSidebar();
 
   const { data: session } = useSession();
 
   const pathname = usePathname();
+
+  const { thread } = useChatThread(chatId || "");
+
+  const title = thread?.title;
 
   const isRootChat = pathname === ROUTES.CHAT;
 
@@ -48,7 +53,7 @@ export function ChatHeader({ title }: ChatHeaderProps) {
   };
 
   return (
-    <header className="flex w-full items-center justify-between py-2 px-3 md:px-4">
+    <header className="w-full flex items-center justify-between px-3 m:px-4 py-2">
       {/* LEFT SECTION */}
       <div className="flex items-center gap-2 overflow-hidden">
         {/* Mobile Sidebar Toggle */}
@@ -76,16 +81,15 @@ export function ChatHeader({ title }: ChatHeaderProps) {
             </span>
           </Link>
         ) : (
-          title && (
-            <h1 className="truncate text-sm font-medium text-foreground">
-              {title}
-            </h1>
-          )
+          <h1 className="truncate text-sm font-medium text-foreground">
+            {title || "New Chat"}
+          </h1>
         )}
       </div>
 
       {/* RIGHT SECTION */}
-      <div className="flex items-center gap-2.5 shrink-0 ml-auto">
+      <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+        {/* New Chat Button */}
         <button
           className="text-foreground/70 bg-muted/50 hover:bg-muted/70 hover:text-foreground hidden sm:flex px-2.5 py-2 border rounded cursor-pointer"
           title="New Chat"
@@ -126,16 +130,13 @@ export function ChatHeader({ title }: ChatHeaderProps) {
                 </p>
               </div>
             </DropdownMenuLabel>
-
             <DropdownMenuSeparator />
-
             <DropdownMenuItem asChild className="sm:hidden cursor-pointer">
               <Link href={ROUTES.CHAT} className="flex items-center gap-2">
                 <Plus className="w-4 h-4" />
                 <span>New Chat</span>
               </Link>
             </DropdownMenuItem>
-
             <DropdownMenuItem
               onClick={handleLogout}
               className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer flex items-center gap-2"
