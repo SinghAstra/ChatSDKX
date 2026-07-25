@@ -17,9 +17,8 @@ interface ChatViewProps {
 export function ChatView({ chatId: initialChatId }: ChatViewProps) {
   const queryClient = useQueryClient();
 
-  // If visiting /chat (no ID), generate a client-side session ID immediately
   const [chatId] = useState<string>(
-    initialChatId || `chat_${Math.random().toString(36).substring(2, 9)}`
+    () => initialChatId || `chat_${Math.random().toString(36).substring(2, 9)}`
   );
 
   const [editingPrompt, setEditingPrompt] = useState<string>("");
@@ -74,19 +73,20 @@ export function ChatView({ chatId: initialChatId }: ChatViewProps) {
 
   const messages = thread?.messages ?? [];
 
-  const isInitialLoading = isLoading && !thread;
+  const isHistoryLoading =
+    isLoading && !!initialChatId && messages.length === 0;
 
   return (
     <div className="flex flex-col flex-1 w-full overflow-hidden">
       <div className="flex flex-col flex-1 w-full overflow-y-auto">
         <div
           className={`flex flex-col w-full max-w-4xl mx-auto p-4 flex-1 ${
-            isInitialLoading || messages.length === 0
+            isHistoryLoading || messages.length === 0
               ? "justify-center"
               : "justify-start"
           }`}
         >
-          {isInitialLoading ? (
+          {isHistoryLoading ? (
             <ChatThreadSkeleton />
           ) : messages.length === 0 ? (
             <ChatEmptyState onSelectPrompt={handleSendMessage} />

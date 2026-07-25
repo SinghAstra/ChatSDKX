@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDown } from "lucide-react";
 import { AiMessage } from "./ai-message";
 import { UserMessage } from "./user-message";
+import { CHAT_ROLE, ChatRole } from "@repo/shared";
 
 export interface MessageItem {
   id?: string;
-  role: "user" | "assistant";
+  role: ChatRole;
   content: string;
   isError?: boolean;
 }
@@ -50,7 +51,7 @@ export function ChatMessageList({
   return (
     <div className="flex flex-col space-y-6 pb-4 w-full relative">
       {messages.map((msg, index) =>
-        msg.role === "user" ? (
+        msg.role === CHAT_ROLE.USER ? (
           <UserMessage
             key={index}
             content={msg.content}
