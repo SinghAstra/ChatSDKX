@@ -14,7 +14,7 @@ const ProcessSection = () => {
         initial="hidden"
         whileInView="visible"
       >
-        <div className="flex flex-col items-center lg:items-center justify-center w-full py-8 max-w-xl mx-auto gap-4">
+        <div className="flex flex-col items-center lg:items-center justify-center w-full py-8 max-w-2xl mx-auto gap-4">
           <MovingBorder className="rounded">
             <div className="w-full h-full bg-background group transition-all duration-300 ease-in-out active:scale-[0.98]">
               <div className="w-full rounded flex items-center justify-center px-4 py-2 hover:bg-muted/20 transition-all duration-300 ease-in-out">
@@ -26,12 +26,12 @@ const ProcessSection = () => {
           </MovingBorder>
 
           <h2 className="text-center text-3xl md:text-5xl font-medium tracking-tight mt-4 text-balance">
-            Codebase clarity in 3 simple steps
+            Production-ready AI chat in 3 steps
           </h2>
 
           <p className="text-center lg:text-center text-lg tracking-normal leading-relaxed text-muted-foreground max-w-lg text-balance">
-            Drop a link, let our background workers handle the heavy lifting,
-            and explore your code without the headache.
+            Install the components, wire up your preferred model, and give your
+            users a world-class AI conversation experience.
           </p>
         </div>
       </motion.div>

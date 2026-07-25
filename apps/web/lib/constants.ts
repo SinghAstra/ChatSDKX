@@ -1,22 +1,22 @@
-import { Cpu, Link2, Sparkles } from "lucide-react";
+import { Package, Plug, Sparkles } from "lucide-react";
 
 export const processSteps = [
   {
-    title: "Paste Repository URL",
+    title: "Initialize the SDK",
     description:
-      "Just drop the link to any public GitHub repository. No complex local setups, no API access tokens, and zero initial configuration required.",
-    icon: Link2,
+      "Quickly drop our pre-built, accessible React components into your Next.js application without wrestling with complex UI state or layout shifts.",
+    icon: Package,
   },
   {
-    title: "Automated Ingestion",
+    title: "Connect Your Backend",
     description:
-      "Our high-performance background queue instantly pulls the code, maps your folder hierarchy, and tracks vital filesystem structural metrics.",
-    icon: Cpu,
+      "Plug in any LLM—whether it's OpenAI, Anthropic, or a custom model—using our unified API handlers and seamless streaming hooks.",
+    icon: Plug,
   },
   {
-    title: "Explore with AI Insight",
+    title: "Launch Your AI",
     description:
-      "Click through a smooth, interactive nested code tree and instantly view resilient, deep AI summaries for every single folder and file.",
+      "Instantly deploy a flawless chat experience complete with real-time markdown rendering, prompt enhancements, and responsive sidebars.",
     icon: Sparkles,
   },
 ];
@@ -26,105 +26,105 @@ export const reviews = [
     name: "Michael Chen",
     rating: 5,
     review:
-      "A total lifesaver for onboarding. I had to dive into a legacy 50k LOC repo, and SummaryX mapped the entire codebase into a clean interactive tree in seconds. I actually understood the system before my first standup.",
+      "A total lifesaver. I was dreading building another streaming chat UI from scratch with all the edge cases. ChatSDKX gave us a production-ready interface in a single afternoon.",
   },
   {
     name: "Emily Watson",
     rating: 5,
     review:
-      "The AI file summaries are incredibly accurate. It doesn't just skim the code; it tells you exactly what the file does in plain English. It's like having the original maintainer sitting right next to you explaining the files.",
+      "The intelligent prompt enhancement feature is incredible. Our users are getting significantly better AI outputs because the UI actively helps them write better instructions.",
   },
   {
     name: "David Kumar",
     rating: 5,
     review:
-      "I use this daily for open-source work. Instead of spending hours opening a hundred different folders on GitHub, I get an immediate map of the project. It has significantly speed up my contribution speed.",
+      "I use this for all my freelance AI projects now. Instead of spending days tweaking scroll-to-bottom logic and markdown parsers, I just drop in ChatSDKX and focus on the core backend logic.",
   },
   {
     name: "Sophia Rossi",
     rating: 4,
     review:
-      "Fantastic tool for exploring new frameworks. The interactive tree explorer helped me understand how core modules interact without me having to clone the whole project and grep everything locally.",
+      "Fantastic tool for React developers. The component architecture is extremely clean, and hooking it up to our existing TanStack Query setup was entirely painless.",
   },
   {
     name: "James Thompson",
     rating: 5,
     review:
-      "Absolutely game-changing for technical leads. I use it to audit external libraries before we add them to our monorepo. The instant file breakdowns give us total code clarity with zero setup overhead.",
+      "Absolutely game-changing for our startup. We needed a ChatGPT-like experience embedded in our SaaS dashboard. ChatSDKX delivered the exact UX we wanted with zero layout jank.",
   },
   {
     name: "Olivia Zhang",
     rating: 4,
     review:
-      "Simple, effective, and fast. It completely takes the guesswork out of complex, messy GitHub repos. Getting a clear view of an entire folder structure with working summaries is a massive time-saver.",
+      "Simple, effective, and fast. It completely takes the guesswork out of handling Server-Sent Events (SSE). Getting a reliable streaming response up and running is finally easy.",
   },
   {
     name: "William Smith",
     rating: 5,
     review:
-      "SummaryX is now a permanent part of my developer workflow. If you deal with large or unfamiliar codebases frequently, this isn't just a luxury—it's a necessity for maintaining your sanity and development speed.",
+      "ChatSDKX is now a permanent part of our boilerplate. If you are building generative AI wrappers or custom chatbots, this isn't just a luxury—it's a necessity for development speed.",
   },
   {
     name: "Mia Lindholm",
     rating: 5,
     review:
-      "I've tried other repository analysis tools, but they usually just generate a giant, unreadable graph diagram. SummaryX actually gives me clean, readable, and logical summaries of what each file is doing.",
+      "I've tried other UI libraries, but they are usually too opinionated or impossible to style. ChatSDKX strikes the perfect balance by utilizing Tailwind, letting us match our brand perfectly.",
   },
   {
     name: "Henry Fletcher",
     rating: 5,
     review:
-      "This has completely transformed how our team handles technical alignment. We drop the repository link into SummaryX first to give everyone an instant high-level map of the codebase architecture before writing code.",
+      "This completely transformed how quickly we can prototype AI features. The mobile responsiveness is spot-on out of the box, and the sidebar management feels incredibly native.",
   },
 ];
 
 export const FAQ = [
   {
     id: "item-1",
-    question: "How does SummaryX work?",
+    question: "What exactly is ChatSDKX?",
     answer:
-      "Just paste a GitHub link. Our AI automatically scans the project, figures out how everything connects, and instantly builds a clean, interactive map with simple summaries for every single file.",
+      "ChatSDKX is a powerful, developer-first React library that provides pre-built, highly optimized UI components and hooks for building real-time AI chat applications.",
   },
   {
     id: "item-2",
-    question: "Do I need to download or clone anything?",
+    question: "Do I need to use a specific LLM provider?",
     answer:
-      "Not at all! SummaryX runs entirely in your browser. You don't have to download heavy folders or touch your computer's terminal. Paste the link, and we handle the rest in seconds.",
+      "Not at all! ChatSDKX is completely model-agnostic. Whether you use OpenAI, Anthropic, Google Gemini, or a local Llama model, our streaming hooks can easily consume your API responses.",
   },
   {
     id: "item-3",
-    question: "Is my code safe? Will it train the AI?",
+    question: "Does it support real-time streaming?",
     answer:
-      "Your code is 100% safe. We never use your code, projects, or intellectual property to train AI models. What's yours stays yours.",
+      "Yes. Real-time streaming via Server-Sent Events (SSE) is supported out of the box. We handle the chunk accumulation and state updates so you don't have to.",
   },
   {
     id: "item-4",
-    question: "What programming languages do you support?",
+    question: "What frameworks do you support?",
     answer:
-      "We support almost all popular languages, including JavaScript, TypeScript, Python, Rust, Go, and Java. Plus, we add support for more language setups every single month.",
+      "ChatSDKX is heavily optimized for Next.js (App Router) and React. It leverages modern ecosystem standards like Tailwind CSS, Lucide Icons, and Framer Motion.",
   },
   {
     id: "item-5",
-    question: "Can it handle massive or messy codebases?",
+    question: "How customizable is the UI?",
     answer:
-      "Yes! SummaryX is built for messy code. Whether it's a tiny weekend hobby app or a giant corporate system, we break the files down into simple, bite-sized summaries so you don't get overwhelmed.",
+      "Fully customizable. We expose flexible components that accept standard className props, allowing you to easily override styles using Tailwind CSS to match your exact brand guidelines.",
   },
   {
     id: "item-6",
-    question: "Can I use it on private repositories?",
+    question: "Does ChatSDKX store my users' messages?",
     answer:
-      "Right now, SummaryX works with any public GitHub repository. Private repository support is our top priority and is launching very soon so you can map your private team projects.",
+      "No. ChatSDKX is strictly a frontend UI and state-management layer. You maintain 100% ownership and control over where and how your chat data is stored in your own database.",
   },
   {
     id: "item-7",
-    question: "Are the AI summaries actually accurate?",
+    question: "Does it include markdown and code highlighting?",
     answer:
-      "Yes. Our AI doesn't just look at a single file in a vacuum. It reads how files talk to each other across the entire codebase, giving you smart summaries that explain what the code actually does in plain English.",
+      "Yes. The message components include robust markdown parsing and syntax highlighting for code blocks, providing a premium reading experience for technical AI responses.",
   },
   {
     id: "item-8",
-    question: "Who is SummaryX built for?",
+    question: "Is it mobile responsive?",
     answer:
-      "It's perfect for developers onboarding to a new job, open-source contributors trying to make a quick fix, or tech leads auditing a new library before adding it to their system.",
+      "Absolutely. The layout, including the collapsible chat history sidebar and the input forms, are fully optimized for mobile devices right out of the box.",
   },
 ];
