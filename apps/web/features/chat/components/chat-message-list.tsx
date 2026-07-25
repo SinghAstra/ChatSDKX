@@ -73,7 +73,7 @@ export function ChatMessageList({
         <div className="sticky bottom-4 w-full flex justify-center pointer-events-none z-10 animate-in fade-in slide-in-from-bottom-4 duration-300">
           <button
             onClick={scrollToBottom}
-            className="pointer-events-auto scroll-auto flex items-center justify-center size-8 rounded-full bg-muted/50 border shadow-sm hover:bg-muted text-foreground transition-all"
+            className="pointer-events-auto cursor-pointer scroll-auto flex items-center justify-center size-8 rounded-full bg-muted/50 border shadow-sm hover:bg-muted text-foreground transition-all"
             aria-label="Scroll to bottom"
           >
             <ArrowDown className="size-4" />

@@ -5,12 +5,14 @@ import { chatKeys } from "../api/query-keys";
 import { getChatThreadAction } from "../actions/get-chat-thread";
 import { getSession } from "next-auth/react";
 import { toast } from "sonner";
-import { CHAT_ROLE, ChatThread } from "@repo/shared";
+import { CHAT_ROLE, ChatThread, ChatBase } from "@repo/shared";
 
 export function useChatThread(chatId: string) {
   const queryClient = useQueryClient();
 
   const queryKey = chatKeys.detail(chatId);
+
+  const listsQueryKey = chatKeys.lists();
 
   const threadQuery = useQuery({
     queryKey,
@@ -86,8 +88,14 @@ export function useChatThread(chatId: string) {
     onMutate: async ({ prompt }) => {
       await queryClient.cancelQueries({ queryKey });
 
-      const previousData = queryClient.getQueryData<ChatThread>(queryKey);
+      await queryClient.cancelQueries({ queryKey: listsQueryKey });
 
+      const previousThreadData = queryClient.getQueryData<ChatThread>(queryKey);
+
+      const previousListsData =
+        queryClient.getQueryData<ChatBase[]>(listsQueryKey);
+
+      // Optimistically update the individual chat thread view
       queryClient.setQueryData<ChatThread>(queryKey, (old) => {
         const newUserMsg = {
           id: `temp-user-${Date.now()}`,
@@ -112,12 +120,33 @@ export function useChatThread(chatId: string) {
         return { ...old, messages: [...old.messages, newUserMsg, newAsstMsg] };
       });
 
-      return { previousData };
+      // Optimistically prepend the new placeholder chat into the sidebar list cache
+      queryClient.setQueryData<ChatBase[]>(listsQueryKey, (oldLists = []) => {
+        // Check if this chat is already in the list to avoid duplicates
+        const exists = oldLists.some((chat) => chat.id === chatId);
+
+        if (exists) return oldLists;
+
+        const newOptimisticChat: ChatBase = {
+          id: chatId,
+          title: null,
+          createdAt: String(new Date()),
+          updatedAt: String(new Date()),
+        };
+
+        return [newOptimisticChat, ...oldLists];
+      });
+
+      return { previousThreadData, previousListsData };
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any, variables, context) => {
-      if (context?.previousData) {
-        queryClient.setQueryData(queryKey, context.previousData);
+      if (context?.previousThreadData) {
+        queryClient.setQueryData(queryKey, context.previousThreadData);
+      }
+
+      if (context?.previousListsData) {
+        queryClient.setQueryData(listsQueryKey, context.previousListsData);
       }
 
       toast.error(err.message || "Failed to stream response.");
@@ -125,7 +154,7 @@ export function useChatThread(chatId: string) {
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey });
 
-      queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: listsQueryKey });
     },
   });
 
