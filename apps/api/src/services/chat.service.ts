@@ -1,51 +1,54 @@
 import { prisma } from "@repo/db";
 import {
   CHAT_ERROR_CODES,
-  CHAT_ROLE,
   DeleteChatPayload,
   GetChatsPayload,
   logError,
+  CHAT_ROLE,
 } from "@repo/shared";
 import { AppError } from "../errors/api-errors";
 import type {
-  ChatRole,
-  ChatThread,
   GetPromptSuggestionsResponse,
+  ChatThread,
+  ChatRole,
 } from "@repo/shared";
-import { geminiClient } from "../config/gemini";
+import { groqClient } from "../config/groq";
 import {
-  buildTitleGenerationPrompt,
   DYNAMIC_SUGGESTIONS_PROMPT,
+  buildTitleGenerationPrompt,
 } from "../prompts/chat.prompt";
-import { suggestionJsonSchema } from "../schemas/gemini.schema";
 
 export const chatService = {
   async generatePromptSuggestions(): Promise<GetPromptSuggestionsResponse> {
-    console.log("🤖 [Gemini] Generating dynamic prompt suggestions...");
+    console.log("⚡ [Groq] Generating dynamic prompt suggestions...");
 
     try {
-      const interaction = await geminiClient.interactions.create({
-        model: "gemini-3.6-flash",
-        input: DYNAMIC_SUGGESTIONS_PROMPT,
+      const completion = await groqClient.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful assistant that outputs JSON.",
+          },
+          { role: "user", content: DYNAMIC_SUGGESTIONS_PROMPT },
+        ],
         response_format: {
-          type: "text",
-          mime_type: "application/json",
-          schema: suggestionJsonSchema,
+          type: "json_object",
         },
       });
 
-      if (!interaction.output_text) {
-        throw new Error("Gemini returned an empty or undefined output text.");
+      const outputText = completion.choices[0]?.message?.content;
+
+      if (!outputText) {
+        throw new Error("Groq returned an empty or undefined output text.");
       }
 
-      console.log("🤖 [Gemini] Successfully generated prompt suggestions.");
+      console.log("⚡ [Groq] Successfully generated prompt suggestions.");
 
-      return JSON.parse(
-        interaction.output_text
-      ) as GetPromptSuggestionsResponse;
+      return JSON.parse(outputText) as GetPromptSuggestionsResponse;
     } catch (error) {
       console.error(
-        "🤖❌ [Gemini Error] Failed to generate dynamic suggestions, using fallback."
+        "⚡❌ [Groq Error] Failed to generate dynamic suggestions, using fallback."
       );
 
       logError(error);
@@ -100,41 +103,29 @@ export const chatService = {
   ): Promise<DeleteChatPayload> => {
     console.log(`🗄️ [DB] Validating ownership for chat: ${chatId}`);
 
-    const chat = await prisma.chat.findUnique({
-      where: { id: chatId },
-    });
+    const chat = await prisma.chat.findUnique({ where: { id: chatId } });
 
-    if (!chat) {
+    if (!chat)
       throw new AppError(
         404,
         CHAT_ERROR_CODES.CHAT_NOT_FOUND,
         "We couldn't find that chat."
       );
-    }
 
-    if (chat.userId !== userId) {
-      console.warn(
-        `🗄️❌ [DB Warning] Unauthorized delete attempt on chat: ${chatId} by user: ${userId}`
-      );
-
+    if (chat.userId !== userId)
       throw new AppError(
         403,
         CHAT_ERROR_CODES.UNAUTHORIZED_CHAT_ACCESS,
         "You can only delete your own chats."
       );
-    }
 
     console.log(`🗄️ [DB] Executing deletion for chat: ${chatId}`);
 
-    await prisma.chat.delete({
-      where: { id: chatId },
-    });
+    await prisma.chat.delete({ where: { id: chatId } });
 
     console.log(`🗄️ [DB] Successfully deleted chat: ${chatId}`);
 
-    return {
-      message: "Chat deleted.",
-    };
+    return { message: "Chat deleted." };
   },
 
   getChatThread: async (
@@ -209,27 +200,27 @@ export const chatService = {
       data: { chatId, role: CHAT_ROLE.USER, content },
     });
 
-    console.log(`🤖 [Gemini] Starting stream for chat: ${chatId}`);
+    // Fetch previous messages for conversation context if needed, or just send current prompt
+    console.log(`⚡ [Groq] Starting stream for chat: ${chatId}`);
 
-    const stream = await geminiClient.interactions.create({
-      model: "gemini-3.6-flash",
-      input: content,
+    const stream = await groqClient.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: "You are a helpful assistant." },
+        { role: "user", content },
+      ],
       stream: true,
     });
 
     let fullAssistantResponse = "";
 
-    for await (const event of stream) {
-      if (
-        event.event_type === "step.delta" &&
-        event.delta?.type === "text" &&
-        event.delta?.text
-      ) {
-        const chunk = event.delta.text;
+    for await (const chunk of stream) {
+      const deltaText = chunk.choices[0]?.delta?.content;
 
-        fullAssistantResponse += chunk;
+      if (deltaText) {
+        fullAssistantResponse += deltaText;
 
-        yield chunk;
+        yield deltaText;
       }
     }
 
@@ -253,20 +244,20 @@ async function generateAndSaveChatTitle(
   chatId: string,
   firstMessage: string
 ): Promise<void> {
-  console.log(`🤖 [Gemini] Generating title in background for chat: ${chatId}`);
+  console.log(`⚡ [Groq] Generating title in background for chat: ${chatId}`);
 
   try {
     const prompt = buildTitleGenerationPrompt(firstMessage);
 
-    const interaction = await geminiClient.interactions.create({
-      model: "gemini-3.6-flash",
-      input: prompt,
+    const completion = await groqClient.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
     });
 
-    const generatedTitle = interaction.output_text?.trim();
+    const generatedTitle = completion.choices[0]?.message?.content?.trim();
 
     if (!generatedTitle) {
-      throw new Error("Received empty title from Gemini.");
+      throw new Error("Received empty title from Groq.");
     }
 
     await prisma.chat.update({
@@ -279,7 +270,7 @@ async function generateAndSaveChatTitle(
     );
   } catch (error) {
     console.error(
-      `🤖❌ [Gemini Error] Failed to generate title for chat: ${chatId}`
+      `⚡❌ [Groq Error] Failed to generate title for chat: ${chatId}`
     );
 
     logError(error);

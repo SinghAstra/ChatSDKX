@@ -14,8 +14,6 @@ interface ChatEmptyStateProps {
 export function ChatEmptyState({ onSelectPrompt }: ChatEmptyStateProps) {
   const { suggestions, isLoading, isError, error } = usePromptSuggestions();
 
-  console.log("suggestions is ", suggestions);
-
   useEffect(() => {
     if (isError) {
       toast.error(error?.message || "Failed to load suggestions.");
