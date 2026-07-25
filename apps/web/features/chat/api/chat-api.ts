@@ -15,6 +15,6 @@ export const chatApi = {
     );
   },
   getChatThread: (chatId: string): Promise<ApiResponse<ChatThread>> => {
-    return apiClient.get(`/chats/${chatId}`, chatThreadSchema);
+    return apiClient.get(`/api/chats/${chatId}`, chatThreadSchema);
   },
 };
