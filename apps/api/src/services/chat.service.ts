@@ -28,7 +28,8 @@ export const chatService = {
         messages: [
           {
             role: "system",
-            content: "You are a helpful assistant that outputs JSON.",
+            content:
+              "You are a helpful assistant that outputs valid JSON conforming to the requested structure.",
           },
           { role: "user", content: DYNAMIC_SUGGESTIONS_PROMPT },
         ],
@@ -45,7 +46,11 @@ export const chatService = {
 
       console.log("⚡ [Groq] Successfully generated prompt suggestions.");
 
-      return JSON.parse(outputText) as GetPromptSuggestionsResponse;
+      const parsed = JSON.parse(outputText);
+
+      const suggestions = parsed.suggestions || parsed;
+
+      return suggestions as GetPromptSuggestionsResponse;
     } catch (error) {
       console.error(
         "⚡❌ [Groq Error] Failed to generate dynamic suggestions, using fallback."
@@ -78,7 +83,6 @@ export const chatService = {
       ];
     }
   },
-
   getChats: async (userId: string): Promise<GetChatsPayload> => {
     console.log(`🗄️ [DB] Fetching chat history for user: ${userId}`);
 
