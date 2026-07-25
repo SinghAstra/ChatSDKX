@@ -92,7 +92,7 @@ export const chatService = {
 
     const chats = await prisma.chat.findMany({
       where: { userId },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { createdAt: "desc" },
     });
 
     console.log(`🗄️ [DB] Successfully retrieved ${chats.length} chats.`);

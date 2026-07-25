@@ -16,20 +16,21 @@ import { ROUTES } from "@/lib/routes";
 import { LogOut, Menu, Plus, User } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import { Logo } from "./logo";
 import { useChatThread } from "../hooks/use-chat-thread";
 
-interface ChatHeaderProps {
-  chatId?: string;
-}
-
-export function ChatHeader({ chatId }: ChatHeaderProps) {
+export function ChatHeader() {
   const { toggleSidebar } = useSidebar();
 
   const { data: session } = useSession();
 
   const pathname = usePathname();
+
+  const params = useParams();
+
+  // Extract chatId from the URL if it exists (e.g., /chat/[id])
+  const chatId = params?.id as string | undefined;
 
   const { thread } = useChatThread(chatId || "");
 
@@ -53,7 +54,7 @@ export function ChatHeader({ chatId }: ChatHeaderProps) {
   };
 
   return (
-    <header className="w-full flex items-center justify-between px-3 m:px-4 py-2">
+    <header className="w-full flex items-center justify-between px-3 md:px-4 py-2">
       {/* LEFT SECTION */}
       <div className="flex items-center gap-2 overflow-hidden">
         {/* Mobile Sidebar Toggle */}
@@ -88,10 +89,9 @@ export function ChatHeader({ chatId }: ChatHeaderProps) {
       </div>
 
       {/* RIGHT SECTION */}
-      <div className="flex items-center gap-1.5 shrink-0 ml-auto">
-        {/* New Chat Button */}
+      <div className="flex items-center gap-2.5 shrink-0 ml-auto">
         <button
-          className="text-foreground/70 bg-muted/50 hover:bg-muted/70 hover:text-foreground hidden sm:flex px-2.5 py-2 border rounded cursor-pointer"
+          className="text-foreground/70 hover:text-foreground hidden sm:flex bg-muted/50 hover:bg-muted/70 rounded p-2 border"
           title="New Chat"
         >
           <Link href={ROUTES.CHAT}>
@@ -119,7 +119,7 @@ export function ChatHeader({ chatId }: ChatHeaderProps) {
             </Button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuContent className="w-56 rounded" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-medium leading-none">
