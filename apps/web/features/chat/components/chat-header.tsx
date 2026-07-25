@@ -16,9 +16,8 @@ import { ROUTES } from "@/lib/routes";
 import { LogOut, Menu, Plus, User } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import { usePathname, useParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Logo } from "./logo";
-import { useChatThread } from "../hooks/use-chat-thread";
 
 export function ChatHeader() {
   const { toggleSidebar } = useSidebar();
@@ -26,15 +25,6 @@ export function ChatHeader() {
   const { data: session } = useSession();
 
   const pathname = usePathname();
-
-  const params = useParams();
-
-  // Extract chatId from the URL if it exists (e.g., /chat/[id])
-  const chatId = params?.id as string | undefined;
-
-  const { thread } = useChatThread(chatId || "");
-
-  const title = thread?.title;
 
   const isRootChat = pathname === ROUTES.CHAT;
 
@@ -53,6 +43,10 @@ export function ChatHeader() {
       .slice(0, 2);
   };
 
+  const handleNewChat = () => {
+    window.location.href = ROUTES.CHAT;
+  };
+
   return (
     <header className="w-full flex items-center justify-between px-3 md:px-4 py-2">
       {/* LEFT SECTION */}
@@ -68,8 +62,8 @@ export function ChatHeader() {
           <Menu className="size-5 text-foreground/70" />
         </Button>
 
-        {/* Dynamic Title / Brand Display */}
-        {isRootChat ? (
+        {/* Brand Display */}
+        {isRootChat && (
           <Link
             href={ROUTES.CHAT}
             className="flex items-center gap-2 md:hidden"
@@ -81,23 +75,18 @@ export function ChatHeader() {
               {siteConfig.name}
             </span>
           </Link>
-        ) : (
-          <h1 className="truncate text-sm font-medium text-foreground">
-            {title || "New Chat"}
-          </h1>
         )}
       </div>
 
       {/* RIGHT SECTION */}
       <div className="flex items-center gap-2.5 shrink-0 ml-auto">
         <button
-          className="text-foreground/70 hover:text-foreground hidden sm:flex bg-muted/50 hover:bg-muted/70 rounded p-2 border"
+          className="text-foreground/70 hover:text-foreground hidden sm:flex bg-muted/50 hover:bg-muted/70 rounded p-2 border cursor-pointer"
           title="New Chat"
+          onClick={handleNewChat}
         >
-          <Link href={ROUTES.CHAT}>
-            <Plus className="size-4" />
-            <span className="sr-only">New Chat</span>
-          </Link>
+          <Plus className="size-4" />
+          <span className="sr-only">New Chat</span>
         </button>
 
         <DropdownMenu>
@@ -131,11 +120,13 @@ export function ChatHeader() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild className="sm:hidden cursor-pointer">
-              <Link href={ROUTES.CHAT} className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
-                <span>New Chat</span>
-              </Link>
+            <DropdownMenuItem
+              asChild
+              className="sm:hidden cursor-pointer flex items-center gap-2"
+              onClick={handleNewChat}
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Chat</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleLogout}

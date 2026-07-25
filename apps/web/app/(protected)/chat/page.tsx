@@ -21,7 +21,7 @@ export default async function ChatPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ChatView />
+      <ChatView key="new-chat" />
     </HydrationBoundary>
   );
 }

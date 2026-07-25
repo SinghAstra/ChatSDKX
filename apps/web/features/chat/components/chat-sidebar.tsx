@@ -52,6 +52,12 @@ export function ChatSidebar() {
     }
   };
 
+  const handleNewChat = () => {
+    window.location.href = ROUTES.CHAT;
+
+    handleMobileNavigationClose();
+  };
+
   return (
     <Sidebar
       className="bg-sidebar border-r border-sidebar-border"
@@ -92,20 +98,15 @@ export function ChatSidebar() {
             <SidebarMenu className="flex flex-col gap-1">
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  asChild
                   isActive={pathname === ROUTES.CHAT}
                   className={cn(
                     getButtonStyles(pathname === ROUTES.CHAT),
-                    "border border-border/60"
+                    "border border-border/60 flex items-center gap-1 cursor-pointer"
                   )}
+                  onClick={handleNewChat}
                 >
-                  <Link
-                    href={ROUTES.CHAT}
-                    onClick={handleMobileNavigationClose}
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>New Chat</span>
-                  </Link>
+                  <Plus className="w-4 h-4" />
+                  <span>New Chat</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

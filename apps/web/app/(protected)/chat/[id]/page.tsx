@@ -27,7 +27,7 @@ export default async function ChatThreadPage({ params }: ChatThreadPageProps) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ChatView chatId={chatId} />
+      <ChatView key={chatId} chatId={chatId} />
     </HydrationBoundary>
   );
 }
