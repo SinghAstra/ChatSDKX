@@ -1,4 +1,4 @@
-import { ChatHeader } from "@/features/chat/components/header";
+import { ChatHeader } from "@/features/chat/components/chat-header";
 
 interface ChatLayoutProps {
   children: React.ReactNode;
