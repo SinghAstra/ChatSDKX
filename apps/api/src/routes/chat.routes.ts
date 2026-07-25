@@ -1,8 +1,15 @@
-import { deleteChatParamsSchema } from "@repo/shared";
+import {
+  deleteChatParamsSchema,
+  enhancePromptRequestSchema,
+  updateChatTitleRequestSchema,
+} from "@repo/shared";
 import { Router } from "express";
 import { chatController } from "../controllers/chat.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
-import { validateParams } from "../middlewares/validation.middleware";
+import {
+  validateBody,
+  validateParams,
+} from "../middlewares/validation.middleware";
 
 export const chatRouter: Router = Router();
 
@@ -28,4 +35,17 @@ chatRouter.delete(
   "/:id",
   validateParams(deleteChatParamsSchema),
   chatController.deleteChat
+);
+
+chatRouter.post(
+  "/enhance",
+  validateBody(enhancePromptRequestSchema),
+  chatController.enhancePrompt
+);
+
+chatRouter.put(
+  "/:id/title",
+  validateParams(deleteChatParamsSchema),
+  validateBody(updateChatTitleRequestSchema),
+  chatController.updateChatTitle
 );

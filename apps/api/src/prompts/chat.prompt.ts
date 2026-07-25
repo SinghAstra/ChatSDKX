@@ -25,3 +25,14 @@ CRITICAL RULES:
 
 Message: "${firstMessage}"
 `;
+
+export const ENHANCE_PROMPT_INSTRUCTION = `
+You are an expert AI prompt engineer. Your task is to rewrite the user's prompt to be clearer, more specific, and highly effective for an LLM to answer.
+If conversation history is provided, ensure the enhanced prompt logically follows the ongoing discussion context.
+You MUST return a valid JSON object containing exactly one key: "enhancedPrompt".
+
+Example format:
+{
+  "enhancedPrompt": "Explain the step-by-step process of how React hydration works, specifically addressing how it handles mismatches between server and client."
+}
+`;

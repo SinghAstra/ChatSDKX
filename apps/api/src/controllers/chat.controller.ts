@@ -1,8 +1,14 @@
-import { COMMON_ERROR_CODES, DeleteChatParams, logError } from "@repo/shared";
+import {
+  COMMON_ERROR_CODES,
+  DeleteChatParams,
+  EnhancePromptInput,
+  logError,
+  UpdateChatTitleInput,
+} from "@repo/shared";
 import { NextFunction, Request, Response } from "express";
-import { AppError, UnauthorizedError } from "../errors/api-errors.js";
-import { chatService } from "../services/chat.service.js";
-import { successResponse } from "../utils/response.js";
+import { AppError, UnauthorizedError } from "../errors/api-errors";
+import { chatService } from "../services/chat.service";
+import { successResponse } from "../utils/response";
 
 export const chatController = {
   getPromptSuggestions: async (
@@ -143,6 +149,64 @@ export const chatController = {
       const { id: chatId } = req.params;
 
       const responseData = await chatService.deleteChat(req.user.id, chatId);
+
+      res.status(200).json(successResponse(responseData));
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  enhancePrompt: async (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    req: Request<any, any, EnhancePromptInput>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError(
+          COMMON_ERROR_CODES.UNAUTHORIZED,
+          "Please sign in to enhance prompts."
+        );
+      }
+
+      const { prompt, chatId } = req.body;
+
+      const responseData = await chatService.enhancePrompt(
+        req.user.id,
+        prompt,
+        chatId
+      );
+
+      res.status(200).json(successResponse(responseData));
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  updateChatTitle: async (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    req: Request<{ id: string }, any, UpdateChatTitleInput>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedError(
+          COMMON_ERROR_CODES.UNAUTHORIZED,
+          "Please sign in to update chat titles."
+        );
+      }
+
+      const { id: chatId } = req.params;
+
+      const { title } = req.body;
+
+      const responseData = await chatService.updateChatTitle(
+        req.user.id,
+        chatId,
+        title
+      );
 
       res.status(200).json(successResponse(responseData));
     } catch (error) {

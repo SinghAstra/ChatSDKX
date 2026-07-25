@@ -11,10 +11,13 @@ import type {
   GetPromptSuggestionsResponse,
   ChatThread,
   ChatRole,
+  EnhancePromptResponse,
+  UpdateChatTitleResponse,
 } from "@repo/shared";
 import { groqClient } from "../config/groq";
 import {
   DYNAMIC_SUGGESTIONS_PROMPT,
+  ENHANCE_PROMPT_INSTRUCTION,
   buildTitleGenerationPrompt,
 } from "../prompts/chat.prompt";
 
@@ -83,6 +86,7 @@ export const chatService = {
       ];
     }
   },
+
   getChats: async (userId: string): Promise<GetChatsPayload> => {
     console.log(`🗄️ [DB] Fetching chat history for user: ${userId}`);
 
@@ -255,6 +259,118 @@ export const chatService = {
     if (isNewChat) {
       generateAndSaveChatTitle(chatId, content).catch(console.error);
     }
+  },
+
+  enhancePrompt: async (
+    userId: string,
+    prompt: string,
+    chatId?: string
+  ): Promise<EnhancePromptResponse> => {
+    console.log(`⚡ [Groq] Enhancing prompt for user: ${userId}`);
+
+    const messages: {
+      role: "system" | "user" | "assistant";
+      content: string;
+    }[] = [
+      {
+        role: "system",
+        content: ENHANCE_PROMPT_INSTRUCTION,
+      },
+    ];
+
+    // Inject history if chatId is provided so Groq understands the context
+    if (chatId) {
+      const chat = await prisma.chat.findUnique({ where: { id: chatId } });
+
+      // Only attach context if the user owns the chat
+      if (chat && chat.userId === userId) {
+        const history = await prisma.message.findMany({
+          where: { chatId },
+          orderBy: { createdAt: "asc" },
+        });
+
+        const formattedHistory = history.map((msg) => ({
+          role:
+            msg.role === CHAT_ROLE.USER
+              ? ("user" as const)
+              : ("assistant" as const),
+          content: msg.content,
+        }));
+
+        messages.push(...formattedHistory);
+      }
+    }
+
+    messages.push({
+      role: "user" as const,
+      content: `Please enhance this prompt: \n\n${prompt}`,
+    });
+
+    try {
+      const completion = await groqClient.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages,
+        response_format: { type: "json_object" },
+      });
+
+      const outputText = completion.choices[0]?.message?.content;
+
+      if (!outputText) {
+        throw new Error("Groq returned an empty response.");
+      }
+
+      const parsed = JSON.parse(outputText);
+
+      console.log(`⚡ [Groq] Successfully enhanced prompt.`);
+
+      return {
+        enhancedPrompt: parsed.enhancedPrompt || prompt,
+      };
+    } catch (error) {
+      console.error(
+        `⚡❌ [Groq Error] Failed to enhance prompt, falling back to original.`
+      );
+
+      logError(error);
+
+      // Graceful fallback: return original prompt if the LLM request fails
+      return { enhancedPrompt: prompt };
+    }
+  },
+
+  updateChatTitle: async (
+    userId: string,
+    chatId: string,
+    title: string
+  ): Promise<UpdateChatTitleResponse> => {
+    console.log(`🗄️ [DB] Updating title for chat: ${chatId}`);
+
+    const chat = await prisma.chat.findUnique({ where: { id: chatId } });
+
+    if (!chat) {
+      throw new AppError(
+        404,
+        CHAT_ERROR_CODES.CHAT_NOT_FOUND,
+        "We couldn't find that chat."
+      );
+    }
+
+    if (chat.userId !== userId) {
+      throw new AppError(
+        403,
+        CHAT_ERROR_CODES.UNAUTHORIZED_CHAT_ACCESS,
+        "You can only update your own chats."
+      );
+    }
+
+    await prisma.chat.update({
+      where: { id: chatId },
+      data: { title },
+    });
+
+    console.log(`🗄️ [DB] Successfully updated chat title: ${chatId}`);
+
+    return { success: true };
   },
 };
 
