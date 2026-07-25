@@ -32,7 +32,6 @@ export function useChatThread(chatId: string) {
       prompt: string;
       onChunk: (chunk: string) => void;
     }) => {
-      // Retrieve session token on the client for Express auth middleware
       const session = await getSession();
 
       const token = session?.accessToken;
@@ -50,8 +49,18 @@ export function useChatThread(chatId: string) {
         body: JSON.stringify({ content: prompt }),
       });
 
-      if (!response.ok || !response.body) {
-        throw new Error("Failed to establish stream connection.");
+      if (!response.ok) {
+        const errorText = await response.text();
+
+        throw new Error(
+          `Server error (${response.status}): ${errorText || response.statusText}`
+        );
+      }
+
+      if (!response.body) {
+        throw new Error(
+          "Failed to establish stream connection: Response body missing."
+        );
       }
 
       const reader = response.body.getReader();
@@ -79,48 +88,34 @@ export function useChatThread(chatId: string) {
 
       const previousData = queryClient.getQueryData<ChatThread>(queryKey);
 
-      // Optimistic update: Inject user prompt & empty assistant placeholder for "Thinking" state
       queryClient.setQueryData<ChatThread>(queryKey, (old) => {
+        const newUserMsg = {
+          id: `temp-user-${Date.now()}`,
+          role: CHAT_ROLE.USER,
+          content: prompt,
+        };
+
+        const newAsstMsg = {
+          id: `temp-asst-${Date.now()}`,
+          role: CHAT_ROLE.ASSISTANT,
+          content: "",
+        };
+
         if (!old) {
           return {
             id: chatId,
             title: null,
-            messages: [
-              {
-                id: `temp-user-${Date.now()}`,
-                role: CHAT_ROLE.USER,
-                content: prompt,
-              },
-              {
-                id: `temp-asst-${Date.now()}`,
-                role: CHAT_ROLE.ASSISTANT,
-                content: "",
-              },
-            ],
+            messages: [newUserMsg, newAsstMsg],
           };
         }
 
-        return {
-          ...old,
-          messages: [
-            ...old.messages,
-            {
-              id: `temp-user-${Date.now()}`,
-              role: CHAT_ROLE.USER,
-              content: prompt,
-            },
-            {
-              id: `temp-asst-${Date.now()}`,
-              role: CHAT_ROLE.ASSISTANT,
-              content: "",
-            },
-          ],
-        };
+        return { ...old, messages: [...old.messages, newUserMsg, newAsstMsg] };
       });
 
       return { previousData };
     },
-    onError: (err, variables, context) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any, variables, context) => {
       if (context?.previousData) {
         queryClient.setQueryData(queryKey, context.previousData);
       }

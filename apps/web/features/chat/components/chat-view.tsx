@@ -28,7 +28,6 @@ export function ChatView({ chatId: initialChatId }: ChatViewProps) {
   const handleSendMessage = async (prompt: string) => {
     setEditingPrompt("");
 
-    // If it's a new chat, update the browser URL without a full page reload
     if (!initialChatId && window.location.pathname === "/chat") {
       window.history.pushState(null, "", `/chat/${chatId}`);
     }
@@ -36,7 +35,6 @@ export function ChatView({ chatId: initialChatId }: ChatViewProps) {
     await sendMessage({
       prompt,
       onChunk: (accumulatedText) => {
-        // Live-update the TanStack Query cache token-by-token as chunks arrive from the server stream
         queryClient.setQueryData<ChatThread>(chatKeys.detail(chatId), (old) => {
           if (!old) return old;
 

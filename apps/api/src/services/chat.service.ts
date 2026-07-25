@@ -204,14 +204,28 @@ export const chatService = {
       data: { chatId, role: CHAT_ROLE.USER, content },
     });
 
-    // Fetch previous messages for conversation context if needed, or just send current prompt
-    console.log(`⚡ [Groq] Starting stream for chat: ${chatId}`);
+    const allMessages = await prisma.message.findMany({
+      where: { chatId },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const formattedHistory = allMessages.map((msg) => ({
+      role:
+        msg.role === CHAT_ROLE.USER
+          ? ("user" as const)
+          : ("assistant" as const),
+      content: msg.content,
+    }));
+
+    console.log(
+      `⚡ [Groq] Starting stream with ${formattedHistory.length} messages of context for chat: ${chatId}`
+    );
 
     const stream = await groqClient.chat.completions.create({
       model: "llama-3.3-70b-versatile",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
-        { role: "user", content },
+        ...formattedHistory,
       ],
       stream: true,
     });
@@ -263,6 +277,8 @@ async function generateAndSaveChatTitle(
     if (!generatedTitle) {
       throw new Error("Received empty title from Groq.");
     }
+
+    console.log("generatedTitle is ", generatedTitle);
 
     await prisma.chat.update({
       where: { id: chatId },

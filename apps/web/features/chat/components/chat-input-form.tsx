@@ -102,6 +102,8 @@ export function ChatInputForm({
 
       if (!isStreaming) {
         handleSubmit();
+      } else {
+        onStop?.();
       }
     }
   };
@@ -122,7 +124,7 @@ export function ChatInputForm({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask anything..."
-            disabled={enhancer.status === "loading" || isStreaming}
+            disabled={enhancer.status === "loading"}
             rows={1}
             className="w-full max-h-50 min-h-14 resize-none bg-transparent px-4 py-4 text-[15px] outline-none placeholder:text-foreground/40 disabled:opacity-50 scrollbar-thin scrollbar-thumb-foreground/10"
           />
