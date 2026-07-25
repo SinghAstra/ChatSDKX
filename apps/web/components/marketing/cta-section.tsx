@@ -17,13 +17,13 @@ const CtaSection = () => {
       className="relative min-h-screen flex flex-col items-center justify-center max-w-300 mx-auto"
     >
       <LampBackground />
-      <div className="flex flex-col items-center justify-center relative w-full text-center gap-6">
+      <div className="flex flex-col items-center justify-center relative w-full text-center gap-6 z-10">
         <h2 className="text-center text-4xl md:text-7xl font-medium tracking-tight">
-          Stop wrestling with messy codebases.
+          Stop wrestling with complex chat UIs.
         </h2>
         <p className="text-muted-foreground text-lg tracking-normal leading-relaxed max-w-md mx-auto">
-          Paste your GitHub link and let SummaryX build a clean, interactive map
-          with clear AI summaries for every file. Start exploring faster today.
+          Integrate our pre-built React components and connect any LLM to launch
+          a seamless, responsive streaming chat interface in minutes.
         </p>
         <div>
           <Link href={ROUTES.SIGN_UP}>
