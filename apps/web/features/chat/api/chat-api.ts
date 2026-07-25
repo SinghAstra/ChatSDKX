@@ -2,8 +2,12 @@ import { apiClient } from "@/lib/api-client";
 import {
   ChatThread,
   chatThreadSchema,
+  DeleteChatPayload,
+  deleteChatPayloadSchema,
   EnhancePromptResponse,
   enhancePromptResponseSchema,
+  GetChatsPayload,
+  getChatsPayloadSchema,
   UpdateChatTitleResponse,
   updateChatTitleResponseSchema,
   type ApiResponse,
@@ -47,5 +51,13 @@ export const chatApi = {
       { title },
       updateChatTitleResponseSchema
     );
+  },
+
+  getChats: (): Promise<ApiResponse<GetChatsPayload>> => {
+    return apiClient.get("/api/chats", getChatsPayloadSchema);
+  },
+
+  deleteChat: (chatId: string): Promise<ApiResponse<DeleteChatPayload>> => {
+    return apiClient.delete(`/api/chats/${chatId}`, deleteChatPayloadSchema);
   },
 };
