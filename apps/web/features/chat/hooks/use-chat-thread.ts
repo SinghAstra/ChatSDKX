@@ -39,9 +39,9 @@ export function useChatThread(chatId: string) {
 
       const baseUrl =
         process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ??
-        "http://localhost:4000";
+        "http://localhost:5000";
 
-      const response = await fetch(`${baseUrl}/chats/${chatId}/messages`, {
+      const response = await fetch(`${baseUrl}/api/chats/${chatId}/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
