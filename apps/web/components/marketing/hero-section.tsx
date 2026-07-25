@@ -42,12 +42,13 @@ export default function HeroSection() {
         </Link>
 
         <h1 className="text-center py-4 text-5xl font-medium tracking-tight sm:text-6xl md:text-7xl lg:text-8xl leading-[1.05] text-balance max-w-5xl">
-          Map any GitHub repo. <span className="opacity-40">In seconds.</span>
+          Next-gen AI chat interfaces.{" "}
+          <span className="opacity-40">In minutes.</span>
         </h1>
 
         <p className="mb-10 text-base tracking-normal leading-relaxed text-muted-foreground md:text-xl text-balance max-w-2xl">
-          Instantly turn any messy repository into a clean, interactive map with
-          clear, AI-powered summaries for every single file.
+          A powerful, scalable AI chat interface featuring real-time streaming,
+          intelligent prompt enhancement, and seamless developer integration.
         </p>
 
         <Link href={ROUTES.SIGN_UP}>
