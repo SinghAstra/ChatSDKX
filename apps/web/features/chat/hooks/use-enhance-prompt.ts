@@ -6,12 +6,24 @@ import { enhancePromptAction } from "../actions/enhance-prompt";
 import { toast } from "sonner";
 import { logError } from "@repo/shared";
 
-type EnhancerStatus = "idle" | "loading" | "improved" | "error";
+export type EnhancerStatus =
+  "idle" | "loading" | "improved" | "needs_info" | "error";
+
+export interface EnhancementResult {
+  status: EnhancerStatus;
+  originalPrompt: string;
+  enhancedPrompt?: string;
+  rationale?: string;
+  questions?: string[];
+}
+
+const initialState: EnhancementResult = {
+  status: "idle",
+  originalPrompt: "",
+};
 
 export function useEnhancePrompt() {
-  const [originalPrompt, setOriginalPrompt] = useState("");
-
-  const [status, setStatus] = useState<EnhancerStatus>("idle");
+  const [result, setResult] = useState<EnhancementResult>(initialState);
 
   const enhanceMutation = useMutation({
     mutationFn: async ({
@@ -27,25 +39,28 @@ export function useEnhancePrompt() {
 
       return res.data;
     },
-    onMutate: () => setStatus("loading"),
-    onSuccess: () => setStatus("improved"),
-    onError: (err) => {
-      setStatus("error");
+    onMutate: (variables) => {
+      setResult({ status: "loading", originalPrompt: variables.prompt });
+    },
+    onSuccess: (data, variables) => {
+      setResult({
+        status: data.status,
+        originalPrompt: variables.prompt,
+        enhancedPrompt: data.enhancedPrompt,
+        rationale: data.rationale,
+        questions: data.questions,
+      });
+    },
+    onError: (err, variables) => {
+      setResult({ status: "error", originalPrompt: variables.prompt });
 
       toast.error(err.message || "Failed to enhance prompt.");
     },
   });
 
   const enhance = async (prompt: string, chatId?: string) => {
-    setOriginalPrompt(prompt);
-
     try {
-      const data = await enhanceMutation.mutateAsync({ prompt, chatId });
-
-      return {
-        status: "improved" as const,
-        enhancedPrompt: data.enhancedPrompt,
-      };
+      return await enhanceMutation.mutateAsync({ prompt, chatId });
     } catch (error) {
       logError(error);
 
@@ -53,21 +68,16 @@ export function useEnhancePrompt() {
     }
   };
 
-  const undo = () => {
-    setStatus("idle");
-  };
+  const undo = () => setResult((prev) => ({ ...prev, status: "idle" }));
 
-  const reset = () => {
-    setStatus("idle");
-
-    setOriginalPrompt("");
-  };
+  const reset = () => setResult(initialState);
 
   return {
     enhance,
-    status,
+    status: result.status,
+    result,
     undo,
     reset,
-    originalPrompt,
+    originalPrompt: result.originalPrompt,
   };
 }

@@ -27,12 +27,21 @@ Message: "${firstMessage}"
 `;
 
 export const ENHANCE_PROMPT_INSTRUCTION = `
-You are an expert AI prompt engineer. Your task is to rewrite the user's prompt to be clearer, more specific, and highly effective for an LLM to answer.
-If conversation history is provided, ensure the enhanced prompt logically follows the ongoing discussion context.
-You MUST return a valid JSON object containing exactly one key: "enhancedPrompt".
+You are an expert AI prompt engineer. Your task is to analyze the user's prompt and determine if it can be enhanced, or if it is too vague and requires more information.
+If conversation history is provided, use it for context.
 
-Example format:
+You MUST return a valid JSON object matching exactly ONE of these two formats:
+
+Format 1 (If you can improve it):
 {
-  "enhancedPrompt": "Explain the step-by-step process of how React hydration works, specifically addressing how it handles mismatches between server and client."
+  "status": "improved",
+  "enhancedPrompt": "The fully rewritten, detailed prompt...",
+  "rationale": "Briefly explain why this is better (e.g., 'Added specificity about the framework and desired output format.')."
+}
+
+Format 2 (If the prompt is completely vague, lacking crucial context, or ambiguous):
+{
+  "status": "needs_info",
+  "questions": ["What specific programming language are you using?", "Are there any error codes?"]
 }
 `;

@@ -278,11 +278,9 @@ export const chatService = {
       },
     ];
 
-    // Inject history if chatId is provided so Groq understands the context
     if (chatId) {
       const chat = await prisma.chat.findUnique({ where: { id: chatId } });
 
-      // Only attach context if the user owns the chat
       if (chat && chat.userId === userId) {
         const history = await prisma.message.findMany({
           where: { chatId },
@@ -302,8 +300,8 @@ export const chatService = {
     }
 
     messages.push({
-      role: "user" as const,
-      content: `Please enhance this prompt: \n\n${prompt}`,
+      role: "user",
+      content: `Please analyze and enhance this prompt: \n\n${prompt}`,
     });
 
     try {
@@ -315,17 +313,15 @@ export const chatService = {
 
       const outputText = completion.choices[0]?.message?.content;
 
-      if (!outputText) {
-        throw new Error("Groq returned an empty response.");
-      }
+      if (!outputText) throw new Error("Groq returned an empty response.");
 
-      const parsed = JSON.parse(outputText);
+      const parsed = JSON.parse(outputText) as EnhancePromptResponse;
 
-      console.log(`⚡ [Groq] Successfully enhanced prompt.`);
+      console.log(
+        `⚡ [Groq] Successfully evaluated prompt. Status: ${parsed.status}`
+      );
 
-      return {
-        enhancedPrompt: parsed.enhancedPrompt || prompt,
-      };
+      return parsed;
     } catch (error) {
       console.error(
         `⚡❌ [Groq Error] Failed to enhance prompt, falling back to original.`
@@ -333,8 +329,11 @@ export const chatService = {
 
       logError(error);
 
-      // Graceful fallback: return original prompt if the LLM request fails
-      return { enhancedPrompt: prompt };
+      return {
+        status: "improved",
+        enhancedPrompt: prompt,
+        rationale: "Network error. Using original prompt.",
+      };
     }
   },
 

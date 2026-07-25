@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowUp, Loader2, Sparkles, Square } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useSimulatedEnhancePrompt } from "../hooks/use-simulated-enhance-prompt";
+import { useEnhancePrompt } from "../hooks/use-enhance-prompt";
 import { ContextualActionBar } from "./contextual-action-bar";
 import { siteConfig } from "@/config/site";
 
@@ -34,7 +34,8 @@ export function ChatInputForm({
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const enhancer = useSimulatedEnhancePrompt();
+  // 2. Use the real hook here
+  const enhancer = useEnhancePrompt();
 
   const adjustHeight = () => {
     if (textareaRef.current) {
@@ -112,7 +113,7 @@ export function ChatInputForm({
     <div className="w-full flex flex-col items-center">
       <div className="w-full max-w-3xl">
         <ContextualActionBar
-          result={enhancer}
+          result={enhancer.result}
           onUndo={handleUndo}
           onDismiss={handleDismiss}
         />

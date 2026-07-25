@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, AlertCircle, RotateCcw, X } from "lucide-react";
-import { EnhancementResult } from "../hooks/use-simulated-enhance-prompt";
+import { EnhancementResult } from "../hooks/use-enhance-prompt";
 
 interface ContextualActionBarProps {
   result: EnhancementResult;
@@ -13,7 +13,11 @@ export function ContextualActionBar({
   onUndo,
   onDismiss,
 }: ContextualActionBarProps) {
-  if (result.status === "idle" || result.status === "loading") {
+  if (
+    result.status === "idle" ||
+    result.status === "loading" ||
+    result.status === "error"
+  ) {
     return null;
   }
 
@@ -28,9 +32,11 @@ export function ContextualActionBar({
             <p className="text-sm font-medium text-foreground">
               Prompt enhanced for clarity
             </p>
-            <p className="text-xs text-foreground/70 leading-relaxed">
-              {result.rationale}
-            </p>
+            {result.rationale && (
+              <p className="text-xs text-foreground/70 leading-relaxed">
+                {result.rationale}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0 ml-4">
