@@ -1,3 +1,5 @@
+## ChatSDKX
+
 ### Why This Exists
 
 chatsdkx is a comprehensive chat application framework designed to simplify the development of scalable and secure chat applications. It provides a robust set of features for managing user authentication, chat functionality, and email communication, ensuring a seamless user experience.
